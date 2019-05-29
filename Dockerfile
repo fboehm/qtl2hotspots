@@ -4,7 +4,7 @@ FROM rocker/verse:3.5.3
 # required
 MAINTAINER Frederick Boehm <frederick.boehm@gmail.com>
 
-COPY . /home/hotspots
+COPY . /home/rstudio/hotspots
 
 # go into the repo directory
 RUN . /etc/environment \
@@ -15,8 +15,8 @@ RUN . /etc/environment \
   && sudo apt-get install libudunits2-dev -y \
   \
   # build this compendium package
-  && R -e "devtools::install('/home/hotspots', dep=TRUE)" \
+  && R -e "devtools::install('/home/rstudio/hotspots', dep=TRUE)" \
   \
  # render the manuscript into a docx, you'll need to edit this if you've
  # customised the location and name of your main Rmd file
-  && R -e "rmarkdown::render('/home/hotspots/analysis/paper/paper.Rmd')"
+  && R -e "rmarkdown::render('/home/rstudio/hotspots/analysis/paper/paper.Rmd')"
