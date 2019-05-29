@@ -22,7 +22,7 @@ after_success:
   - docker login -u $DOCKER_USER -p $DOCKER_PASS
   - export REPO=$DOCKER_USER/hotspots
   - export TAG=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "latest"; else echo $TRAVIS_BRANCH ; fi`
-  - docker build -t fboehm/hotspots:$COMMIT .
+  - docker build .
   - docker tag fboehm/hotspots:$COMMIT fjboehm/hotspots:$TAG
   - docker tag fboehm/hotspots:$COMMIT fjboehm/hotspots:travis-$TRAVIS_BUILD_NUMBER
   - docker push $REPO
