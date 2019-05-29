@@ -4,7 +4,7 @@ FROM rocker/verse:3.5.3
 # required
 MAINTAINER Frederick Boehm <frederick.boehm@gmail.com>
 
-COPY . /hotspots
+COPY . /home/hotspots
 
 # go into the repo directory
 RUN . /etc/environment \
