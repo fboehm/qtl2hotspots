@@ -48,6 +48,11 @@ Here is a citation [@Marwick2017]
 
 # Results
 
+```{r}
+install.packages("here")
+```
+
+
 ```{r get-data, eval = FALSE}
 # Note the path that we need to use to access our data files when rendering this document
 my_data <- read.csv(here::here('analysis', 'data', 'raw_data', 'my_csv_file.csv'))
