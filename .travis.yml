@@ -13,16 +13,15 @@ language: generic
 services:
   - docker
 
+deploy:
+  provider: script
+  script: bash docker_push
+  on:
+    branch: master
+
+
+
 before_install:
     # create & run container using our dockerfile, i.e. compile pkg and render Rmd to Word doc
   - docker build -t fboehm/hotspots .
 
-# push our custom docker container to docker hub, env vars stored on travis-ci.org
-after_success:
-  - docker login -u $DOCKER_USER -p $DOCKER_PASS
-  - export REPO=$DOCKER_USER/hotspots
-  - export TAG=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "latest"; else echo $TRAVIS_BRANCH ; fi`
-  - docker build .
-  - docker tag fboehm/hotspots:$COMMIT fjboehm/hotspots:$TAG
-  - docker tag fboehm/hotspots:$COMMIT fjboehm/hotspots:travis-$TRAVIS_BUILD_NUMBER
-  - docker push $REPO
