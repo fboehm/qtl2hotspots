@@ -15,7 +15,7 @@ RUN . /etc/environment \
   && sudo apt-get install libudunits2-dev -y \
   \
   # build this compendium package
-  && R -e "devtools::install('/hotspots', dep=TRUE)" \
+  && R -e "devtools::install('/home/hotspots', dep=TRUE)" \
   \
  # render the manuscript into a docx, you'll need to edit this if you've
  # customised the location and name of your main Rmd file
