@@ -24,4 +24,7 @@ deploy:
 before_install:
     # create & run container using our dockerfile, i.e. compile pkg and render Rmd to Word doc
   - docker build -t fboehm/hotspots .
+  - docker tag fboehm/hotspots fjboehm/hotspots:$COMMIT
+  - docker tag fjboehm/hotspots:$COMMIT fjboehm/hotspots:$TAG
+  - docker tag fjboehm/hotspots:$COMMIT fjboehm/hotspots:travis-$TRAVIS_BUILD_NUMBER
 
