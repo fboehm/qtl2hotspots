@@ -25,5 +25,4 @@ before_install:
     # create & run container using our dockerfile, i.e. compile pkg and render Rmd to Word doc
   - docker build -t fjboehm/hotspots:$TRAVIS_COMMIT .
   - docker tag fjboehm/hotspots:$TRAVIS_COMMIT fjboehm/hotspots:travis-$TRAVIS_BUILD_NUMBER
-  - docker tag fjboehm/hotspots:$TRAVIS_COMMIT fjboehm/hotspots:latest
 
