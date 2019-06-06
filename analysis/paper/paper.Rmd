@@ -82,7 +82,7 @@ Studies of complex traits in mammalian multiparental populations, such as the Di
 # Results
 
 ```{r}
-install.packages("here")
+install.packages("here", repos = "https://cloud.r-project.org")
 ```
 
 
