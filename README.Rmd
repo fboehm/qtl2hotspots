@@ -27,6 +27,19 @@ The goal of hotspots is to ...
 
 ## Installation
 
+Install from Dockerhub with this command:
+
+```{bash, docker_pull, eval = FALSE}
+docker pull fjboehm/hotspots
+```
+
+Alternatively, if you wish to install the package directly from Github, use `devtools`.
+
+```{r, devtools_stuff, eval = FALSE}
+install.packages("devtools")
+devtools::install_github("fboehm/hotspots")
+```
+
 
 ## Example
 
@@ -38,6 +51,19 @@ This is a basic example which shows you how to solve a common problem:
 ```
 
 ## Build the manuscript `paper.Rmd`
+
+To render the manuscript `paper.Rmd`, into html, tex, and pdf, use a shell to enter the following text from the 'hotspots' directory:
+
+```{bash, docker_build, eval = FALSE}
+docker build .
+```
+
+If you're not using Docker, and have cloned the repository from Github, you can use the Makefile to render `paper.Rmd`. Just type `make` in the shell:
+
+```{bash, make, eval = FALSE}
+make
+```
+
 
 
 
