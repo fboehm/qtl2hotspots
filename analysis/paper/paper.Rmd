@@ -71,6 +71,12 @@ Studies of complex traits in mammalian multiparental populations, such as the Di
 
 # Methods
 
+
+
+
+
+
+
 # Results
 
 ```{r}

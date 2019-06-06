@@ -23,6 +23,8 @@ This is a basic example which shows you how to solve a common problem:
 ## basic example code
 ```
 
+## Build the manuscript `paper.Rmd`
+
 ## Code of Conduct
 
 Please note that the ‘hotspots’ project is released with a [Contributor
