@@ -11,7 +11,28 @@ output:
 bibliography: references.bib
 csl: "../templates/journal-of-archaeological-science.csl" # Insert path for the bib-style
 abstract: |
-  Text of abstract
+  High-dimensional traits in multiparental populations of model organisms offer 
+  unprecedented opportunities to understand relationships between genotypic 
+  variation and phenotypic variation. The ability to infer founder haplotypes in 
+  multiparental populations combined with the measurement of molecular phenotypes 
+  in hundreds of mammalian subjects has produced insights into diverse biological 
+  processes.
+  
+  Quantitative trait locus (QTL) mapping of one trait at a time provides insights 
+  into genetic underpinnings of complex traits. Furthermore, multivariate QTL
+  mapping enables identification of pleiotropic QTL. Mediation analysis is widely 
+  used to identify causal relationships among pairs of biomolecular traits. We 
+  examine and compare two strategies, mediation analysis and pleiotropy testing, 
+  for understanding relationships among traits. We apply our approach to five 
+  expression trait hotspots that Keller, et al. (2018) identified in pancreatic 
+  islets from nearly 400 Diversity Outbred mice. 
+  
+  At each hotspot, we identify local transcripts and nonlocal transcripts. We then 
+  perform bivariate pleiotropy tests for all pairs involving one local and one 
+  nonlocal transcript. Our mediation analyses consider each local transcript as a 
+  candidate mediator for each nonlocal transcript. We summarize our findings with 
+  the pleiotropy test statistics and LOD difference statistics. We conclude with 
+  recommended practices for dissection of expression trait hotspots.
 keywords: |
   keyword 1; keyword 2; keyword 3
 highlights: |
