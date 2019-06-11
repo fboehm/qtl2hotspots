@@ -10,7 +10,7 @@ output:
       reference_docx: "../templates/template.docx" # Insert path for the DOCX file
     pdf_document:
       keep_tex: yes
-bibliography: references.bib
+bibliography: research.bib
 csl: "../templates/journal-of-archaeological-science.csl" # Insert path for the bib-style
 abstract: |
   High-dimensional traits in multiparental populations of model organisms offer 
