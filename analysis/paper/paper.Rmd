@@ -59,7 +59,7 @@ library(hotspots) # Or use devtools::load_all('.', quiet = T) if your code is in
 
 # Introduction
 
-Here is a citation [@Marwick2017]
+
 
 Studies of complex traits in mammalian multiparental populations, such as the Diversity Outbred mice, have generated insights into many biological processes, including pancreatic islet gene expression patterns, <!-- look at articles that cite DO papers  -->
 
