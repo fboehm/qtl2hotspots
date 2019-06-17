@@ -1,5 +1,5 @@
 \documentclass[oneside]{book}
-\usepackage[colorinlistoftodos]{todonotes}
+%\usepackage[colorinlistoftodos]{todonotes}
 \usepackage[utf8]{inputenc}
 %\usepackage{lineno}
 %\linenumbers
