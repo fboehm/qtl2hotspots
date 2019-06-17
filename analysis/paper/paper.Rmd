@@ -63,15 +63,17 @@ library(hotspots) # Or use devtools::load_all('.', quiet = T) if your code is in
 
 Studies of complex traits in mammalian multiparental populations, such as the Diversity Outbred mice, have generated insights into many biological processes, including pancreatic islet gene expression patterns, <!-- look at articles that cite DO papers  -->
 
+@chick2016defining 
 
 
 # Background
 
-```{r demo, eval = FALSE}
-1 + 1
-```
 
 # Methods
+
+@keller2018genetic studied gene expression in pancreatic islets of 378 Diversity Outbred mice. They used RNA sequencing technology to quantify 21,771 distinct transcripts. They publicly shared these data at this url. 
+
+We performed pleiotropy tests and mediation analyses at each of five hotspots that @keller2018genetic identified. They are located on Chromosomes 2, 5, 7, 11, and 13 .
 
 
 
@@ -81,9 +83,30 @@ Studies of complex traits in mammalian multiparental populations, such as the Di
 
 # Results
 
-```{r}
-install.packages("here", repos = "https://cloud.r-project.org")
-```
+
+## Chr 2 hotspot
+
+
+
+
+## Chr 5 hotspot
+
+
+
+
+## Chr 7 hotspot
+
+
+
+
+## Chr 11 hotspot
+
+
+
+
+## Chr 13 hotspot
+
+
 
 
 ```{r get-data, eval = FALSE}

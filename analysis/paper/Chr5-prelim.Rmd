@@ -1,0 +1,367 @@
+---
+title: "Chr5 hotspot preliminary analyses"
+author: "Frederick Boehm"
+date: "6/11/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, load_attie}
+load("~/Box Sync/attie/keller2018-chr2-hotspot-chtc/data-to-ignore/Attie_DO378_eQTL_viewer_v1.Rdata")
+ls()
+library(tidyverse)
+```
+
+```{r checks}
+dataset.islet.rnaseq$expr %>%
+  dim
+colnames(dataset.islet.rnaseq$expr) %>%
+  head
+```
+
+We need to get the names of the nonlocal traits that map to Chromosome 5 hotspot. 
+
+```{r, make_Chr5_tib}
+dataset.islet.rnaseq$annots %>%
+  colnames
+#dataset.islet.rnaseq$annots$hotspot
+dataset.islet.rnaseq$annots %>%
+  filter(hotspot == "chr5") -> hotspot_annot_tib
+dim(hotspot_annot_tib)
+```
+
+Keller et al., in their supplementary files, reported 182 transcripts, yet I've isolated only 180 here. 
+
+I previously documented the issue with the Attie data set's hotspot annotations. Namely, when that file was created, they permitted the "hotspot" field to be only a single value per transcript. Thus, if a transcript mapped to multiple hotspots, it would still have only a single value in this "hotspot" field. Because of this, I need to first redo the mediation analyses that Keller did. 
+
+Specifically, I'll isolate all ~600 or so transcripts that map to at least one hotspot per the hotspot annotation. I'll then perform mediation analyses with each (for the appropriate local transcript).
+
+
+```{r}
+dataset.islet.rnaseq$annots %>%
+  filter(!is.na(hotspot)) -> hotspot_all_tx
+dim(hotspot_all_tx)
+```
+
+I have 671 transcripts. Let's examine all 671 at each of the four hotspots that I have yet to study, ie, those on Chromosomes 5, 7, 11, and 13. Actually, before I do that, I want to get the genome-wide scan results for these 671 transcripts to see, for each, which hotspots they map to.
+
+```{r get_671_tx}
+tx671 <- dataset.islet.rnaseq$expr[ , colnames(dataset.islet.rnaseq$expr) %in% hotspot_all_tx$gene_id]
+dim(tx671)  
+```
+
+
+```{r load_qtl2}
+library(qtl2)
+```
+
+I forgot that the LOD peaks for all traits are saved in `dataset.islet.rnaseq$lod.peaks`. It has nearly 40,000 peaks recorded. I really just need to look at it. That is, for now, I don't really need the output of `scan1()`.
+
+We want the ensembl ids for the traits that map to Chr 5 hotspot. First, define the boundaries of the hotspot. The supplemental table in Keller et al. 2018 lists only the midpoint of the hotspot. The half-width is 2 Mb.
+
+```{r}
+c5hot_lower <- 144
+c5hot_upper <- 148
+```
+
+Now, filter to get those traits that map to the hotspot. Note that we're likely to get local traits, too, in this step.
+
+```{r}
+dataset.islet.rnaseq$lod.peaks %>%
+  filter(chrom == 5, pos <= c5hot_upper, pos >= c5hot_lower) %>%
+  left_join(y = dataset.islet.rnaseq$annots, by = c("annot.id" = "gene_id")) %>%
+  filter(!duplicated(annot.id)) %>%
+  filter(lod >= 7.18)
+```
+
+The above yields 226 expression traits that map to the hotspot on Chr 5. The list includes both local and nonlocal traits. We'll create two distinct objects, one for locals and one for nonlocal traits.
+
+```{r}
+local_annot <- dataset.islet.rnaseq$lod.peaks %>%
+  filter(chrom == 5, pos <= c5hot_upper, pos >= c5hot_lower) %>%
+  left_join(y = dataset.islet.rnaseq$annots, by = c("annot.id" = "gene_id")) %>%
+  filter(!duplicated(annot.id)) %>%
+  filter(lod >= 7.18) %>%
+  mutate(local_tx = chr ==5) %>%
+  filter(local_tx)
+```
+
+```{r}
+dim(local_annot)
+```
+
+
+
+```{r}
+nonlocal_annot <- dataset.islet.rnaseq$lod.peaks %>%
+  filter(chrom == 5, pos <= c5hot_upper, pos >= c5hot_lower) %>%
+  left_join(y = dataset.islet.rnaseq$annots, by = c("annot.id" = "gene_id")) %>%
+  filter(!duplicated(annot.id)) %>%
+  filter(lod >= 7.18) %>% #genomewide threshold
+  mutate(local_tx = chr == 5) %>%
+  filter(!local_tx) %>% 
+  filter(!is.na(hotspot))
+```
+
+
+```{r}
+dim(nonlocal_annot)
+```
+
+We'll use only those nonlocal traits that Keller et al. annotated as mapping to a hotspot.
+
+This gives us 182 traits for Chr 5 hotspot, which is what Keller et al. reported.
+
+We also want to look at the local traits for Chr5 hotspot. We have 42 local traits. We want to identify a subset of those for two-dimensional scans. Let's first limit to those near the hotspot, ie, within 5Mb of either end.
+
+```{r}
+local_annot2 <- local_annot %>%
+  filter(middle <= c5hot_upper + 5, middle >= c5hot_lower - 5) %>%
+  arrange(desc(lod))
+```
+
+Recall that *Pdx1* is the gene that Keller et al. identified as the key mediator for Chr 5 hotspot. Its LOD is only 15, which seems to indicate that I should be looking at a broad set of local traits, not just those, eg., with LOD > 40!
+
+Also, I'm limiting consideration of local genes to those with middle within 5Mb of the hotspot. 
+
+Now, I make the two expression trait matrices that I need for use with Condor.
+
+```{r}
+Chr5hot_local <- dataset.islet.rnaseq$expr[, colnames(dataset.islet.rnaseq$expr) %in% local_annot2$annot.id]
+Chr5hot_nonlocal <- dataset.islet.rnaseq$expr[, colnames(dataset.islet.rnaseq$expr) %in% nonlocal_annot$annot.id]
+```
+
+Prepare the covariates matrix for input to `fit1_med`.
+
+```{r define_addcovar}
+addcovar <- dataset.islet.rnaseq$covar[rownames(dataset.islet.rnaseq$covar) %in% rownames(Chr5hot_local), 1:4] 
+```
+
+Calls to `fit1_med`
+
+```{r install_intermediate}
+devtools::install_github("fboehm/qtl2mediate")
+```
+
+We then define the driver object. Note that we use the marker that corresponds to each nonlocal trait's peak position.
+
+```{r define_dri}
+# need the index of the peak for every nonlocal trait
+indices <- nonlocal_annot %>%
+  mutate(marker_index = purrr::map_int(.x = marker.id, .f = function(x){which(names(map$`5`) == x)})) %>%
+  select(marker_index) %>%
+  unlist() %>%
+  as.integer()
+```
+
+```{r}
+nonlocal_annot$marker.id[1] -> aa
+which(names(map$`5`) == aa)
+```
+
+
+
+
+
+
+```{r fit1_med}
+nlocal <- ncol(Chr5hot_local)
+nnonlocal <- ncol(Chr5hot_nonlocal)
+out <- list()
+out2 <- list()
+for (j in 1:nlocal){
+  foo <- list()
+  foo2 <- list()
+  for (i in 1:nnonlocal){
+    foo[[i]]<- qtl2mediate::fit1_med(driver = genoprobs$`5`[rownames(genoprobs$`5`) %in% rownames(Chr5hot_local) , , indices[i]], 
+                                      # genoprobs at peak position for nonlocal trait
+                                      target = Chr5hot_nonlocal[ , i], 
+                                      mediator = Chr5hot_local[ , j], 
+                                      addcovar = addcovar
+         )
+    foo2[[i]] <- qtl2mediate:::fit1_med_qtl2(driver = genoprobs$`5`[, , indices[i]],
+                                             target = Chr5hot_nonlocal[ , i],
+                                             mediator = Chr5hot_local[ , j],
+                                             addcovar = addcovar
+                                             )
+  }
+  out[[j]] <- foo
+  out2[[j]] <- foo2
+}
+```
+
+We need to be careful when creating the `local_gene_id` and `nonlocal_gene_id` objects. 
+
+```{r tabulate, message=FALSE, warning = FALSE}
+tib <- out %>%
+  purrr::map(bind_rows) %>%
+  bind_rows() %>%
+  as_tibble() %>%
+  mutate(local_gene_id = rep(colnames(Chr5hot_local), each = nnonlocal), nonlocal_gene_id = rep(colnames(Chr5hot_nonlocal), times = nlocal)) %>%
+  mutate(lod_without_med = (ll_d - ll_1) / log(10), lod_with_med = (ll_dm - ll_1m) / log(10), lod_diff = lod_without_med - lod_with_med, lod_diff_proportion = lod_diff / lod_without_med) %>%
+  left_join(local_annot2, by = c("local_gene_id" = "annot.id")) %>%
+  left_join(nonlocal_annot, by = c("nonlocal_gene_id" = "annot.id")) %>%
+  select(symbol.x, symbol.y, lod_without_med, lod_with_med, lod_diff, lod_diff_proportion, local_gene_id, nonlocal_gene_id) %>%
+  rename(local_symbol = symbol.x, nonlocal_symbol = symbol.y)
+```
+
+
+
+
+
+We also added gene symbols to the tibble. 
+
+## Reading pleiotropy test results
+
+```{r read_pleio_results}
+results_dir <- "~/Box Sync/attie/keller-hotspots/results/pvl-run-9901"
+dir(results_dir) -> fns
+mylist <- list()
+for (i in 1:length(fns)){
+  mylist[[i]] <- read.table(file.path(results_dir, fns[i])) %>%
+  as_tibble() %>%
+  mutate(filename = fns[i]) %>%
+  mutate(local_gene_id = stringr::str_split(fns[i], "_")[[1]][[3]], nonlocal_gene_id = stringr::str_split(stringr::str_split(fns[i], "_")[[1]][[4]], ".txt")[[1]][[1]]) %>%
+  filter(lod == max(lod), trace == "profile1") %>%
+  select(local_gene_id, nonlocal_gene_id, lod, filename)
+}
+mylist %>%
+  bind_rows() %>%
+  rename(pleiotropy_lod = lod) %>%
+  left_join(tib, by = c("local_gene_id", "nonlocal_gene_id")) %>%
+  select(local_symbol, nonlocal_symbol, pleiotropy_lod, lod_diff, lod_diff_proportion, lod_without_med, lod_with_med, filename, nonlocal_gene_id, local_gene_id) %>%
+  group_by(nonlocal_symbol) %>%
+  filter(lod_diff == max(lod_diff)) %>%
+  arrange(local_symbol, desc(lod_diff))
+```
+
+We want to identify, for each nonlocal transcript, which local transcript gives the greatest `lod_diff` value.
+
+```{r}
+(counts1 <- mylist %>%
+  bind_rows() %>%
+  rename(pleiotropy_lod = lod) %>%
+  left_join(tib, by = c("local_gene_id", "nonlocal_gene_id")) %>%
+  select(local_symbol, nonlocal_symbol, pleiotropy_lod, lod_diff, lod_diff_proportion, lod_without_med, lod_with_med, filename, nonlocal_gene_id, local_gene_id) %>%
+  group_by(nonlocal_symbol) %>%
+  filter(lod_diff == max(lod_diff)) %>%
+  arrange(local_symbol, desc(lod_diff)) %>%
+  plyr::ddply(.variables = "local_symbol", .fun = count) %>%
+  arrange(desc(n)) %>%
+  rename(n_no_pleio_thresh = n)
+)
+```
+
+
+```{r}
+pleiotropy_threshold <- 3
+mylist %>%
+  bind_rows() %>%
+  rename(pleiotropy_lod = lod) %>%
+  left_join(tib, by = c("local_gene_id", "nonlocal_gene_id")) %>%
+  select(local_symbol, nonlocal_symbol, pleiotropy_lod, lod_diff, lod_diff_proportion, lod_without_med, lod_with_med, filename, nonlocal_gene_id, local_gene_id) %>%
+  group_by(nonlocal_symbol) %>%
+  filter(pleiotropy_lod < pleiotropy_threshold) %>%
+  filter(lod_diff == max(lod_diff)) %>%
+  arrange(local_symbol, desc(lod_diff)) %>%
+  plyr::ddply(.variables = "local_symbol", .fun = count) %>%
+  arrange(desc(n)) %>%
+  rename(n_with_pleio_thresh_3 = n) %>%
+  left_join(counts1)
+```
+
+
+```{r}
+mylist %>%
+  bind_rows() %>%
+  rename(pleiotropy_lod = lod) %>%
+  left_join(tib, by = c("local_gene_id", "nonlocal_gene_id")) %>%
+  select(local_symbol, nonlocal_symbol, pleiotropy_lod, lod_diff, lod_diff_proportion, lod_without_med, lod_with_med, filename, nonlocal_gene_id, local_gene_id) %>%
+  filter(local_symbol == "Rpl21") %>%
+  arrange(desc(lod_diff)) %>%
+  filter(pleiotropy_lod < pleiotropy_threshold)
+```
+
+```{r}
+mylist %>%
+  bind_rows() %>%
+  rename(pleiotropy_lod = lod) %>%
+  left_join(tib, by = c("local_gene_id", "nonlocal_gene_id")) %>%
+  select(local_symbol, nonlocal_symbol, pleiotropy_lod, lod_diff, lod_diff_proportion, lod_without_med, lod_with_med, filename, nonlocal_gene_id, local_gene_id) %>%
+  filter(local_symbol == "Pdx1") %>%
+  arrange(desc(lod_without_med)) %>%
+  filter(pleiotropy_lod < pleiotropy_threshold)
+  
+
+```
+
+## Scatter plots of LOD difference & pleiotropy test statistics
+
+```{r}
+p <- mylist %>%
+  bind_rows() %>%
+  rename(pleiotropy_lod = lod) %>%
+  left_join(tib, by = c("local_gene_id", "nonlocal_gene_id")) %>%
+  select(local_symbol, nonlocal_symbol, pleiotropy_lod, lod_diff, lod_diff_proportion, lod_without_med, lod_with_med, filename, nonlocal_gene_id, local_gene_id) %>%
+  ggplot() + geom_point(mapping = aes(x = pleiotropy_lod, y = lod_diff, colour = local_symbol, nonlocal = nonlocal_symbol), size = 0.1)
+plotly::ggplotly(p)
+
+```
+
+
+
+```{r, plotly_by_local, fig.height=20}
+p <- mylist %>%
+  bind_rows() %>%
+  rename(pleiotropy_lod = lod) %>%
+  left_join(tib, by = c("local_gene_id", "nonlocal_gene_id")) %>%
+  select(local_symbol, nonlocal_symbol, pleiotropy_lod, lod_diff, lod_diff_proportion, lod_without_med, lod_with_med, filename, nonlocal_gene_id, local_gene_id) %>%
+  ggplot() + geom_point(mapping = aes(x = pleiotropy_lod, y = lod_diff, colour = local_symbol, nonlocal = nonlocal_symbol), size = 0.1) + facet_wrap(. ~ local_symbol, nrow = 20, ncol = 2) + theme(legend.position = "none")
+plotly::ggplotly(p)
+```
+
+
+```{r, plotly_by_nonlocal, fig.height=46}
+p <- mylist %>%
+  bind_rows() %>%
+  rename(pleiotropy_lod = lod) %>%
+  left_join(tib, by = c("local_gene_id", "nonlocal_gene_id")) %>%
+  select(local_symbol, nonlocal_symbol, pleiotropy_lod, lod_diff, lod_diff_proportion, lod_without_med, lod_with_med, filename, nonlocal_gene_id, local_gene_id) %>%
+  ggplot() + geom_point(mapping = aes(x = pleiotropy_lod, y = lod_diff, colour = local_symbol, nonlocal = nonlocal_symbol), size = 0.1) + facet_wrap(. ~ nonlocal_symbol, nrow = 46, ncol = 4) + theme(legend.position = "none")
+plotly::ggplotly(p)
+```
+
+
+
+
+
+## Are the lods from fit1_med correct?
+
+Yes.
+
+I see that a large number of nonlocal transcripts have `lod_without_med` values below 7.18. While the 7.18 threshold was determined with the mixed model, I still find the large number of transcripts unusual.
+
+First, a given nonlocal transcript should have a single value for `lod_without_med`, regardless of which local transcript it's paired with. Let's verify this.
+
+
+```{r, check1}
+mylist %>%
+  bind_rows() %>%
+  rename(pleiotropy_lod = lod) %>%
+  left_join(tib, by = c("local_gene_id", "nonlocal_gene_id")) %>%
+  select(local_symbol, nonlocal_symbol, pleiotropy_lod, lod_diff, lod_diff_proportion, lod_without_med, lod_with_med, filename, nonlocal_gene_id, local_gene_id) %>% 
+  arrange(nonlocal_symbol)
+```
+
+```{r, check_table}
+mylist %>%
+  bind_rows() %>%
+  select(lod) %>%
+  mutate(indic = lod > 5) %>%
+  select(indic) %>%
+  table()
+```
+

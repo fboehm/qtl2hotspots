@@ -45,7 +45,7 @@ library(tidyverse)
 library(qtl2chtc)
 ```
 
-```{r}
+```{r, eval = TRUE}
 find_missing_jobs(DIR = "~/Box Sync/attie/keller-hotspots/results/pvl-run-9901", njobs = 6734, outfile = "~/Box Sync/attie/keller-hotspots/submit_files/run9901-bad")
 find_missing_jobs(DIR = "~/Box Sync/attie/keller-hotspots/results/pvl-run-9911", njobs = 8979, outfile = "~/Box Sync/attie/keller-hotspots/submit_files/run9911-bad")
 find_missing_jobs(DIR = "~/Box Sync/attie/keller-hotspots/results/pvl-run-9921", njobs = 10332, outfile = "~/Box Sync/attie/keller-hotspots/submit_files/run9921-bad")
