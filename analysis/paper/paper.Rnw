@@ -148,8 +148,11 @@
 <<include=FALSE>>=
 library(knitr)
 opts_chunk$set(
-concordance=TRUE, echo = FALSE, fig.lp = "fig:", warning = FALSE, message = FALSE, results = "hide"
-)
+concordance=TRUE,
+echo = TRUE,
+fig.lp = "../figures:",
+warning = FALSE,
+message = FALSE)
 @
 
 
