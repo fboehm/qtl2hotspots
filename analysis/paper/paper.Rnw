@@ -154,7 +154,6 @@ concordance=TRUE, echo = FALSE, fig.lp = "fig:", warning = FALSE, message = FALS
 
 
 \doublespacing
-\begin{titlepage}\thispagestyle{empty}
 \tableofcontents
 %\listoffigures
 %\listoftables
@@ -309,18 +308,6 @@ and founder allele dosages. In fact, the extent of the reduction in association
 strength indicates that the primary pathway by which the genetic marker affects DHTKD1
 protein concentrations is through \emph{Dhtkd1} transcript levels.
 
-\begin{figure}
-  \centering
-  \includegraphics[width = 0.7\textwidth]{../QTLfigs/Figs/central_dogma.pdf}
-  \caption{Biological information is encoded in DNA. This information is passed, via transcription, to sequence-specific RNA molecules. The process of translation transmits the information to sequence-specific proteins.}\label{fig:dogma}
-\end{figure}
-
-
-\begin{figure}
-  \centering
-  \includegraphics[width = 0.7\textwidth]{../QTLfigs/Figs/central_dogma-Dhtkd1.pdf}
-  \caption{A DNA variant in the \emph{Dhtkd1} gene affects \emph{Dhtkd1} transcript abundances which, in turn, affect DHTKD1 protein concentrations.}\label{fig:Dhtkd1}
-\end{figure}
 
 
 In our studies below, we follow \citet{keller2018genetic} by generalizing this setting to
@@ -508,10 +495,6 @@ level - nonlocal transcript level relationship, and the DNA variant - local tran
 relationship. Failure to measure C1, C2, or C3 leads to violations of Assumption 1,
 Assumption 2, or Assumption 3, respectively (Frame~\ref{frame1}).
 
-\begin{figure}
-\includegraphics{figs/confounding.pdf}
-\caption{Example causal diagram showing relationships between random variables in an expression QTL study.}\label{fig:confounding}
-\end{figure}
 
 
 
@@ -724,18 +707,6 @@ score for the association between nonlocal trait and QTL.
 
 
 
-\begin{figure}
-    \centering
-    \includegraphics[width = 0.7\textwidth]{../keller2018-chr2-hotspot-chtc/Rmd/lod-diff-prop-v-lrt.eps}
-    \caption[LOD difference proportion vs. pleiotropy test statistic]{LOD difference proportion against pleiotropy vs. separate QTL test statistics for 1911 pairs of traits.
-    Each point represents a single pair. Pairs that involve local expression trait \emph{Hnf4a} are colored red, while all others are colored blue.
-    Note the high concentration of red points in the upper left quadrant of the figure.
-    These points, with low values of the pleiotropy vs. separate QTL test statistic and
-    high values of LOD difference proportion, are consistent with \emph{Hnf4a} transcript
-    levels mediating the effect of \emph{Hnf4a} genetic variants affecting nonlocal
-    transcript abundances.}
-    \label{fig:lod-diff-prop-v-lrt-all}
-\end{figure}
 
 %\subsection{Local gene analyses}
 
@@ -763,26 +734,6 @@ However, each of \emph{Serinc3}, \emph{Stk4}, \emph{Neurl2}, and \emph{Cdh22}
 has very few points with LOD difference proportion above 0.5,
 while \emph{Hnf4a} has many points with LOD difference proportion above 0.5.
 
-\begin{figure}
-    \centering
-    \includegraphics[width = \textwidth]{../keller2018-chr2-hotspot-chtc/Rmd/Hnf4a-lod-diff-prop-v-lrt.eps}
-    \caption[LOD difference proportion vs. pleiotropy test statistic.]{Scatter plot of LOD difference proportion against pleiotropy vs.
-    separate QTL test statistic for 147 pairs of traits.
-    Each pair includes \emph{Hnf4a} and one of the nonlocal gene expression traits that map to the Chromosome 2 hotspot.}
-    \label{fig:hnf4a}
-\end{figure}
-
-\begin{figure}
-    \centering
-    \includegraphics[width = 0.8\textwidth]{../keller2018-chr2-hotspot-chtc/Rmd/12local-facet_grid-no-strip.eps}
-    \caption[LOD difference proportion vs. pleiotropy test statistic from the per-local gene perspective.]{Scatter plots of LOD difference proportion against pleiotropy vs. separate QTL
-    test statistic with 147 pairs of traits per panel.
-    Each panel includes a local gene expression trait
-    (per the label in the upper right quadrant) and one of the 147 nonlocal gene
-    expression traits that map to the Chromosome 2 hotspot.}
-    \label{fig:nothnf4a-12}
-\end{figure}
-
 
 
 
@@ -807,32 +758,6 @@ difference proportion. This tells me that \emph{Hnf4a} shares a pleiotropic locu
 \emph{Tmprss4} and \emph{Gm3095}, yet none of the 13 local gene expression traits mediates
 the relationship between these two nonlocal traits and the QTL.
 
-
-\begin{figure}
-    \centering
-    \caption{Scatter plots for four nonlocal expression traits. Each plot features 13
-    points, one for each local gene expression trait. The vertical axis denotes LOD
-    difference proportion values, while the horizontal axis corresponds to pleiotropy test
-    statistics. Red points represent the pairing with local gene expression trait
-    \emph{Hnf4a}. Blue points represent the other 12 local gene expression traits.}
-    \begin{subfigure}[t]{.45\textwidth}
-        \includegraphics[width = \textwidth]{../keller2018-chr2-hotspot-chtc/Rmd/nonlocal-scatter_97.eps}
-        \caption[\emph{Hnf4a} transcript levels mediate \emph{Abcb4} transcript levels.]{\emph{Hnf4a} transcript levels mediate \emph{Abcb4} transcript levels. The high LOD difference proportion and the very small pleiotropy test statistic together provide evidence that \emph{Hnf4a} mediates \emph{Abcb4} transcript levels.}
-    \end{subfigure}\hspace{0.05\textwidth}
-    \begin{subfigure}[t]{.45\textwidth}
-        \includegraphics[width = \textwidth]{../keller2018-chr2-hotspot-chtc/Rmd/nonlocal-scatter_105.eps}
-        \caption[\emph{Hnf4a} transcript levels mediate \emph{Smim5} transcript levels.]{\emph{Hnf4a} transcript levels mediate \emph{Smim5} transcript levels. The high LOD difference proportion and the very small pleiotropy test statistic together provide evidence that \emph{Hnf4a} mediates \emph{Smim5} transcript levels.}
-    \end{subfigure}
-    \begin{subfigure}[t]{.45\textwidth}
-        \includegraphics[width = \textwidth]{../keller2018-chr2-hotspot-chtc/Rmd/nonlocal-scatter_64.eps}
-        \caption[\emph{Tmprss4} transcript levels are not mediated by any of the 13 local gene expression traits.]{\emph{Tmprss4} transcript levels are not mediated by any of the 13 local gene expression traits. However, several local gene expression traits arise from separate QTL, as evidenced by their large (greater than 5) values of the pleiotropy test statistic.}
-    \end{subfigure}\hspace{0.05\textwidth}
-    \begin{subfigure}[t]{.45\textwidth}
-        \includegraphics[width = \textwidth]{../keller2018-chr2-hotspot-chtc/Rmd/nonlocal-scatter_141.eps}
-        \caption[\emph{Gm3095} transcript levels are not mediated by any of the 13 local genes.]{\emph{Gm3095} transcript levels are not mediated by any of the 13 local genes. The tests of pleiotropy demonstrate evidence of separate QTL for some local expression traits when paired with \emph{Gm3095}.}
-    \end{subfigure}
-    \label{fig:4nonlocal}
-\end{figure}
 
 
 

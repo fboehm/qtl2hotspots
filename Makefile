@@ -10,7 +10,7 @@ RM = rm -f
 all: $(PAPER_DIR)/paper.pdf
 
 $(PAPER_DIR)/paper.tex: $(PAPER_DIR)/paper.Rnw
-	R -e "devtools::install(dep = TRUE)"; cd $(PAPER_DIR); Rscript -e "knitr::knit('paper.Rnw')"
+	R -e "devtools::install(dep = TRUE)"; cd $(PAPER_DIR); Rscript -e "knitr::knit('$(notdir $<)')"
 
 %.pdf: %.tex
 	cd $(PAPER_DIR); $(LATEXMK) -pdfps -bibtex paper
