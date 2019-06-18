@@ -61,12 +61,14 @@
 
 \title{Expression QTL hotspot dissection}
 \author{Frederick J. Boehm, Brian S. Yandell, and Karl W. Broman}
-\date{}
+\date{\today}
 
 
 
 
 \begin{document}
+
+\maketitle
 
 <<include=FALSE>>=
 library(knitr)
