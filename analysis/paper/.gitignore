@@ -11,3 +11,5 @@ paper.bcf
 paper.blg
 paper.run.xml
 paper.toc
+paper.lof
+paper.lot
