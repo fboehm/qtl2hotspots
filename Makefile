@@ -13,7 +13,7 @@ all: $(PAPER_DIR)/paper.pdf
 $(PAPER_DIR)/paper.tex: $(PAPER_DIR)/paper.Rnw
 	R -e "devtools::install(dep = TRUE)"; cd $(PAPER_DIR); Rscript -e "knitr::knit('$(notdir $<)')"
 
-%.pdf: %.tex
+$(PAPER_DIR)/paper.pdf: $(PAPER_DIR)/paper.tex $(PAPER_DIR)/research.bib
 	cd $(PAPER_DIR); R -e "install.packages('tinytex', repos = 'https://cloud.r-project.org'); tinytex::latexmk('$(notdir $<)', bib_engine = 'biber', install_packages = TRUE)"
 
 mostlyclean:
