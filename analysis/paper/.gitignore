@@ -14,3 +14,6 @@ paper.toc
 paper.lof
 paper.lot
 paper.tdo
+paper.dvi
+paper.synctex(busy)
+missfont.log

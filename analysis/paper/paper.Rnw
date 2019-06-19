@@ -3,11 +3,9 @@
 \usepackage[utf8]{inputenc}
 \usepackage{lineno}
 \linenumbers
-
-\usepackage{bbm}
 \usepackage{setspace}
+\usepackage{bbm}
 \usepackage[left = 1in, right = 1in, top = 1.5in, bottom = 1in]{geometry}
-%\usepackage[lite]{mtpro2} %contains \widetilde
 %\usepackage[titletoc]{appendix}
 \usepackage{amsmath}
 \usepackage{hyperref}
@@ -33,31 +31,30 @@
 \DeclareLanguageMapping{english}{english-apa}
 \addbibresource{research.bib}
 \usepackage{graphicx}
-\usepackage{color, colortbl, xcolor}
+\usepackage{color, colortbl}
 \usepackage{amssymb}
 \usepackage{amsthm}
 \usepackage{amsfonts}
-\usepackage{longtable}
+%\usepackage{longtable}
 %\usepackage[outdir=./figs/]{epstopdf}
 %\usepackage{etoolbox} % for messing with page style & title pages
-%\usepackage{fancyhdr}
-%\setlength{\headheight}{15.2pt}
-%\pagestyle{fancyplain}
-%\fancyhf{}
-%\lhead{}
-%\chead{}
-%\rhead{ \fancyplain{}{\thepage} } % put page number in upper right corner
-%\rfoot{Compiled on \today\ at \currenttime}
-%\renewcommand{\headrulewidth}{0pt} % remove top line
-%\renewcommand{\footrulewidth}{0pt} % remove bottom line
-%\renewcommand{\headrule}{}%
+\usepackage{fancyhdr}
+\setlength{\headheight}{15.2pt}
+\pagestyle{fancyplain}
+\fancyhf{}
+\lhead{}
+\chead{}
+\rhead{ \fancyplain{}{\thepage} } % put page number in upper right corner
+\rfoot{Compiled on \today\ at \currenttime}
+\renewcommand{\headrulewidth}{0pt} % remove top line
+\renewcommand{\footrulewidth}{0pt} % remove bottom line
+\renewcommand{\headrule}{}%
 
 \title{Expression QTL hotspot dissection with mediation analysis and pleiotropy testing}
 \author{Frederick J. Boehm, Brian S. Yandell, and Karl W. Broman}
 \date{\today}
 
-
-
+\doublespacing
 
 \begin{document}
 
@@ -71,10 +68,11 @@ echo = TRUE,
 fig.lp = "fig:",
 warning = FALSE,
 message = FALSE)
+
+options(tinytex.verbose = TRUE)
 @
 
 
-\doublespacing
 \listoftodos
 \tableofcontents
 \listoffigures
@@ -184,7 +182,6 @@ In all mediation analyses, the nonlocal transcripts are the targets, while the l
 
 
 
-
 \printbibliography
 
 
@@ -198,10 +195,14 @@ install.packages("here", repos = "https://cloud.r-project.org")
 
 This report was generated on \Sexpr{Sys.time()} using the following computational environment and dependencies:
 
+\begin{singlespacing}
+
 <<colophon, cache = FALSE>>=
 # which R packages and versions?
 devtools::session_info()
 @
+
+
 
 The current Git commit details are:
 
@@ -210,7 +211,7 @@ The current Git commit details are:
 git2r::repository(here::here())
 @
 
-
+\end{singlespacing}
 
 
 
