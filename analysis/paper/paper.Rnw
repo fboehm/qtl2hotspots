@@ -37,29 +37,26 @@
 \DeclareLanguageMapping{english}{english-apa}
 \addbibresource{research.bib}
 \usepackage{graphicx}
-\usepackage{color, colortbl}
-\definecolor{LightCyan}{rgb}{0.88,1,1}
-\usepackage{subcaption}
-\usepackage{array}
+\usepackage{color, colortbl, xcolor}
 \usepackage{amssymb}
 \usepackage{amsthm}
 \usepackage{amsfonts}
 \usepackage{longtable}
-\usepackage[outdir=./figs/]{epstopdf}
+%\usepackage[outdir=./figs/]{epstopdf}
 \usepackage{etoolbox} % for messing with page style & title pages
-\usepackage{fancyhdr}
-\setlength{\headheight}{15.2pt}
-\pagestyle{fancyplain}
-\fancyhf{}
-\lhead{}
-\chead{}
-\rhead{ \fancyplain{}{\thepage} } % put page number in upper right corner
-\rfoot{Compiled on \today\ at \currenttime}
-\renewcommand{\headrulewidth}{0pt} % remove top line
-\renewcommand{\footrulewidth}{0pt} % remove bottom line
-\renewcommand{\headrule}{}
+%\usepackage{fancyhdr}
+%\setlength{\headheight}{15.2pt}
+%\pagestyle{fancyplain}
+%\fancyhf{}
+%\lhead{}
+%\chead{}
+%\rhead{ \fancyplain{}{\thepage} } % put page number in upper right corner
+%\rfoot{Compiled on \today\ at \currenttime}
+%\renewcommand{\headrulewidth}{0pt} % remove top line
+%\renewcommand{\footrulewidth}{0pt} % remove bottom line
+%\renewcommand{\headrule}{}%
 
-\title{Expression QTL hotspot dissection}
+\title{Expression QTL hotspot dissection with mediation analysis and pleiotropy testing}
 \author{Frederick J. Boehm, Brian S. Yandell, and Karl W. Broman}
 \date{\today}
 
@@ -70,7 +67,7 @@
 
 \maketitle
 
-<<include=FALSE>>=
+<<setup, include=FALSE>>=
 library(knitr)
 opts_chunk$set(
 concordance=TRUE,
@@ -82,6 +79,7 @@ message = FALSE)
 
 
 \doublespacing
+\listoftodos
 \tableofcontents
 \listoffigures
 \listoftables
@@ -150,6 +148,34 @@ From the two-dimensional scans, we calculated pleiotropy test statistics for eac
 \label{eq:lrt}
 \end{equation}
 
+\subsection{Mediation analysis}
+
+For each hotspot and each local trait - nonlocal trait pair, we also performed a
+mediation analysis. Each mediation analysis involved fitting four linear models (Equations~\ref{model1}, \ref{model2}, \ref{model3}, \ref{model4}).
+
+\begin{equation}
+Y = \alpha 1 + WC + E
+\label{model1}
+\end{equation}
+
+\begin{equation}
+Y = XB + WC + E
+\label{model2}
+\end{equation}
+
+\begin{equation}
+Y = \alpha 1 + WC + M\beta + E
+\label{model3}
+\end{equation}
+
+\begin{equation}
+Y = XB + WC + M\beta + E
+\label{model4}
+\end{equation}
+
+In all mediation analyses, the nonlocal transcripts are the targets, while the local transcripts serve as candidate mediators of the QTL-target relationship.
+
+
 
 
 
@@ -166,7 +192,7 @@ From the two-dimensional scans, we calculated pleiotropy test statistics for eac
 \printbibliography
 
 
-<<r install_here>>=
+<<install_here>>=
 install.packages("here", repos = "https://cloud.r-project.org")
 @
 
@@ -176,14 +202,14 @@ install.packages("here", repos = "https://cloud.r-project.org")
 
 This report was generated on \Sexpr{Sys.time()} using the following computational environment and dependencies:
 
-<<r colophon, cache = FALSE>>=
+<<colophon, cache = FALSE>>=
 # which R packages and versions?
-#devtools::session_info()
+devtools::session_info()
 @
 
 The current Git commit details are:
 
-<<r git2r, cache = FALSE>>=
+<<git2r, cache = FALSE>>=
 # what commit is this file at?
 git2r::repository(here::here())
 @
