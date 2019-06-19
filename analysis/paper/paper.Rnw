@@ -7,12 +7,8 @@
 \usepackage{bbm}
 \usepackage{setspace}
 \usepackage[left = 1in, right = 1in, top = 1.5in, bottom = 1in]{geometry}
-\usepackage{multirow}
-\usepackage{float}
-\usepackage{newfloat}
-\usepackage{multicol}
 %\usepackage[lite]{mtpro2} %contains \widetilde
-\usepackage[titletoc]{appendix}
+%\usepackage[titletoc]{appendix}
 \usepackage{amsmath}
 \usepackage{hyperref}
 \hypersetup{unicode=true,
@@ -43,7 +39,7 @@
 \usepackage{amsfonts}
 \usepackage{longtable}
 %\usepackage[outdir=./figs/]{epstopdf}
-\usepackage{etoolbox} % for messing with page style & title pages
+%\usepackage{etoolbox} % for messing with page style & title pages
 %\usepackage{fancyhdr}
 %\setlength{\headheight}{15.2pt}
 %\pagestyle{fancyplain}
