@@ -24,6 +24,7 @@ clean: mostlyclean
 	cd $(PAPER_DIR); $(LATEXMK) -silent -C
 	$(RM) $(PAPER_DIR)/*.run.xml $(PAPER_DIR)/*.synctex.gz
 	$(RM) $(PAPER_DIR)/*.d
+	$(RM) $(PAPER_DIR)/paper.tex
 
 .PHONY: all clean doc mostlyclean pdf
 
