@@ -1,4 +1,4 @@
-\documentclass[oneside]{book}
+\documentclass[]{article}
 \usepackage[colorinlistoftodos]{todonotes}
 \usepackage[utf8]{inputenc}
 \usepackage{lineno}
@@ -87,7 +87,7 @@ message = FALSE)
 \listoftables
 %\pagestyle{headings} % page numbers appear at bottom of page, centered!
 %\markright{\hfill}
-\chapter{Introduction}
+\section{Introduction}
 
 Genetics studies in model organisms like mice can identify
 genomic regions that affect complex traits, such as systolic blood pressure and body weight \citep{sax1923association,soller1976power,lander1989mapping,broman2009guide,jansen2007quantitative}. These genomic regions are called ``quantitative trait loci'' or ``QTL''.
@@ -178,7 +178,7 @@ This report was generated on \Sexpr{Sys.time()} using the following computationa
 
 <<r colophon, cache = FALSE>>=
 # which R packages and versions?
-devtools::session_info()
+#devtools::session_info()
 @
 
 The current Git commit details are:
