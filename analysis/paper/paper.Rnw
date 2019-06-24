@@ -115,19 +115,22 @@ study of pancreatic islet gene expression in 378 Diversity Outbred mice. They
 defined a hotspot to be a 4-Mb region that affects at least 100 expression
 traits.
 
-For each hotspot, we performed a series of mediation analyses and pleiotropy
-tests. For each hotspot, we identified a set of local expression traits and a
+For each hotspot, we identified a set of local expression traits and a
 set of nonlocal expression traits. All traits demonstrated LOD peaks that met
-the genome-wide significance threshold. The nonlocal expression traits arose from genes
+the genome-wide significance threshold, 7.18 \citep{keller2018genetic}.
+The nonlocal expression traits arose from genes
 on other chromosomes, while the local traits reflected expression levels for
-genes on the same chromosome as the hotspot and within 7 Mb of the hotspot
-center.
+genes on the same chromosome as the hotspot and within 4 Mb of the hotspot
+center. We ignored transcripts for genes on the hotspot chromosome but not within 4 Mb of
+the hotspot center.
+
+
 
 \subsection{Pleiotropy testing}
 
 For each hotspot, we paired each local trait with each nonlocal trait and performed a
 two-dimensional, two-QTL scan over a genomic region that included the entirety of the
-hotspot. We fitted bivariate linear mixed effects models at each ordered pair of markers \citep{boehm2019testing}.
+hotspot. We fitted bivariate linear mixed effects models at each ordered pair of markers in a two-dimensional grid \citep{boehm2019testing}.
 
 \begin{equation}
 vec(Y) = X vec(B) + vec(G) + vec(E)
@@ -135,17 +138,27 @@ vec(Y) = X vec(B) + vec(G) + vec(E)
 \end{equation}
 
 
-From the two-dimensional scans, we calculated pleiotropy test statistics for each pair of traits \citep{jiang1995multiple,boehm2019testing}.
+From the two-dimensional scans, we calculated pleiotropy likelihood ratio test statistics for each
+pair of traits \citep{jiang1995multiple,boehm2019testing, boehm2019thesis}. Because of the required
+computing time for bootstrap analyses, we didn't obtain p-values for the pleiotropy tests. Instead,
+we worked directly with the test statistic values.
+
+\todo[inline]{copy equations from G3 paper}
 
 \begin{equation}
-\Lambda = \max_{\lambda_1, \lambda_2}ll(\lambda_1, \lambda_2) - \max_{\lambda} ll(\lambda, \lambda)
+LOD = \log_{10} \left(\frac{\max_{\lambda_1, \lambda_2}L(B, \Sigma, \lambda_1, \lambda_2)}{\max_{\lambda}L(B, \Sigma, \lambda, \lambda)} \right)
 \label{eq:lrt}
 \end{equation}
+
+\begin{equation}
+ll(\lambda_1, \lambda_2)
+\end{equation}
+
 
 \subsection{Mediation analysis}
 
 For each hotspot and each local trait - nonlocal trait pair, we also performed a
-mediation analysis. Each mediation analysis involved fitting four linear models (Equations~\ref{model1}, \ref{model2}, \ref{model3}, \ref{model4}).
+mediation analysis to assess the extent which the local trait mediates the QTL effect on the nonlocal trait. Each mediation analysis involved fitting four linear models (Equations~\ref{model1}, \ref{model2}, \ref{model3}, \ref{model4}) \citep{chick2016defining}.
 
 \begin{equation}
 Y = \alpha 1 + WC + E
@@ -167,7 +180,18 @@ Y = XB + WC + M\beta + E
 \label{model4}
 \end{equation}
 
-In all mediation analyses, the nonlocal transcripts are the targets, while the local transcripts serve as candidate mediators of the QTL-target relationship.
+In all mediation analyses, the nonlocal transcripts are the targets, while the local
+transcripts serve as candidate mediators of the QTL-target relationship.
+In Equations~\ref{model1} through \ref{model4}, $X$ is a matrix of founder allele dosages,
+$B$ is a matrix
+of founder allele effects, $W$ is a matrix of covariates, $C$ is a matrix of covariate
+effects, $M$ is a vector of values for a single candidate mediator, $\beta$ is the effect
+of the mediator on the complex trait, 1 is a vector with all entries set to 1, $\alpha$
+is the mean trait value, and $E$ is a vector of normally distributed random errors. \todo[inline]{better so say 'column matrix' or 'vector'? I hate to worry about this.}
+
+
+
+
 
 
 
