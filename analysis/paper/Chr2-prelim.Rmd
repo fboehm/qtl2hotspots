@@ -221,6 +221,202 @@ plotly::ggplotly(p)
 ```
 
 
+## Filter to remove local traits that are outside hotspot
+
+In initial analyses for each hotspot, I included too many local traits. Namely, I considered all local traits that are within 7 Mb of the hotspot midpoint. I wish to limit this to traits that are within 3 Mb of the hotspot midpoint.
+
+
+
+```{r define_foo}
+foo <- mylist %>%
+  bind_rows() %>%
+  rename(pleiotropy_lod = lod) %>%
+  left_join(tib, by = c("local_gene_id", "nonlocal_gene_id")) %>%
+  select(local_symbol, nonlocal_symbol, pleiotropy_lod, lod_diff, lod_diff_proportion, lod_without_med, lod_with_med, filename, nonlocal_gene_id, local_gene_id) 
+```
+
+
+```{r add_local_peak_positions}
+foo %>%
+  left_join(local_annot2, by = c("local_gene_id" = "annot.id")) %>%
+  rename(local_peak_pos = pos, local_peak_lod = lod) %>%
+  select(- marker.id, - chrom, - strand, - biotype, - local_tx) %>%
+  filter(local_peak_pos < hot_upper, local_peak_pos > hot_lower)
+
+
+```
+
+```{r}
+foo %>%
+  left_join(local_annot2, by = c("local_gene_id" = "annot.id")) %>%
+  rename(local_peak_pos = pos, local_peak_lod = lod) %>%
+  select(- marker.id, - chrom, - strand, - biotype, - local_tx) %>%
+  filter(local_peak_pos < hot_upper, local_peak_pos > hot_lower) %>%
+  select(middle) %>% unlist() %>% range()
+
+```
+
+## Convert tibble to matrix for clustering of pleiotropy test statistics
+
+```{r, hclust_pleio_stats}
+bar <- foo %>%
+  select(nonlocal_gene_id, local_gene_id, pleiotropy_lod) %>%
+hotspots::tibble_to_matrix() %>%
+  dist() %>%
+  hclust() 
+```
+
+```{r load_colors}
+library(RColorBrewer) 
+hmcol <- colorRampPalette(brewer.pal(9, "GnBu"))(100)
+```
+
+
+```{r heat_pleio_stats}
+foo %>%
+  select(nonlocal_gene_id, local_gene_id, pleiotropy_lod, lod_diff) %>%
+hotspots::tibble_to_matrix() %>%
+  t() %>%
+  gplots::heatmap.2(cexRow = 0.1, cexCol = 0.1, col = hmcol, trace = "none")
+```
+
+```{r heat_lod_diff}
+foo %>%
+  select(nonlocal_gene_id, local_gene_id, lod_diff) %>%
+hotspots::tibble_to_matrix() %>%
+  t() %>%
+  gplots::heatmap.2(cexRow = 0.1, cexCol = 0.1, col = hmcol, trace = "none")
+```
+
+```{r heat_lod_diff0}
+foo %>%
+  select(nonlocal_gene_id, local_gene_id, lod_diff) %>%
+  mutate(lod_diff = lod_diff * (lod_diff > 0)) %>%
+hotspots::tibble_to_matrix() %>%
+  t() %>%
+  gplots::heatmap.2(cexRow = 0.1, cexCol = 0.1, col = hmcol, trace = "none")
+```
+
+
+
+```{r, define_hld, eval = FALSE}
+hld <- foo %>%
+  select(nonlocal_gene_id, local_gene_id, lod_diff)
+plotly::plot_ly(as.data.frame(hld), z = as.data.frame(hld)$lod_diff, type = "heatmap")
+```
+
+
+## Compare dendograms 
+
+Should we create a lod difference dendogram based on the mediations with a single local trait? Or with the full matrix of mediation analyses? 
+
+```{r load_dendextend}
+suppressPackageStartupMessages(library(dendextend))
+```
+
+```{r define_hc_objects}
+hc_lod_diff <- foo %>%
+  select(nonlocal_gene_id, local_gene_id, lod_diff) %>%
+  hotspots::tibble_to_matrix() %>%
+  dist() %>%
+  hclust() 
+hc_pleio <- foo %>%
+  select(nonlocal_gene_id, local_gene_id, pleiotropy_lod) %>%
+  hotspots::tibble_to_matrix() %>%
+  dist() %>%
+  hclust() 
+```
+
+```{r load_dendextend}
+library(dendextend)
+```
+
+```{r dend_dist}
+dend_diff(as.dendrogram(hc_pleio), as.dendrogram(hc_lod_diff))
+```
+
+## 2 x 2 tables
+
+We binarize the continuum of mediation LOD difference values and that of pleiotropy test statistics. 
+
+```{r 2x2_table}
+mediation_threshold <- 1.5
+mediation_threshold_proportion <- 0.5
+pleiotropy_threshold <- 4
+table(med = foo$lod_diff > mediation_threshold, pleio = foo$pleiotropy_lod <= pleiotropy_threshold)
+```
+
+```{r 2x2_table_proportion}
+table(med = foo$lod_diff_proportion > mediation_threshold_proportion, pleio = foo$pleiotropy_lod <= pleiotropy_threshold)
+```
+
+```{r 2x2_table_proportion}
+table(med = foo$lod_diff_proportion > 0.4, pleio = foo$pleiotropy_lod <= pleiotropy_threshold)
+```
+
+
+
+
+```{r counts_lod_diff}
+foo %>%
+  filter(lod_diff > mediation_threshold, pleiotropy_lod <= pleiotropy_threshold) %>%
+  group_by(local_symbol) %>%
+  count() %>%
+  arrange(desc(n))
+
+```
+
+```{r counts_lod_diff_prop_first}
+foo %>%
+  filter(lod_diff_proportion > mediation_threshold_proportion, pleiotropy_lod <= pleiotropy_threshold) %>%
+  group_by(local_symbol) %>%
+  count() %>%
+  arrange(desc(n))
+
+```
+
+
+```{r counts_both}
+foo %>%
+  filter(lod_diff > mediation_threshold, lod_diff_proportion > mediation_threshold_proportion, pleiotropy_lod <= pleiotropy_threshold) %>%
+  group_by(local_symbol) %>%
+  count() %>%
+  arrange(desc(n))
+```
+
+
+```{r counts_either}
+foo %>%
+  filter(lod_diff_proportion > mediation_threshold_proportion | lod_diff > mediation_threshold, pleiotropy_lod <= pleiotropy_threshold) %>%
+  group_by(local_symbol) %>%
+  count() %>%
+  arrange(desc(n))
+
+```
+
+
+```{r counts_lod_diff_prop}
+foo %>%
+  filter(lod_diff_proportion > 0.2, pleiotropy_lod <= pleiotropy_threshold) %>%
+  group_by(local_symbol) %>%
+  count() %>%
+  arrange(desc(n))
+
+```
+
+```{r counts_more}
+foo %>%
+  filter(lod_diff_proportion > 0.2, pleiotropy_lod <= pleiotropy_threshold) %>%
+  group_by(nonlocal_symbol) %>%
+  count() %>%
+  arrange(desc(n))
+foo %>% 
+  filter(lod_diff_proportion > 0.2, pleiotropy_lod <= pleiotropy_threshold) %>%
+  select(local_symbol, nonlocal_symbol, pleiotropy_lod, lod_diff_proportion, lod_diff)
+  arrange(desc(nonlocal_symbol)) 
+```
+
+
 
 
 
