@@ -199,7 +199,10 @@ is the mean trait value, and $E$ is a vector of normally distributed random erro
 
 \section{Results}
 
-We generated scatter plots of pleiotropy test statistics vs. mediation LOD difference proportion values. Each point represents a pairing of a local trait with a nonlocal trait. In all five scatter plots, we observe few points in the upper right quadrant of the figure. That is, few pairs have high pleiotropy test statistics and high mediation LOD difference values.
+We generated scatter plots of pleiotropy test statistics vs. mediation LOD difference proportion values. Each
+point represents a pairing of a local trait with a nonlocal trait. In all five scatter plots, we observe few
+points in the upper right quadrant of the figure. That is, few pairs have high pleiotropy test statistics and
+high mediation LOD difference values.
 
 
 \section{Discussion}
@@ -209,7 +212,7 @@ collection of potential mediators for a nonlocal trait, mediation analyses clear
 mediator when there is, in fact, a mediator among the candidates. However, when there is no
 mediator, mediation analyses provide little information about the genetics of the complex trait.
 Pleiotropy testing is particularly useful in this setting, since a pleiotropy test always gives
-an answer about the number of underlying QTL. A drawback of pleiotropy testing is that the scientific question that it addresses - do two traits share a single QTL - informs, but doesn't fully resolve, the genetics of the nonlocal complex trait under study.
+an answer about the number of underlying QTL. A drawback of pleiotropy testing is that the scientific question that it addresses - do two traits share a single QTL - informs, but doesn't fully resolve, the genetics of the nonlocal complex traits under study.
 
 
 
