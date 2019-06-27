@@ -7,7 +7,7 @@ RM = rm -f
 
 # Rules
 
-all: $(PAPER_DIR)/paper.pdf $(PAPER_DIR)/%.html
+all: $(PAPER_DIR)/paper.pdf $(PAPER_DIR)/Chr11-prelim.html $(PAPER_DIR)/Chr13-prelim.html $(PAPER_DIR)/Chr7-prelim.html $(PAPER_DIR)/Chr5-prelim.html $(PAPER_DIR)/Chr2-prelim.html
 
 # use tinytex to find and install needed latex packages
 $(PAPER_DIR)/paper.tex: $(PAPER_DIR)/paper.Rnw
@@ -16,8 +16,20 @@ $(PAPER_DIR)/paper.tex: $(PAPER_DIR)/paper.Rnw
 $(PAPER_DIR)/paper.pdf: $(PAPER_DIR)/paper.tex $(PAPER_DIR)/research.bib
 	cd $(PAPER_DIR); R -e "install.packages('tinytex', repos = 'https://cloud.r-project.org'); tinytex::latexmk('$(notdir $<)', bib_engine = 'biber', install_packages = TRUE)"
 
-$(PAPER_DIR)/%.html: $(PAPER_DIR)/%.Rmd
-	cd $(PAPER_DIR); R -e "rmarkdown::render('$^')"
+$(PAPER_DIR)/Chr11-prelim.html: $(PAPER_DIR)/Chr11-prelim.Rmd
+	cd $(PAPER_DIR); R -e "rmarkdown::render('$(<F)')"
+
+$(PAPER_DIR)/Chr13-prelim.html: $(PAPER_DIR)/Chr13-prelim.Rmd
+	cd $(PAPER_DIR); R -e "rmarkdown::render('$(<F)')"
+
+$(PAPER_DIR)/Chr7-prelim.html: $(PAPER_DIR)/Chr7-prelim.Rmd
+	cd $(PAPER_DIR); R -e "rmarkdown::render('$(<F)')"
+
+$(PAPER_DIR)/Chr5-prelim.html: $(PAPER_DIR)/Chr5-prelim.Rmd
+	cd $(PAPER_DIR); R -e "rmarkdown::render('$(<F)')"
+
+$(PAPER_DIR)/Chr2-prelim.html: $(PAPER_DIR)/Chr2-prelim.Rmd
+	cd $(PAPER_DIR); R -e "rmarkdown::render('$(<F)')"
 
 
 mostlyclean:
