@@ -7,7 +7,9 @@ RM = rm -f
 
 # Rules
 
-all: $(PAPER_DIR)/paper.pdf $(PAPER_DIR)/Chr11-prelim.html $(PAPER_DIR)/Chr13-prelim.html $(PAPER_DIR)/Chr7-prelim.html $(PAPER_DIR)/Chr5-prelim.html $(PAPER_DIR)/Chr2-prelim.html
+all: $(PAPER_DIR)/paper.pdf
+
+interactive: $(PAPER_DIR)/Chr11-prelim.html $(PAPER_DIR)/Chr13-prelim.html $(PAPER_DIR)/Chr7-prelim.html $(PAPER_DIR)/Chr5-prelim.html $(PAPER_DIR)/Chr2-prelim.html
 
 # use tinytex to find and install needed latex packages
 $(PAPER_DIR)/paper.tex: $(PAPER_DIR)/paper.Rnw
