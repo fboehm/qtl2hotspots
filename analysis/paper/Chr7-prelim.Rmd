@@ -241,6 +241,7 @@ pleiotropy_threshold <- 4
 table(med = foo$lod_diff > mediation_threshold, pleio = foo$pleiotropy_lod <= pleiotropy_threshold)
 ```
 
+
 ```{r make_mylist}
 med_vals <- 2 * (1:5)
 pleio_vals <- 2 * (2:5)
@@ -268,13 +269,13 @@ for(i in 1:length(med_vals)){
       mutate(med = lod_diff > med_vals[i], pleio = pleiotropy_lod <= pleio_vals[j]) %>%
       group_by(med, pleio) %>%
       count() %>%
-      left_join(uniq_cts, by = c("med", "pleio"))
+      left_join(uniq_cts, by = c("med", "pleio")) %>%
+      mutate(med_thr = med_vals[i], pleio_thr = pleio_vals[j])
   }
   mylist[[i]] <- my_other_list
 } 
 mylist
 ```
-
 ```{r}
 mylist %>%
   map_df(bind_rows)
