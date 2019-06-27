@@ -222,5 +222,136 @@ plotly::ggplotly(p)
 
 
 
+## 2 x 2 tables
+
+```{r define_foo}
+foo <- mylist %>%
+  bind_rows() %>%
+  rename(pleiotropy_lod = lod) %>%
+  left_join(tib, by = c("local_gene_id", "nonlocal_gene_id")) %>%
+  select(local_symbol, nonlocal_symbol, pleiotropy_lod, lod_diff, lod_diff_proportion, lod_without_med, lod_with_med, filename, nonlocal_gene_id, local_gene_id) 
+```
+
+
+We binarize the continuum of mediation LOD difference values and that of pleiotropy test statistics. 
+
+```{r 2x2_table}
+mediation_threshold <- 1.5
+mediation_threshold_proportion <- 0.5
+pleiotropy_threshold <- 4
+table(med = foo$lod_diff > mediation_threshold, pleio = foo$pleiotropy_lod <= pleiotropy_threshold)
+```
+
+```{r make_mylist}
+med_vals <- 2 * (1:5)
+pleio_vals <- 2 * (2:5)
+mylist <- list()
+for(i in 1:length(med_vals)){
+  my_other_list <- list()
+  for (j in 1:length(pleio_vals)){
+    uniq_cts_nonlocal <- foo %>% 
+      mutate(med = lod_diff > med_vals[i], pleio = pleiotropy_lod <= pleio_vals[j]) %>%
+      group_by(med, pleio) %>%
+      select(nonlocal_gene_id, med, pleio) %>%
+      unique() %>%
+      count() %>%
+      rename(n_unique_nonlocal_gene_id = n)
+    uniq_cts <- foo %>% 
+      mutate(med = lod_diff > med_vals[i], pleio = pleiotropy_lod <= pleio_vals[j]) %>%
+      group_by(med, pleio) %>%
+      select(local_gene_id, med, pleio) %>%
+      unique() %>%
+      count() %>%
+      rename(n_unique_local_gene_id = n) %>%
+      left_join(uniq_cts_nonlocal, by = c("pleio", "med"))
+    
+    my_other_list[[j]] <- foo %>%
+      mutate(med = lod_diff > med_vals[i], pleio = pleiotropy_lod <= pleio_vals[j]) %>%
+      group_by(med, pleio) %>%
+      count() %>%
+      left_join(uniq_cts, by = c("med", "pleio"))
+  }
+  mylist[[i]] <- my_other_list
+} 
+mylist
+```
+
+```{r}
+mylist %>%
+  map_df(bind_rows)
+```
+
+```{r}
+mylist %>%
+  map_df(bind_rows) %>%
+  filter(as.logical(med), !as.logical(pleio))
+```
+
+```{r}
+mylist %>%
+  map_df(bind_rows) %>%
+  filter(as.logical(med), as.logical(pleio))
+```
+
+
+
+
+```{r 2x2_table_proportion}
+table(med = foo$lod_diff_proportion > mediation_threshold_proportion, pleio = foo$pleiotropy_lod <= pleiotropy_threshold)
+```
+
+
+
+
+
+```{r counts_lod_diff}
+foo %>%
+  filter(lod_diff > mediation_threshold, pleiotropy_lod <= pleiotropy_threshold) %>%
+  group_by(local_symbol) %>%
+  count() %>%
+  arrange(desc(n))
+
+```
+
+```{r counts_lod_diff_prop_first}
+foo %>%
+  filter(lod_diff_proportion > mediation_threshold_proportion, pleiotropy_lod <= pleiotropy_threshold) %>%
+  group_by(local_symbol) %>%
+  count() %>%
+  arrange(desc(n))
+
+```
+
+
+```{r counts_both}
+foo %>%
+  filter(lod_diff > mediation_threshold, lod_diff_proportion > mediation_threshold_proportion, pleiotropy_lod <= pleiotropy_threshold) %>%
+  group_by(local_symbol) %>%
+  count() %>%
+  arrange(desc(n))
+```
+
+
+```{r counts_either}
+foo %>%
+  filter(lod_diff_proportion > mediation_threshold_proportion | lod_diff > mediation_threshold, pleiotropy_lod <= pleiotropy_threshold) %>%
+  group_by(local_symbol) %>%
+  count() %>%
+  arrange(desc(n))
+
+```
+
+
+```{r counts_lod_diff_prop}
+foo %>%
+  filter(lod_diff_proportion > 0.2, pleiotropy_lod <= pleiotropy_threshold) %>%
+  group_by(local_symbol) %>%
+  count() %>%
+  arrange(desc(n))
+
+```
+
+
+
 
 

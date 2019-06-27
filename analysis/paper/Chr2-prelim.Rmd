@@ -16,6 +16,7 @@ hot_mid <- 165.5
 load("~/Box Sync/attie/keller2018-chr2-hotspot-chtc/data-to-ignore/Attie_DO378_eQTL_viewer_v1.Rdata")
 ls()
 library(tidyverse)
+options(tibble.print_max = 50, tibble.print_min = 20)
 ```
 
 We need to get the names of the nonlocal traits that map to Chromosome 2 hotspot. 
@@ -310,9 +311,6 @@ plotly::plot_ly(as.data.frame(hld), z = as.data.frame(hld)$lod_diff, type = "hea
 
 Should we create a lod difference dendogram based on the mediations with a single local trait? Or with the full matrix of mediation analyses? 
 
-```{r load_dendextend}
-suppressPackageStartupMessages(library(dendextend))
-```
 
 ```{r define_hc_objects}
 hc_lod_diff <- foo %>%
@@ -346,13 +344,64 @@ pleiotropy_threshold <- 4
 table(med = foo$lod_diff > mediation_threshold, pleio = foo$pleiotropy_lod <= pleiotropy_threshold)
 ```
 
+```{r make_mylist}
+med_vals <- 2 * (1:5)
+pleio_vals <- 2 * (2:5)
+mylist <- list()
+for(i in 1:length(med_vals)){
+  my_other_list <- list()
+  for (j in 1:length(pleio_vals)){
+    uniq_cts_nonlocal <- foo %>% 
+      mutate(med = lod_diff > med_vals[i], pleio = pleiotropy_lod <= pleio_vals[j]) %>%
+      group_by(med, pleio) %>%
+      select(nonlocal_gene_id, med, pleio) %>%
+      unique() %>%
+      count() %>%
+      rename(n_unique_nonlocal_gene_id = n)
+    uniq_cts <- foo %>% 
+      mutate(med = lod_diff > med_vals[i], pleio = pleiotropy_lod <= pleio_vals[j]) %>%
+      group_by(med, pleio) %>%
+      select(local_gene_id, med, pleio) %>%
+      unique() %>%
+      count() %>%
+      rename(n_unique_local_gene_id = n) %>%
+      left_join(uniq_cts_nonlocal, by = c("pleio", "med"))
+    
+    my_other_list[[j]] <- foo %>%
+      mutate(med = lod_diff > med_vals[i], pleio = pleiotropy_lod <= pleio_vals[j]) %>%
+      group_by(med, pleio) %>%
+      count() %>%
+      left_join(uniq_cts, by = c("med", "pleio"))
+  }
+  mylist[[i]] <- my_other_list
+} 
+mylist
+```
+
+```{r}
+mylist %>%
+  map_df(bind_rows)
+```
+
+```{r}
+mylist %>%
+  map_df(bind_rows) %>%
+  filter(as.logical(med), !as.logical(pleio))
+```
+
+```{r}
+mylist %>%
+  map_df(bind_rows) %>%
+  filter(as.logical(med), as.logical(pleio))
+```
+
+
+
+
 ```{r 2x2_table_proportion}
 table(med = foo$lod_diff_proportion > mediation_threshold_proportion, pleio = foo$pleiotropy_lod <= pleiotropy_threshold)
 ```
 
-```{r 2x2_table_proportion}
-table(med = foo$lod_diff_proportion > 0.4, pleio = foo$pleiotropy_lod <= pleiotropy_threshold)
-```
 
 
 
@@ -404,19 +453,46 @@ foo %>%
 
 ```
 
-```{r counts_more}
-foo %>%
-  filter(lod_diff_proportion > 0.2, pleiotropy_lod <= pleiotropy_threshold) %>%
-  group_by(nonlocal_symbol) %>%
-  count() %>%
-  arrange(desc(n))
-foo %>% 
-  filter(lod_diff_proportion > 0.2, pleiotropy_lod <= pleiotropy_threshold) %>%
-  select(local_symbol, nonlocal_symbol, pleiotropy_lod, lod_diff_proportion, lod_diff)
-  arrange(desc(nonlocal_symbol)) 
+
+
+## More figures
+
+Let's plot a matrix of pleiotropy test statistics for nonlocal - local pairs, ordered by local gene's chromosomal position (ie, coordinate of the middle of the gene per ENSEMBL). We could, for example, color cells by pleiotropy test statistic value. Maybe truncate for those over 10. 
+
+## Still more figures: graph theory package
+
+Can we represent, say, the collection of nonlocal traits in an undirected graph theory graph? We might say that nodes i and j are connected by an edge if they are both pleiotropic in pairwise tests with a single local trait.
+
+```{r load_hotspots}
+library(hotspots)
 ```
 
+```{r}
+mymat <- foo %>%
+  tibble_to_matrix() %>%
+  t() %>%
+  (function(mat) mat <= 4) %>%
+  make_adjacency_matrix()
+myg <- mymat %>%
+  igraph::graph_from_adjacency_matrix(mode = "undirected", weighted = TRUE, diag = FALSE) 
+comm2 <- igraph::fastgreedy.community(myg)
+```
 
+### Find communities
+
+```{r}
+library(igraph)
+```
+
+```{r}
+comm <- foo %>%
+  tibble_to_matrix() %>%
+  t() %>%
+  make_adjacency_matrix() %>%
+  igraph::graph_from_adjacency_matrix(mode = "undirected", weighted = TRUE, diag = FALSE) %>%
+  fastgreedy.community()
+
+```
 
 
 
