@@ -3,6 +3,7 @@
 #' @param tib a tibble with three columns; the first two are gene ids and the last is pleiotropy test statistics
 #' @param binarize logical of length one indicating whether to binarize the matrix of pleiotropy test statistics based on pleio_threshold value
 #' @param pleio_threshold a positive number to distinguish pleiotropy from separate QTL
+#' @export
 
 cluster_pleio_stats <- function(tib, binarize = FALSE, pleio_threshold = NULL){
   # convert tibble to matrix
@@ -18,6 +19,7 @@ cluster_pleio_stats <- function(tib, binarize = FALSE, pleio_threshold = NULL){
 #' Convert tibble to matrix
 #'
 #' @param tib
+#' @export
 
 tibble_to_matrix <- function(tib){
   rn <- unique(tib[[1]])
@@ -33,10 +35,11 @@ tibble_to_matrix <- function(tib){
   return(out)
 }
 
-#' Sort a binary matrix into something close to a block diagonal
+#' Determine adjacency matrix from a n local by m nonlocal traits binary matrix
 #'
-#' @param bmat a binary matrix
+#' @param mat a binary matrix with rownames and colnames
+#' @export
 
-sort_binary_matrix <- function(bmat){
-  bmat[ , order(colSums(bmat), decreasing = TRUE)]
+make_adjacency_matrix <- function(mat){
+  mat %*% t(mat)
 }
