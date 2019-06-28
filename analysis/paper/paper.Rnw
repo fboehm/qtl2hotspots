@@ -128,7 +128,7 @@ the hotspot center.
 
 \subsection{Pleiotropy testing}
 
-For each hotspot, we paired each local trait with each nonlocal trait and performed a
+For each hotspot, we tested all pairs of traits, regardless of whether the traits were local or nonlocal. We performed a
 two-dimensional, two-QTL scan over a genomic region that included the entirety of the
 hotspot. We fitted bivariate linear mixed effects models at each ordered pair of markers in a two-dimensional grid \citep{boehm2019testing}.
 
@@ -137,7 +137,37 @@ vec(Y) = X vec(B) + vec(G) + vec(E)
 \label{eq:mvlmm}
 \end{equation}
 
+\begin{equation}
+G \sim MN_{n x 2}(0, K, V_g)
+\end{equation}
 
+\begin{equation}
+E \sim MN_{n x 2}(0, I_n, V_e)
+\end{equation}
+
+and $G$ and $E$ are independent.
+
+\begin{equation}
+\hat B = (X^T\hat \Sigma^{-1}X)^{-1}X^T\hat\Sigma^{-1}Y
+\label{eq:Bhat}
+\end{equation}
+
+\begin{equation}
+\hat \Sigma = \hat V_g \otimes \hat K + \hat V_e \otimes I_n
+\label{eq:Sigmahat}
+\end{equation}
+
+
+\begin{equation}
+l_{10}(\hat B, \hat \Sigma) = - \frac{1}{2}\log_{10}\left((Y - X\hat B)^T\hat \Sigma^{-1}(Y - X\hat B)\right) - n\log_{10}(2\pi) - \log_{10}|\hat \Sigma|
+\label{eq:loglik}
+\end{equation}
+
+
+For $n$ mice, $\Sigma$ is a $2n$ by $2n$ covariance matrix, while $V_g$ and $V_e$ are $2$ by $2$ covariance matrices. Estimates $\hat V_g$ and $\hat V_e$ are obtained via an expectation-maximization algorithm \citep{zhou2014efficient,gemma2}
+
+
+\subsubsection{Calculating likelihood ratio test statistics}
 From the two-dimensional scans, we calculated pleiotropy likelihood ratio test statistics for each
 pair of traits \citep{jiang1995multiple,boehm2019testing, boehm2019thesis}. Because of the required
 computing time for bootstrap analyses, we didn't obtain p-values for the pleiotropy tests. Instead,
