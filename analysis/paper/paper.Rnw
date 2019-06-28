@@ -128,6 +128,8 @@ the hotspot center.
 
 \subsection{Pleiotropy testing}
 
+\subsubsection{Two-dimensional, two-QTL scans}
+
 For each hotspot, we tested all pairs of traits, regardless of whether the traits were local or nonlocal. We performed a
 two-dimensional, two-QTL scan over a genomic region that included the entirety of the
 hotspot. We fitted bivariate linear mixed effects models at each ordered pair of markers in a two-dimensional grid \citep{boehm2019testing}.
@@ -229,9 +231,11 @@ is the mean trait value, and $E$ is a vector of normally distributed random erro
 
 \section{Results}
 
-We generated scatter plots of pleiotropy test statistics vs. mediation LOD difference proportion values. Each
-point represents a pairing of a local trait with a nonlocal trait. In all five scatter plots, we observe few
-points in the upper right quadrant of the figure. That is, few pairs have high pleiotropy test statistics and
+We generated scatter plots of pleiotropy test statistics vs. mediation LOD difference values.
+Each point represents a pairing of a local trait with a nonlocal trait.
+In all five scatter plots, we observe few
+points in the upper right quadrant of the figure.
+That is, few pairs have high pleiotropy test statistics and
 high mediation LOD difference values.
 
 
