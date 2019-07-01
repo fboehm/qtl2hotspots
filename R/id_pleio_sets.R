@@ -18,18 +18,35 @@ cluster_pleio_stats <- function(tib, binarize = FALSE, pleio_threshold = NULL){
 
 #' Convert tibble to matrix
 #'
-#' @param tib
+#' @param tib a tibble with pleiotropy test results
+#' @param symmetric logical to indicate if the resulting matrix should be symmetric
 #' @export
 
-tibble_to_matrix <- function(tib){
-  rn <- unique(tib[[1]])
-  cn <- unique(tib[[2]])
-  out <- matrix(NA, nrow = length(rn), ncol = length(cn))
-  rownames(out) <- rn
-  colnames(out) <- cn
-  for (i in 1:length(rn)){
-    for (j in 1:length(cn)){
-      out[i, j] <- tib[[3]][(tib[[1]] == rownames(out)[i] & tib[[2]] == colnames(out)[j])]
+tibble_to_matrix <- function(tib, symmetric = FALSE){
+  if (!symmetric){
+    rn <- unique(tib[[1]])
+    cn <- unique(tib[[2]])
+    out <- matrix(NA, nrow = length(rn), ncol = length(cn))
+    rownames(out) <- rn
+    colnames(out) <- cn
+    for (i in 1:length(rn)){
+      for (j in 1:length(cn)){
+        out[i, j] <- tib[[3]][(tib[[1]] == rownames(out)[i] & tib[[2]] == colnames(out)[j])]
+      }
+    }
+  }
+  if (symmetric) {
+    rn <- unique(union(tib[[1]], tib[[2]]))
+    out <- matrix(NA, nrow = length(rn), ncol = length(rn))
+    rownames(out) <- rn
+    colnames(out) <- rn
+    for (i in 2:length(rn)){
+      for (j in 1:(i - 1)){
+        ind1 <- tib[[1]] == rownames(out)[i] & tib[[2]] == colnames(out)[j]
+        ind2 <- tib[[2]] == rownames(out)[i] & tib[[1]] == colnames(out)[j]
+        if (sum(ind1) | sum(ind2)) out[i, j] <- tib[[3]][ind1 | ind2]
+        out[j, i] <- out[i, j]
+      }
     }
   }
   return(out)
