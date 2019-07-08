@@ -4,7 +4,12 @@
 \alias{tibble_to_matrix}
 \title{Convert tibble to matrix}
 \usage{
-tibble_to_matrix(tib)
+tibble_to_matrix(tib, symmetric = FALSE)
+}
+\arguments{
+\item{tib}{a tibble with pleiotropy test results}
+
+\item{symmetric}{logical to indicate if the resulting matrix should be symmetric}
 }
 \description{
 Convert tibble to matrix

@@ -10,6 +10,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r, load_attie}
+hot_chr <- 5
 load("~/Box Sync/attie/keller2018-chr2-hotspot-chtc/data-to-ignore/Attie_DO378_eQTL_viewer_v1.Rdata")
 ls()
 library(tidyverse)
@@ -130,8 +131,8 @@ Also, I'm limiting consideration of local genes to those with middle within 5Mb 
 Now, I make the two expression trait matrices that I need for use with Condor.
 
 ```{r}
-Chr5hot_local <- dataset.islet.rnaseq$expr[, colnames(dataset.islet.rnaseq$expr) %in% local_annot2$annot.id]
-Chr5hot_nonlocal <- dataset.islet.rnaseq$expr[, colnames(dataset.islet.rnaseq$expr) %in% nonlocal_annot$annot.id]
+hot_local <- dataset.islet.rnaseq$expr[, colnames(dataset.islet.rnaseq$expr) %in% local_annot2$annot.id]
+hot_nonlocal <- dataset.islet.rnaseq$expr[, colnames(dataset.islet.rnaseq$expr) %in% nonlocal_annot$annot.id]
 ```
 
 Prepare the covariates matrix for input to `fit1_med`.
@@ -168,29 +169,24 @@ which(names(map$`5`) == aa)
 
 
 ```{r fit1_med}
-nlocal <- ncol(Chr5hot_local)
-nnonlocal <- ncol(Chr5hot_nonlocal)
-out <- list()
-out2 <- list()
-for (j in 1:nlocal){
+nlocal <- ncol(hot_local)
+nnonlocal <- ncol(hot_nonlocal)
+medfile <- "_cache/Chr5_mediations.rds"
+if (!file.exists(medfile)){
+  out <- list()
+  for (j in 1:nlocal){
   foo <- list()
-  foo2 <- list()
   for (i in 1:nnonlocal){
-    foo[[i]]<- qtl2mediate::fit1_med(driver = genoprobs$`5`[rownames(genoprobs$`5`) %in% rownames(Chr5hot_local) , , indices[i]], 
-                                      # genoprobs at peak position for nonlocal trait
-                                      target = Chr5hot_nonlocal[ , i], 
-                                      mediator = Chr5hot_local[ , j], 
-                                      addcovar = addcovar
-         )
-    foo2[[i]] <- qtl2mediate:::fit1_med_qtl2(driver = genoprobs$`5`[, , indices[i]],
-                                             target = Chr5hot_nonlocal[ , i],
-                                             mediator = Chr5hot_local[ , j],
+    foo[[i]] <- qtl2mediate:::fit1_med_qtl2(driver = genoprobs[[as.character(hot_chr)]][, , indices[i]],
+                                             target = hot_nonlocal[ , i],
+                                             mediator = hot_local[ , j],
                                              addcovar = addcovar
                                              )
   }
   out[[j]] <- foo
-  out2[[j]] <- foo2
 }
+saveRDS(out, medfile)
+} else {out <- readRDS(medfile)}
 ```
 
 We need to be careful when creating the `local_gene_id` and `nonlocal_gene_id` objects. 
@@ -214,29 +210,67 @@ tib <- out %>%
 
 We also added gene symbols to the tibble. 
 
-## Reading pleiotropy test results
+## Reading pleiotropy test results (for local-nonlocal pairs)
 
 ```{r read_pleio_results}
-results_dir <- "~/Box Sync/attie/keller-hotspots/results/pvl-run-9901"
-dir(results_dir) -> fns
-mylist <- list()
-for (i in 1:length(fns)){
-  mylist[[i]] <- read.table(file.path(results_dir, fns[i])) %>%
-  as_tibble() %>%
-  mutate(filename = fns[i]) %>%
-  mutate(local_gene_id = stringr::str_split(fns[i], "_")[[1]][[3]], nonlocal_gene_id = stringr::str_split(stringr::str_split(fns[i], "_")[[1]][[4]], ".txt")[[1]][[1]]) %>%
-  filter(lod == max(lod), trace == "profile1") %>%
-  select(local_gene_id, nonlocal_gene_id, lod, filename)
+run_num <- 9901
+pleio_file <- "_cache/Chr5_pleio.rds"
+
+if (file.exists(pleio_file)) {mylist <- readRDS(pleio_file)} else {
+  results_dir <- paste0("~/Box Sync/attie/keller-hotspots/results/pvl-run-", run_num)
+  dir(results_dir) -> fns
+  mylist <- list()
+  for (i in 1:length(fns)){
+    mylist[[i]] <- read.table(file.path(results_dir, fns[i])) %>%
+    as_tibble() %>%
+    mutate(filename = fns[i]) %>%
+    mutate(local_gene_id = stringr::str_split(fns[i], "_")[[1]][[3]], nonlocal_gene_id = stringr::str_split(stringr::str_split(fns[i], "_")[[1]][[4]], ".txt")[[1]][[1]]) %>%
+    filter(lod == max(lod), trace == "profile1") %>%
+    select(local_gene_id, nonlocal_gene_id, lod, filename)
+  }
+  saveRDS(mylist, pleio_file)
 }
-mylist %>%
-  bind_rows() %>%
-  rename(pleiotropy_lod = lod) %>%
-  left_join(tib, by = c("local_gene_id", "nonlocal_gene_id")) %>%
-  select(local_symbol, nonlocal_symbol, pleiotropy_lod, lod_diff, lod_diff_proportion, lod_without_med, lod_with_med, filename, nonlocal_gene_id, local_gene_id) %>%
-  group_by(nonlocal_symbol) %>%
-  filter(lod_diff == max(lod_diff)) %>%
-  arrange(local_symbol, desc(lod_diff))
 ```
+
+```{r read_pleio_results_local}
+results_dir <- paste0("~/Box Sync/attie/keller-hotspots/results/pvl-run-", run_num * 10 + 1)
+dir(results_dir) -> fns
+pleio_file_local <- "_cache/Chr5_pleio_local.rds"
+if (file.exists(pleio_file_local)) {mylist_local <- readRDS(pleio_file_local)} else {
+  mylist_local <- list()
+  for (i in 1:length(fns)){
+    mylist_local[[i]] <- read.table(file.path(results_dir, fns[i])) %>%
+    as_tibble() %>%
+    mutate(filename = fns[i]) %>%
+    mutate(gene1_id = stringr::str_split(fns[i], "_")[[1]][[3]], gene2_id = stringr::str_split(stringr::str_split(fns[i], "_")[[1]][[4]], ".txt")[[1]][[1]]) %>%
+    filter(lod == max(lod), trace == "profile1") %>%
+    select(gene1_id, gene2_id, lod, filename)
+  }
+  saveRDS(mylist_local, pleio_file_local)
+}
+  
+```
+
+```{r read_pleio_results_nonlocal}
+results_dir <- paste0("~/Box Sync/attie/keller-hotspots/results/pvl-run-", run_num * 10)
+dir(results_dir) -> fns
+pleio_file_nonlocal <- "_cache/Chr5_pleio_nonlocal.rds"
+if (file.exists(pleio_file_nonlocal)) {mylist_nonlocal <- readRDS(pleio_file_nonlocal)} else {
+  mylist_nonlocal <- list()
+  for (i in 1:length(fns)){
+    mylist_nonlocal[[i]] <- read.table(file.path(results_dir, fns[i])) %>%
+    as_tibble() %>%
+    mutate(filename = fns[i]) %>%
+    mutate(gene1_id = stringr::str_split(fns[i], "_")[[1]][[3]], 
+           gene2_id = stringr::str_split(stringr::str_split(fns[i], "_")[[1]][[4]], ".txt")[[1]][[1]]) %>%
+    filter(lod == max(lod), trace == "profile1") %>%
+    select(gene1_id, gene2_id, lod, filename)
+  }
+  saveRDS(mylist_nonlocal, pleio_file_nonlocal)
+}
+```
+
+
 
 We want to identify, for each nonlocal transcript, which local transcript gives the greatest `lod_diff` value.
 
@@ -338,32 +372,6 @@ plotly::ggplotly(p)
 
 
 
-## Are the lods from fit1_med correct?
-
-Yes.
-
-I see that a large number of nonlocal transcripts have `lod_without_med` values below 7.18. While the 7.18 threshold was determined with the mixed model, I still find the large number of transcripts unusual.
-
-First, a given nonlocal transcript should have a single value for `lod_without_med`, regardless of which local transcript it's paired with. Let's verify this.
-
-
-```{r, check1}
-mylist %>%
-  bind_rows() %>%
-  rename(pleiotropy_lod = lod) %>%
-  left_join(tib, by = c("local_gene_id", "nonlocal_gene_id")) %>%
-  select(local_symbol, nonlocal_symbol, pleiotropy_lod, lod_diff, lod_diff_proportion, lod_without_med, lod_with_med, filename, nonlocal_gene_id, local_gene_id) %>% 
-  arrange(nonlocal_symbol)
-```
-
-```{r, check_table}
-mylist %>%
-  bind_rows() %>%
-  select(lod) %>%
-  mutate(indic = lod > 5) %>%
-  select(indic) %>%
-  table()
-```
 
 ## 2 x 2 tables
 
@@ -494,6 +502,168 @@ foo %>%
   arrange(desc(n))
 
 ```
+
+## Heatmaps of pleiotropy results
+
+### Convert pleiotropy results lists to tibbles
+
+```{r}
+local_annot3 <- local_annot2 %>%
+  select(annot.id, symbol)
+local_pleio <- mylist_local %>%
+  bind_rows() %>%
+  rename(pleiotropy_lod = lod) %>%
+  left_join(local_annot3, by = c("gene1_id" = "annot.id")) %>%
+  rename(gene1_symbol = symbol) %>%
+  left_join(local_annot3, by = c("gene2_id" = "annot.id")) %>%
+  rename(gene2_symbol = symbol)
+  
+nonlocal_annot3 <- nonlocal_annot %>%
+  select(annot.id, symbol)
+nonlocal_pleio <- mylist_nonlocal %>%
+  bind_rows() %>%
+  rename(pleiotropy_lod = lod) %>%
+  left_join(nonlocal_annot3, by = c("gene1_id" = "annot.id")) %>%
+  rename(gene1_symbol = symbol) %>%
+  left_join(nonlocal_annot3, by = c("gene2_id" = "annot.id")) %>%
+  rename(gene2_symbol = symbol)
+  
+```
+
+I now bind all three tibbles that contain pleiotropy results into a single tibble.
+
+```{r}
+pleio_results_mat <- foo %>%
+  dplyr::select(local_gene_id, nonlocal_gene_id, pleiotropy_lod, local_symbol, nonlocal_symbol) %>%
+  rename(gene1_id = local_gene_id, 
+         gene2_id = nonlocal_gene_id, 
+         gene1_symbol = local_symbol,
+         gene2_symbol = nonlocal_symbol
+         ) %>%
+  bind_rows(local_pleio, nonlocal_pleio) %>%
+  hotspots::tibble_to_matrix(symmetric = TRUE)
+```
+
+```{r}
+pleio_results_mat %>%
+  is.na() %>%
+  sum()
+```
+
+```{r}
+pleio_results_mat %>%
+  dist() %>%
+  hclust()
+```
+
+```{r}
+foobar <- pleio_results_mat %>%
+  igraph::graph_from_adjacency_matrix(mode = "undirected", weighted = TRUE, diag = FALSE) %>%
+  fastgreedy.community()
+foobar$membership %>% table()
+t1 <- tibble(gene = foobar$names, 
+       community_membership = foobar$membership, 
+       local = foobar$names %in% local_annot3$annot.id
+       )
+  table(t1$community_membership, t1$local)
+```
+
+## Clustering
+
+```{r, hclust1}
+pleio_results_mat %>%
+  dist() %>%
+  hclust() %>% 
+  plot(cex = 0.1)
+```
+
+Check out https://genomicsclass.github.io/book/pages/clustering_and_heatmaps.html for helpful code on clustering gene expressions.
+
+```{r rafalib_plot}
+pleio_results_mat %>%
+  dist() %>%
+  hclust() %>% 
+  rafalib::myplclust(cex = 0.1
+                     )
+```
+
+```{r rafalib_plot2}
+bar <- foo %>%
+  filter(local_symbol == "Hnf4a")
+  
+  
+  
+pleio_hc <- foo %>%
+  tibble_to_matrix() %>%
+  t() %>%
+  dist() %>%
+  hclust()
+
+rafalib::myplclust(pleio_hc,
+                     lab.col = 1+ round(bar$pleiotropy_lod[match(x = bar$nonlocal_symbol, table = pleio_hc$labels)]),
+                     cex = 0.3
+                     )
+```
+
+```{r}
+rafalib::myplclust(pleio_hc,
+                   lab.col = 1 + (bar$lod_diff[match(x = bar$nonlocal_symbol,
+                                                     table = pleio_hc$labels)] >
+                                    mediation_threshold),
+                     cex = 0.3
+                     )
+
+```
+
+```{r}
+library(RColorBrewer) 
+library(genefilter)
+library(gplots) ##Available from CRAN
+cols <- palette(RColorBrewer::brewer.pal(8, "Dark2"))
+#head(cbind(colnames(e),cols))
+```
+
+
+
+
+```{r heatmap.2}
+pleio_mat <- foo %>%
+  tibble_to_matrix() %>%
+  t()
+ld <- bar$lod_diff
+idx1 <- match(x = bar$nonlocal_symbol, table = rownames(pleio_mat))
+idx <- 1 + floor((ld * (ld > 0))[idx1])
+cols[idx] -> indexed_colors
+ic2 <- 1 + (ld[idx1] > mediation_threshold)
+#indexed_colors[is.na(indexed_colors)] <- cols[8]
+gplots::heatmap.2(pleio_mat, 
+                  trace="none", 
+                  #RowSideColors = indexed_colors, 
+                  RowSideColors = c("red", "green")[ic2],
+                  col=hmcol,
+                  cexRow = 0.5,
+                  cexCol = 0.5
+                  )
+```
+
+
+```{r}
+d3heatmap(t(pleio_mat) <= 4, cexRow = 0.2, cexCol = 0.3)
+```
+
+```{r}
+gplots::heatmap.2(t(pleio_mat), 
+                  trace="none", 
+                  #RowSideColors = indexed_colors, 
+                  ColSideColors = c("red", "green")[ic2],
+                  col=hmcol,
+                  cexRow = 0.5,
+                  cexCol = 0.5
+                  )
+
+```
+
+
 
 
 
