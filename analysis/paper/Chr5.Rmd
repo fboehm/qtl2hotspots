@@ -935,4 +935,46 @@ nonlocal_pleio %>%
 ```
 
 
+## Pleiotropy test results for *all* trait pairs
+
+```{r all-pleio}
+foo %>%
+  dplyr::select(9, 10, 3, 8, 1, 2) %>%
+  rename(gene1_id = nonlocal_gene_id,
+         gene2_id = local_gene_id,
+         gene1_symbol = nonlocal_symbol, 
+         gene2_symbol = local_symbol
+         ) %>%
+  bind_rows(local_pleio) %>%
+  bind_rows(nonlocal_pleio) %>%
+  dplyr::select(5, 6, 3) %>%
+  tibble_to_matrix(symmetric = TRUE) %>%
+  d3heatmap(cexRow = 0.2, cexCol = 0.2)
+```
+
+## Mediation (LOD diff) results (truncated at zero) for local-nonlocal pairs
+
+
+```{r med-trunc-heat}
+foo %>%
+  dplyr::select(1, 2, 4) %>%
+  mutate(lod_diff_trunc = lod_diff * (lod_diff > 0)) %>%
+  dplyr::select(-3) %>%
+  tibble_to_matrix(symmetric = FALSE) %>%
+  d3heatmap(cexRow = 0.3, cexCol = 0.3)
+```
+
+
+## Mediation (LOD diff proportion) results (truncated at zero) for local-nonlocal pairs
+
+
+```{r med-prop-trunc-heat}
+foo %>%
+  dplyr::select(1, 2, 5) %>%
+  mutate(lod_diff_prop_trunc = lod_diff_proportion * (lod_diff_proportion > 0)) %>%
+  dplyr::select(-3) %>%
+  tibble_to_matrix(symmetric = FALSE) %>%
+  d3heatmap(cexRow = 0.3, cexCol = 0.3)
+```
+
 

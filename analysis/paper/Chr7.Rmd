@@ -116,7 +116,7 @@ We then define the driver object. Note that we use the marker that corresponds t
 # need the index of the peak for every nonlocal trait
 indices <- nonlocal_annot %>%
   mutate(marker_index = purrr::map_int(.x = marker.id, .f = function(x){which(names(map[[as.character(hot_chr)]]) == x)})) %>%
-  select(marker_index) %>%
+  dplyr::select(marker_index) %>%
   unlist() %>%
   as.integer()
 ```
@@ -164,7 +164,7 @@ tib <- out %>%
   mutate(local_gene_id = rep(colnames(hot_local), each = nnonlocal), nonlocal_gene_id = rep(colnames(hot_nonlocal), times = nlocal)) %>%
   left_join(local_annot2, by = c("local_gene_id" = "annot.id")) %>%
   left_join(nonlocal_annot, by = c("nonlocal_gene_id" = "annot.id")) %>%
-  select(symbol.x, symbol.y, lod_without_med, lod_with_med, lod_diff, lod_diff_proportion, local_gene_id, nonlocal_gene_id) %>%
+  dplyr::select(symbol.x, symbol.y, lod_without_med, lod_with_med, lod_diff, lod_diff_proportion, local_gene_id, nonlocal_gene_id) %>%
   rename(local_symbol = symbol.x, nonlocal_symbol = symbol.y)
 ```
 
@@ -188,7 +188,7 @@ if (file.exists(pleio_file)) {mylist <- readRDS(pleio_file)} else {
     mutate(filename = fns[i]) %>%
     mutate(local_gene_id = stringr::str_split(fns[i], "_")[[1]][[3]], nonlocal_gene_id = stringr::str_split(stringr::str_split(fns[i], "_")[[1]][[4]], ".txt")[[1]][[1]]) %>%
     filter(lod == max(lod), trace == "profile1") %>%
-    select(local_gene_id, nonlocal_gene_id, lod, filename)
+    dplyr::select(local_gene_id, nonlocal_gene_id, lod, filename)
   }
   saveRDS(mylist, pleio_file)
 }
@@ -201,7 +201,7 @@ p <- mylist %>%
   bind_rows() %>%
   rename(pleiotropy_lod = lod) %>%
   left_join(tib, by = c("local_gene_id", "nonlocal_gene_id")) %>%
-  select(local_symbol, nonlocal_symbol, pleiotropy_lod, lod_diff, lod_diff_proportion, lod_without_med, lod_with_med, filename, nonlocal_gene_id, local_gene_id) %>%
+  dplyr::select(local_symbol, nonlocal_symbol, pleiotropy_lod, lod_diff, lod_diff_proportion, lod_without_med, lod_with_med, filename, nonlocal_gene_id, local_gene_id) %>%
   ggplot() + geom_point(mapping = aes(x = pleiotropy_lod, y = lod_diff, colour = local_symbol, nonlocal = nonlocal_symbol), size = 0.05)
 plotly::ggplotly(p)
 
@@ -214,7 +214,7 @@ p <- mylist %>%
   bind_rows() %>%
   rename(pleiotropy_lod = lod) %>%
   left_join(tib, by = c("local_gene_id", "nonlocal_gene_id")) %>%
-  select(local_symbol, nonlocal_symbol, pleiotropy_lod, lod_diff, lod_diff_proportion, lod_without_med, lod_with_med, filename, nonlocal_gene_id, local_gene_id) %>%
+  dplyr::select(local_symbol, nonlocal_symbol, pleiotropy_lod, lod_diff, lod_diff_proportion, lod_without_med, lod_with_med, filename, nonlocal_gene_id, local_gene_id) %>%
   ggplot() + geom_point(mapping = aes(x = pleiotropy_lod, y = lod_diff, colour = local_symbol, nonlocal = nonlocal_symbol), size = 0.1) + facet_wrap(. ~ local_symbol, nrow = ceiling(nlocal / 2), ncol = 2) + theme(legend.position = "none")
 #plotly::ggplotly(p)
 ```
@@ -225,7 +225,7 @@ p <- mylist %>%
   bind_rows() %>%
   rename(pleiotropy_lod = lod) %>%
   left_join(tib, by = c("local_gene_id", "nonlocal_gene_id")) %>%
-  select(local_symbol, nonlocal_symbol, pleiotropy_lod, lod_diff, lod_diff_proportion, lod_without_med, lod_with_med, filename, nonlocal_gene_id, local_gene_id) %>%
+  dplyr::select(local_symbol, nonlocal_symbol, pleiotropy_lod, lod_diff, lod_diff_proportion, lod_without_med, lod_with_med, filename, nonlocal_gene_id, local_gene_id) %>%
   ggplot() + geom_point(mapping = aes(x = pleiotropy_lod, y = lod_diff, colour = local_symbol, nonlocal = nonlocal_symbol), size = 0.1) + facet_wrap(. ~ nonlocal_symbol, ncol = 4, nrow = ceiling(nnonlocal / 4)) + theme(legend.position = "none")
 #plotly::ggplotly(p)
 ```
@@ -242,7 +242,7 @@ foo <- mylist %>%
   bind_rows() %>%
   rename(pleiotropy_lod = lod) %>%
   left_join(tib, by = c("local_gene_id", "nonlocal_gene_id")) %>%
-  select(local_symbol, nonlocal_symbol, pleiotropy_lod, lod_diff, lod_diff_proportion, lod_without_med, lod_with_med, filename, nonlocal_gene_id, local_gene_id) 
+  dplyr::select(local_symbol, nonlocal_symbol, pleiotropy_lod, lod_diff, lod_diff_proportion, lod_without_med, lod_with_med, filename, nonlocal_gene_id, local_gene_id) 
 ```
 
 
@@ -250,7 +250,7 @@ foo <- mylist %>%
 foo %>%
   left_join(local_annot2, by = c("local_gene_id" = "annot.id")) %>%
   rename(local_peak_pos = pos, local_peak_lod = lod) %>%
-  select(- marker.id, - chrom, - strand, - biotype, - local_tx) %>%
+  dplyr::select(- marker.id, - chrom, - strand, - biotype, - local_tx) %>%
   filter(local_peak_pos < hot_upper, local_peak_pos > hot_lower)
 
 
@@ -260,9 +260,9 @@ foo %>%
 foo %>%
   left_join(local_annot2, by = c("local_gene_id" = "annot.id")) %>%
   rename(local_peak_pos = pos, local_peak_lod = lod) %>%
-  select(- marker.id, - chrom, - strand, - biotype, - local_tx) %>%
+  dplyr::select(- marker.id, - chrom, - strand, - biotype, - local_tx) %>%
   filter(local_peak_pos < hot_upper, local_peak_pos > hot_lower) %>%
-  select(middle) %>% unlist() %>% range()
+  dplyr::select(middle) %>% unlist() %>% range()
 
 ```
 
@@ -270,7 +270,7 @@ foo %>%
 
 ```{r, hclust_pleio_stats}
 bar <- foo %>%
-  select(nonlocal_gene_id, local_gene_id, pleiotropy_lod) %>%
+  dplyr::select(nonlocal_gene_id, local_gene_id, pleiotropy_lod) %>%
 hotspots::tibble_to_matrix() %>%
   dist() %>%
   hclust() 
@@ -284,7 +284,7 @@ hmcol <- colorRampPalette(brewer.pal(9, "GnBu"))(100)
 
 ```{r heat_pleio_stats, fig.height=4, fig.width = 6}
 foo %>%
-  select(nonlocal_gene_id, local_gene_id, pleiotropy_lod, lod_diff) %>%
+  dplyr::select(nonlocal_gene_id, local_gene_id, pleiotropy_lod, lod_diff) %>%
 hotspots::tibble_to_matrix() %>%
   t() %>%
   gplots::heatmap.2(cexRow = 0.1, cexCol = 0.1, col = hmcol, trace = "none")
@@ -292,7 +292,7 @@ hotspots::tibble_to_matrix() %>%
 
 ```{r heat_lod_diff}
 foo %>%
-  select(nonlocal_gene_id, local_gene_id, lod_diff) %>%
+  dplyr::select(nonlocal_gene_id, local_gene_id, lod_diff) %>%
 hotspots::tibble_to_matrix() %>%
   t() %>%
   gplots::heatmap.2(cexRow = 0.1, cexCol = 0.1, col = hmcol, trace = "none")
@@ -300,7 +300,7 @@ hotspots::tibble_to_matrix() %>%
 
 ```{r heat_lod_diff0}
 foo %>%
-  select(nonlocal_gene_id, local_gene_id, lod_diff) %>%
+  dplyr::select(nonlocal_gene_id, local_gene_id, lod_diff) %>%
   mutate(lod_diff = lod_diff * (lod_diff > 0)) %>%
 hotspots::tibble_to_matrix() %>%
   t() %>%
@@ -311,7 +311,7 @@ hotspots::tibble_to_matrix() %>%
 
 ```{r, define_hld, eval = FALSE}
 hld <- foo %>%
-  select(nonlocal_gene_id, local_gene_id, lod_diff)
+  dplyr::select(nonlocal_gene_id, local_gene_id, lod_diff)
 plotly::plot_ly(as.data.frame(hld), z = as.data.frame(hld)$lod_diff, type = "heatmap")
 ```
 
@@ -323,12 +323,12 @@ Should we create a lod difference dendogram based on the mediations with a singl
 
 ```{r define_hc_objects}
 hc_lod_diff <- foo %>%
-  select(nonlocal_gene_id, local_gene_id, lod_diff) %>%
+  dplyr::select(nonlocal_gene_id, local_gene_id, lod_diff) %>%
   hotspots::tibble_to_matrix() %>%
   dist() %>%
   hclust() 
 hc_pleio <- foo %>%
-  select(nonlocal_gene_id, local_gene_id, pleiotropy_lod) %>%
+  dplyr::select(nonlocal_gene_id, local_gene_id, pleiotropy_lod) %>%
   hotspots::tibble_to_matrix() %>%
   dist() %>%
   hclust() 
@@ -363,14 +363,14 @@ for(i in 1:length(med_vals)){
     uniq_cts_nonlocal <- foo %>% 
       mutate(med = lod_diff > med_vals[i], pleio = pleiotropy_lod <= pleio_vals[j]) %>%
       group_by(med, pleio) %>%
-      select(nonlocal_gene_id, med, pleio) %>%
+      dplyr::select(nonlocal_gene_id, med, pleio) %>%
       unique() %>%
       count() %>%
       rename(n_unique_nonlocal_gene_id = n)
     uniq_cts <- foo %>% 
       mutate(med = lod_diff > med_vals[i], pleio = pleiotropy_lod <= pleio_vals[j]) %>%
       group_by(med, pleio) %>%
-      select(local_gene_id, med, pleio) %>%
+      dplyr::select(local_gene_id, med, pleio) %>%
       unique() %>%
       count() %>%
       rename(n_unique_local_gene_id = n) %>%
@@ -481,7 +481,7 @@ if (file.exists(pleio_file_local)) {mylist_local <- readRDS(pleio_file_local)} e
     mutate(filename = fns[i]) %>%
     mutate(gene1_id = stringr::str_split(fns[i], "_")[[1]][[3]], gene2_id = stringr::str_split(stringr::str_split(fns[i], "_")[[1]][[4]], ".txt")[[1]][[1]]) %>%
     filter(lod == max(lod), trace == "profile1") %>%
-    select(gene1_id, gene2_id, lod, filename)
+    dplyr::select(gene1_id, gene2_id, lod, filename)
   }
   saveRDS(mylist_local, pleio_file_local)
 }
@@ -501,7 +501,7 @@ if (file.exists(pleio_file_nonlocal)) {mylist_nonlocal <- readRDS(pleio_file_non
     mutate(gene1_id = stringr::str_split(fns[i], "_")[[1]][[3]], 
            gene2_id = stringr::str_split(stringr::str_split(fns[i], "_")[[1]][[4]], ".txt")[[1]][[1]]) %>%
     filter(lod == max(lod), trace == "profile1") %>%
-    select(gene1_id, gene2_id, lod, filename)
+    dplyr::select(gene1_id, gene2_id, lod, filename)
   }
   saveRDS(mylist_nonlocal, pleio_file_nonlocal)
 }
@@ -511,7 +511,7 @@ if (file.exists(pleio_file_nonlocal)) {mylist_nonlocal <- readRDS(pleio_file_non
 
 ```{r}
 local_annot3 <- local_annot2 %>%
-  select(annot.id, symbol)
+  dplyr::select(annot.id, symbol)
 local_pleio <- mylist_local %>%
   bind_rows() %>%
   rename(pleiotropy_lod = lod) %>%
@@ -521,7 +521,7 @@ local_pleio <- mylist_local %>%
   rename(gene2_symbol = symbol)
   
 nonlocal_annot3 <- nonlocal_annot %>%
-  select(annot.id, symbol)
+  dplyr::select(annot.id, symbol)
 nonlocal_pleio <- mylist_nonlocal %>%
   bind_rows() %>%
   rename(pleiotropy_lod = lod) %>%
@@ -536,7 +536,7 @@ I now bind all three tibbles that contain pleiotropy results into a single tibbl
 
 ```{r}
 pleio_results_mat <- foo %>%
-  select(local_gene_id, nonlocal_gene_id, pleiotropy_lod, local_symbol, nonlocal_symbol) %>%
+  dplyr::select(local_gene_id, nonlocal_gene_id, pleiotropy_lod, local_symbol, nonlocal_symbol) %>%
   rename(gene1_id = local_gene_id, 
          gene2_id = nonlocal_gene_id, 
          gene1_symbol = local_symbol,
@@ -735,7 +735,7 @@ heatmap.2(foomat,
 
 ```{r, loddiff_clust}
 foo %>%
-  select(1, 2, 4) %>% # choose lod_diff as the stat of interest
+  dplyr::select(1, 2, 4) %>% # choose lod_diff as the stat of interest
   tibble_to_matrix() %>%
   heatmap.2( 
           #labCol=tissue,
@@ -750,7 +750,7 @@ foo %>%
 
 ```{r, loddiffprop_clust}
 foo %>%
-  select(1, 2, 5) %>% # choose lod_diff_proportion as stat of interest
+  dplyr::select(1, 2, 5) %>% # choose lod_diff_proportion as stat of interest
   tibble_to_matrix() %>%
   heatmap.2( 
           #labCol=tissue,
@@ -771,7 +771,7 @@ library(d3heatmap)
 ```{r threshold_clust}
 med_thresh <- 2
 foomat <- foo %>%
-  select(1, 2, 4) %>% # choose lod_diff as stat of interest
+  dplyr::select(1, 2, 4) %>% # choose lod_diff as stat of interest
   tibble_to_matrix()
   apply(FUN = function(x) x <= med_thresh, X = foomat, MARGIN = 2) %>%
     d3heatmap()
@@ -779,7 +779,7 @@ foomat <- foo %>%
 
 ```{r}
 foo %>%
-  select(1, 2, 4) %>% # choose lod_diff as stat of interest
+  dplyr::select(1, 2, 4) %>% # choose lod_diff as stat of interest
   tibble_to_matrix() %>%
   d3heatmap(cexRow = 0.2, cexCol = 0.2)
 ```
@@ -925,8 +925,25 @@ d3heatmap(pmat[hc1$order, hc2$order],
 local_pleio %>%
   dplyr::select(5, 6, 3) %>%
   tibble_to_matrix(symmetric = TRUE) %>%
-  d3heatmap()
+  d3heatmap(cexRow = 0.3, cexCol = 0.3, symm = TRUE)
+
 ```
+
+```{r local-local-hclust}
+l_l_hclust <- local_pleio %>%
+  dplyr::select(5, 6, 3) %>%
+  tibble_to_matrix(symmetric = TRUE) %>%
+  (function(x){x[is.null(x)] <- 0; return(x)}) %>%
+  dist() %>%
+  hclust()
+l_l_hclust %>%  
+  cutree(h = 40) %>% table()
+
+l_l_hclust %>%
+  rafalib::myplclust(cex = 0.4, lab.col = 1 + as.numeric(l_l_hclust$labels == keller_mediator))
+```
+
+
 
 ## Nonlocal-nonlocal pleiotropy test results
 
@@ -934,6 +951,102 @@ local_pleio %>%
 nonlocal_pleio %>%
   dplyr::select(5, 6, 3) %>%
   tibble_to_matrix(symmetric = TRUE) %>%
+  d3heatmap(cexRow = 0.3, cexCol = 0.3, symm = TRUE)
+```
+
+
+```{r nl-nl-hclust}
+nl_nl_hclust <- nonlocal_pleio %>%
+  dplyr::select(5, 6, 3) %>%
+  tibble_to_matrix(symmetric = TRUE) %>%
+  dist() %>% 
+  hclust()
+plot(nl_nl_hclust, cex = 0.2)
+nl_nl_hclust %>%
+  cutree(h = 10) %>%
+  table()
+```
+
+```{r rafalib-plot1}
+# make color labels for dendro plot
+precols <- tibble(nonlocal_symbol = nl_nl_hclust$labels) %>%
+  left_join(bar) %>% # bar has local_symbol set to keller_mediator
+  dplyr::arrange(match(x = nonlocal_symbol, table = nl_nl_hclust$labels))
+# check ordering of nonlocal_symbol against nl_nl_hclust$labels
+# IT'S THE SAME, but only after including the call to dplyr::arrange()
+
+cols <- 1 + (precols$lod_diff > 1.5)
+# dendro plot
+nl_nl_hclust %>%
+  rafalib::myplclust(cex = 0.3, lab.col = cols)
+```
+
+
+## Pleiotropy test results for *all* trait pairs
+
+```{r all-pleio}
+foo %>%
+  dplyr::select(9, 10, 3, 8, 1, 2) %>%
+  rename(gene1_id = nonlocal_gene_id,
+         gene2_id = local_gene_id,
+         gene1_symbol = nonlocal_symbol, 
+         gene2_symbol = local_symbol
+         ) %>%
+  bind_rows(local_pleio) %>%
+  bind_rows(nonlocal_pleio) %>%
+  dplyr::select(5, 6, 3) %>%
+  tibble_to_matrix(symmetric = TRUE) %>%
+  d3heatmap(cexRow = 0.2, cexCol = 0.2)
+```
+
+```{r, all-all-hclust}
+all_all_hclust <- foo %>%
+  dplyr::select(9, 10, 3, 8, 1, 2) %>%
+  rename(gene1_id = nonlocal_gene_id,
+         gene2_id = local_gene_id,
+         gene1_symbol = nonlocal_symbol, 
+         gene2_symbol = local_symbol
+         ) %>%
+  bind_rows(local_pleio) %>%
+  bind_rows(nonlocal_pleio) %>%
+  dplyr::select(5, 6, 3) %>%
+  tibble_to_matrix(symmetric = TRUE) %>%
+  dist() %>%
+  hclust()
+```
+
+```{r rafalib-plot2}
+cols <- 1 + (all_all_hclust$labels %in% bar$nonlocal_symbol)
+cols[all_all_hclust$labels == keller_mediator] <- 3
+# dendro plot
+all_all_hclust %>%
+  rafalib::myplclust(cex = 0.2, lab.col = cols)
+
+```
+
+
+## Mediation (LOD diff) results (truncated at zero) for local-nonlocal pairs
+
+
+```{r med-trunc-heat}
+foo %>%
+  dplyr::select(1, 2, 4) %>%
+  mutate(lod_diff_trunc = lod_diff * (lod_diff > 0)) %>%
+  dplyr::select(-3) %>%
+  tibble_to_matrix(symmetric = FALSE) %>%
+  d3heatmap(cexRow = 0.3, cexCol = 0.3)
+```
+
+
+## Mediation (LOD diff proportion) results (truncated at zero) for local-nonlocal pairs
+
+
+```{r med-prop-trunc-heat}
+foo %>%
+  dplyr::select(1, 2, 5) %>%
+  mutate(lod_diff_prop_trunc = lod_diff_proportion * (lod_diff_proportion > 0)) %>%
+  dplyr::select(-3) %>%
+  tibble_to_matrix(symmetric = FALSE) %>%
   d3heatmap(cexRow = 0.3, cexCol = 0.3)
 ```
 
