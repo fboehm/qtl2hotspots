@@ -9,7 +9,7 @@ RM = rm -f
 
 all: $(PAPER_DIR)/paper.pdf
 
-interactive: $(PAPER_DIR)/Chr11-prelim.html $(PAPER_DIR)/Chr13-prelim.html $(PAPER_DIR)/Chr7-prelim.html $(PAPER_DIR)/Chr5-prelim.html $(PAPER_DIR)/Chr2-prelim.html
+interactive: $(PAPER_DIR)/Chr11-hclusterings.html $(PAPER_DIR)/Chr13-hclusterings.html $(PAPER_DIR)/Chr7-hclusterings.html $(PAPER_DIR)/Chr5-hclusterings.html $(PAPER_DIR)/Chr2-hclusterings.html
 
 # use tinytex to find and install needed latex packages
 $(PAPER_DIR)/paper.tex: $(PAPER_DIR)/paper.Rnw
@@ -18,19 +18,19 @@ $(PAPER_DIR)/paper.tex: $(PAPER_DIR)/paper.Rnw
 $(PAPER_DIR)/paper.pdf: $(PAPER_DIR)/paper.tex $(PAPER_DIR)/research.bib
 	cd $(PAPER_DIR); R -e "install.packages('tinytex', repos = 'https://cloud.r-project.org'); tinytex::latexmk('$(notdir $<)', bib_engine = 'biber', install_packages = TRUE)"
 
-$(PAPER_DIR)/Chr11-prelim.html: $(PAPER_DIR)/Chr11-prelim.Rmd
+$(PAPER_DIR)/Chr11-hclusterings.html: $(PAPER_DIR)/Chr11-hclusterings.Rmd
 	cd $(PAPER_DIR); R -e "rmarkdown::render('$(<F)')"
 
-$(PAPER_DIR)/Chr13-prelim.html: $(PAPER_DIR)/Chr13-prelim.Rmd
+$(PAPER_DIR)/Chr13-hclusterings.html: $(PAPER_DIR)/Chr13-hclusterings.Rmd
 	cd $(PAPER_DIR); R -e "rmarkdown::render('$(<F)')"
 
-$(PAPER_DIR)/Chr7-prelim.html: $(PAPER_DIR)/Chr7-prelim.Rmd
+$(PAPER_DIR)/Chr7-hclusterings.html: $(PAPER_DIR)/Chr7-hclusterings.Rmd
 	cd $(PAPER_DIR); R -e "rmarkdown::render('$(<F)')"
 
-$(PAPER_DIR)/Chr5-prelim.html: $(PAPER_DIR)/Chr5-prelim.Rmd
+$(PAPER_DIR)/Chr5-hclusterings.html: $(PAPER_DIR)/Chr5-hclusterings.Rmd
 	cd $(PAPER_DIR); R -e "rmarkdown::render('$(<F)')"
 
-$(PAPER_DIR)/Chr2-prelim.html: $(PAPER_DIR)/Chr2-prelim.Rmd
+$(PAPER_DIR)/Chr2-hclusterings.html: $(PAPER_DIR)/Chr2-hclusterings.Rmd
 	cd $(PAPER_DIR); R -e "rmarkdown::render('$(<F)')"
 
 
