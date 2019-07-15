@@ -1,0 +1,34 @@
+---
+title: "Checking heatmaps and dendrograms"
+author: "Frederick Boehm"
+date: "7/14/2019"
+output: html_document
+---
+
+```{r setup}
+knitr::opts_chunk$set(echo = TRUE)
+library(hotspots)
+fp <- paste0("../figures/Chr", hot_chr, "-")
+knitr::opts_chunk$set(fig.path = fp)
+
+```
+
+The questions that I want to address today deal with heatmaps and dendrograms. Basically, I want to ensure that I'm correctly sorting & ordering a data matrix before passing it to a heatmap function.
+
+I need to check a few things. First, what is the ordering of rows of a matrix when I create a dendrogram? What is the ordering of rows when I create a heatmap (without attempting any manual reordering)?
+
+Can I order the data matrix according to the dendrogram so that, when calling the heatmap function *while preventing the automated reordering of rows*, do I get the same ordering as in the dendrogram?
+
+Other questions that I want to consider include the *method* for dendrogram creation. I also want to think about coloring schemes in heatmaps.
+
+## Reading Chr 11 intermediate result files 
+
+Let's examine the Chr 11 files for pleiotropy results.
+
+```{r}
+pleio <- readRDS("_cache/Chr11_pleio.rds")
+```
+
+
+
+
