@@ -853,7 +853,7 @@ nl_nl_hclust %>%
 ## Pleiotropy test results for *all* trait pairs
 
 ```{r all-pleio}
-foo %>%
+foohc <- foo %>%
   dplyr::select(9, 10, 3, 8, 1, 2) %>%
   rename(gene1_id = nonlocal_gene_id,
          gene2_id = local_gene_id,
@@ -864,7 +864,16 @@ foo %>%
   bind_rows(nonlocal_pleio) %>%
   dplyr::select(5, 6, 3) %>%
   tibble_to_matrix(symmetric = TRUE) %>%
-  d3heatmap(cexRow = 0.2, cexCol = 0.2)
+  (function(x) {
+    hc <- dist(x) %>% hclust()
+    return(x[hc$order, hc$order])
+    }
+   ) %>%
+  (function(x) {
+    cols <- c("green", "orange")[1 + (colnames(x) %in% bar$nonlocal_symbol)]
+    heatmap.2(x, symm = TRUE, dendrogram = "both", na.rm = TRUE, ColSideColors = cols, cexRow = 0.2, cexCol = 0.2)
+              }
+   )
 ```
 
 ```{r, all-all-hclust}
@@ -882,6 +891,8 @@ all_all_hclust <- foo %>%
   dist() %>%
   hclust()
 ```
+
+
 
 ```{r rafalib-plot2}
 cols <- 1 + (all_all_hclust$labels %in% bar$nonlocal_symbol)
