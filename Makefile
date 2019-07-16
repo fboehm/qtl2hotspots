@@ -16,7 +16,7 @@ $(PAPER_DIR)/paper.tex: $(PAPER_DIR)/paper.Rnw
 	R -e "devtools::install(dep = TRUE)"; cd $(PAPER_DIR); Rscript -e "knitr::knit('$(notdir $<)')"
 
 $(PAPER_DIR)/paper.pdf: $(PAPER_DIR)/paper.tex $(PAPER_DIR)/research.bib
-	cd $(PAPER_DIR); R -e "install.packages('tinytex', repos = 'https://cloud.r-project.org'); tinytex::latexmk('$(notdir $<)', bib_engine = 'biber', install_packages = TRUE)"
+	cd $(PAPER_DIR); R -e "install.packages('tinytex', repos = 'https://cloud.r-project.org'); tinytex::tlmgr_update() ; tinytex::latexmk('$(notdir $<)', bib_engine = 'biber', install_packages = TRUE)"
 
 $(PAPER_DIR)/Chr11-hclusterings.html: $(PAPER_DIR)/Chr11-hclusterings.Rmd
 	cd $(PAPER_DIR); R -e "rmarkdown::render('$(<F)')"

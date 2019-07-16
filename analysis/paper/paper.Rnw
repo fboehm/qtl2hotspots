@@ -166,7 +166,7 @@ l_{10}(\hat B, \hat \Sigma) = - \frac{1}{2}\log_{10}\left((Y - X\hat B)^T\hat \S
 \end{equation}
 
 
-For $n$ mice, $\Sigma$ is a $2n$ by $2n$ covariance matrix, while $V_g$ and $V_e$ are $2$ by $2$ covariance matrices. Estimates $\hat V_g$ and $\hat V_e$ are obtained via an expectation-maximization algorithm \citep{zhou2014efficient,gemma2}
+For $n$ mice, $\Sigma$ is a $2n$ by $2n$ covariance matrix, while $V_g$ and $V_e$ are $2$ by $2$ covariance matrices. Estimates $\hat V_g$ and $\hat V_e$ are obtained via an expectation-maximization algorithm \citep{zhou2014efficient,gemma2}.
 
 
 \subsubsection{Calculating likelihood ratio test statistics}
