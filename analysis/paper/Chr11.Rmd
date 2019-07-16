@@ -144,7 +144,10 @@ if (!file.exists(medfile)){
                                              target = hot_nonlocal[ , i],
                                              mediator = hot_local[ , j],
                                              addcovar = addcovar
-                                             )
+                                             ) %>%
+        mutate(local_gene_id = colnames(hot_local)[j], 
+               nonlocal_gene_id = colnames(hot_nonlocal)[i]
+               )
   }
   out[[j]] <- foo
 }

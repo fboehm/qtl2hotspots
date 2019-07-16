@@ -139,13 +139,16 @@ out <- list()
 medfile <- "_cache/Chr2_mediations.rds"
 if (!file.exists(medfile)){
   for (j in 1:nlocal){
-  foo <- list()
-  for (i in 1:nnonlocal){
-    foo[[i]] <- qtl2mediate:::fit1_med_qtl2(driver = genoprobs[[as.character(hot_chr)]][, , indices[i]],
+    foo <- list()
+    for (i in 1:nnonlocal){
+      foo[[i]] <- qtl2mediate:::fit1_med_qtl2(driver = genoprobs[[as.character(hot_chr)]][, , indices[i]],
                                              target = hot_nonlocal[ , i],
                                              mediator = hot_local[ , j],
                                              addcovar = addcovar
-                                             )
+                                             ) %>%
+        mutate(local_gene_id = colnames(hot_local)[j], 
+               nonlocal_gene_id = colnames(hot_nonlocal)[i]
+               )
   }
   out[[j]] <- foo
 }
@@ -162,7 +165,6 @@ tib <- out %>%
   as_tibble() %>%
   rename(lod_without_med = lod_no_med, lod_with_med = lod_med) %>%
   mutate(lod_diff = lod_without_med - lod_with_med, lod_diff_proportion = lod_diff / lod_without_med) %>%
-  mutate(local_gene_id = rep(colnames(hot_local), each = nnonlocal), nonlocal_gene_id = rep(colnames(hot_nonlocal), times = nlocal)) %>%
   left_join(local_annot2, by = c("local_gene_id" = "annot.id")) %>%
   left_join(nonlocal_annot, by = c("nonlocal_gene_id" = "annot.id")) %>%
   dplyr::select(symbol.x, symbol.y, lod_without_med, lod_with_med, lod_diff, lod_diff_proportion, local_gene_id, nonlocal_gene_id) %>%

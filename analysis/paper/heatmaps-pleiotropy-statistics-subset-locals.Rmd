@@ -89,21 +89,20 @@ local_annot2 <- local_annot %>%
 ```{r subset_expr_matrix-2}
 hot_local <- dataset.islet.rnaseq$expr[, colnames(dataset.islet.rnaseq$expr) %in% local_annot2$annot.id]
 hot_nonlocal <- dataset.islet.rnaseq$expr[, colnames(dataset.islet.rnaseq$expr) %in% nonlocal_annot$annot.id]
-nnonlocal <- ncol(hot_nonlocal)
-nlocal <- ncol(hot_local)
+nnonlocal <- nrow(nonlocal_annot)
+nlocal <- nrow(local_annot2)
 ```
 
 
 
 
-```{r tabulate-2, message=FALSE, warning = FALSE, eval = FALSE}
+```{r tabulate-2, message=FALSE, warning = FALSE}
 med_tib <- med_list %>%
   purrr::map(bind_rows) %>%
   bind_rows() %>%
   as_tibble() %>%
   rename(lod_without_med = lod_no_med, lod_with_med = lod_med) %>%
   mutate(lod_diff = lod_without_med - lod_with_med, lod_diff_proportion = lod_diff / lod_without_med) %>%
-  mutate(local_gene_id = rep(colnames(hot_local), each = nnonlocal), nonlocal_gene_id = rep(colnames(hot_nonlocal), times = nlocal)) %>%
   left_join(local_annot2, by = c("local_gene_id" = "annot.id")) %>%
   left_join(nonlocal_annot, by = c("nonlocal_gene_id" = "annot.id")) %>%
   dplyr::select(symbol.x, symbol.y, lod_without_med, lod_with_med, lod_diff, lod_diff_proportion, local_gene_id, nonlocal_gene_id) %>%
@@ -153,7 +152,7 @@ scols <- 1L + (rownames(pm) %in% local_annot2$symbol)
 The vignette for `heatmaply` is quite helpful and includes discussion of its methods for ordering rows.
 
 ```{r heat-pleio-2}
-heatmaply(pm, symm = TRUE, cexRow = 0.2, cexCol = 0.2, row_side_colors = scols)
+heatmaply(pm, symm = TRUE, cexRow = 0.2, cexCol = 0.2, row_side_colors = scols, limits = c(0,4))
 ```
 
 
@@ -165,6 +164,13 @@ heatmaply(pm, symm = TRUE, cexRow = 0.2, cexCol = 0.2, row_side_colors = scols)
   heatmaply(cexRow = 0.2, cexCol = 0.2, symm = TRUE, row_side_colors = scols)
 ```
 
+```{r}
+pm %>%
+  apply(FUN = hotspots::trunc2, MARGIN = 2, threshold = 5) %>%
+  (function(x) {rownames(x) <- colnames(x); return(x)}) %>%
+  heatmaply(cexRow = 0.2, cexCol = 0.2, symm = TRUE, row_side_colors = scols, limits = c(0, 5))
+
+```
 
 
 
