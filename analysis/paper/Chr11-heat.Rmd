@@ -1,5 +1,5 @@
 ---
-title: "Checking heatmaps and dendrograms"
+title: "Heatmaps of pleiotropy test statistics"
 author: "Frederick Boehm"
 date: "7/14/2019"
 output: html_document
@@ -8,9 +8,22 @@ output: html_document
 ```{r setup}
 knitr::opts_chunk$set(echo = TRUE)
 library(hotspots)
+```
+
+
+The questions that I want to address today deal with heatmaps and dendrograms. Basically, I want to ensure that I'm correctly sorting & ordering a data matrix before passing it to a heatmap function.
+
+I need to check a few things. First, what is the ordering of rows of a matrix when I create a dendrogram? What is the ordering of rows when I create a heatmap (without attempting any manual reordering)?
+
+Can I order the data matrix according to the dendrogram so that, when calling the heatmap function *while preventing the automated reordering of rows*, do I get the same ordering as in the dendrogram?
+
+Other questions that I want to consider include the *method* for dendrogram creation. I also want to think about coloring schemes in heatmaps.
+
+# Chr 11
+
+```{r setup_continued}
 hot_chr <- 11
 hot_mid <- 71
-keller_mediator <- "Sat2"
 ```
 
 ```{r more_setup}
@@ -20,13 +33,8 @@ fp <- paste0("../figures/Chr", hot_chr, "-")
 knitr::opts_chunk$set(fig.path = fp)
 ```
 
-The questions that I want to address today deal with heatmaps and dendrograms. Basically, I want to ensure that I'm correctly sorting & ordering a data matrix before passing it to a heatmap function.
 
-I need to check a few things. First, what is the ordering of rows of a matrix when I create a dendrogram? What is the ordering of rows when I create a heatmap (without attempting any manual reordering)?
 
-Can I order the data matrix according to the dendrogram so that, when calling the heatmap function *while preventing the automated reordering of rows*, do I get the same ordering as in the dendrogram?
-
-Other questions that I want to consider include the *method* for dendrogram creation. I also want to think about coloring schemes in heatmaps.
 
 ## Reading Chr 11 intermediate result files 
 
@@ -187,6 +195,8 @@ pm_nonlocal %>%
 
 
 In the matrix of nonlocal - nonlocal pairs of pleiotropy test statistics, the fact that the maximum is only `r round(max(pm_nonlocal, na.rm = TRUE))` tells us that the heatmap of binary values is not going to be informative, since all or nearly all entries are less than any reasonable threshold.
+
+Regarding possible transformations of the rows of the matrix, I don't really like transformations here. Transformations aim to preserve, in some sense, the distribution of values - test statistics, here - and I don't think that we should do that. I don't really care if a given row comes from a normal distribution, for example. I'm inclined to prefer heatmaps of the raw values.
 
 
 
