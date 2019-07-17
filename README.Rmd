@@ -23,7 +23,7 @@ knitr::opts_chunk$set(
 
 <!-- badges: end -->
 
-The goal of hotspots is to ...
+The goal of hotspots is to analyze the Keller et al. (2018) expression trait hotspots.
 
 ## Installation
 
@@ -40,6 +40,22 @@ install.packages("devtools")
 devtools::install_github("fboehm/hotspots")
 ```
 
+## Keller, et al. (2018)'s hotspots table
+
+Here is Keller's Table S1 (from the Supplemental Documents).
+
+| Chr | position (Mb) |  number of transcripts  | candidate mediator  | number of genes with LOD difference > 1.5  |     
+| --- | -----------   |  ---------------------  |  ------------------ |  ----------------------------------------- |   
+| 2    | 165.5        |   147                   |  Hnf4a              |  88                                        | 
+| 5    | 146          |   182                   |  Pdx1               |  77                                        |
+| 7    | 46           |   123                   |  Fam83e             |  96                                        |
+| 11   | 71           |   126                   |  Sat2               |  115                                       |
+| 13   | 112.5        |   104                   |  Il6st              |  82                                        |
+
+Table: From [Keller et al. 2018 GENETICS](https://www.genetics.org/content/209/1/335), [Supplementary table 1](https://figshare.com/articles/Supplemental_Material_for_Attie_et_al_2018_in_review_/5977459)
+
+
+
 
 ## Example
 
@@ -50,15 +66,15 @@ This is a basic example which shows you how to solve a common problem:
 ## basic example code
 ```
 
-## Build the manuscript `paper.Rmd`
+## Build the manuscript `paper.Rnw`
 
-To render the manuscript `paper.Rmd`, into html, tex, and pdf, use a shell to enter the following text from the 'hotspots' directory:
+To render the manuscript `paper.Rnw`, into pdf, use a shell to enter the following text from the 'hotspots' directory:
 
 ```{bash, docker_build, eval = FALSE}
 docker build .
 ```
 
-If you're not using Docker, and have cloned the repository from Github, you can use the Makefile to render `paper.Rmd`. Just type `make` in the shell:
+If you're not using Docker, and have cloned the repository from Github, you can use the Makefile to render `paper.Rnw`. Just type `make` in the shell (from within the `hotspots` directory):
 
 ```{bash, make, eval = FALSE}
 make

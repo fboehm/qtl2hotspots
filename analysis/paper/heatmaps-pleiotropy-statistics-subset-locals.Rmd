@@ -28,6 +28,7 @@ Below, we produce heatmaps for every hotspot. We consider, for every hotspot, al
 ```{r setup_continued-2}
 hot_chr <- 2
 hot_mid <- 165.5
+keller_mediator <- "Hnf4a"
 ```
 
 ```{r more_setup-2}
@@ -106,7 +107,8 @@ med_tib <- med_list %>%
   left_join(local_annot2, by = c("local_gene_id" = "annot.id")) %>%
   left_join(nonlocal_annot, by = c("nonlocal_gene_id" = "annot.id")) %>%
   dplyr::select(symbol.x, symbol.y, lod_without_med, lod_with_med, lod_diff, lod_diff_proportion, local_gene_id, nonlocal_gene_id) %>%
-  rename(local_symbol = symbol.x, nonlocal_symbol = symbol.y)
+  rename(local_symbol = symbol.x, nonlocal_symbol = symbol.y) %>%
+  filter(!is.na(local_symbol))
 ```
 
 
@@ -117,7 +119,7 @@ med_tib <- med_list %>%
 ```{r make_pleio_tib-2}
 hot_annot <- local_annot2 %>%
   bind_rows(nonlocal_annot) %>%
-  select(annot.id, symbol)
+  dplyr::select(annot.id, symbol)
 (pleio_tib <- pleio_mixed_list %>%
   purrr::map(.f = function(x) rename(x, gene1_id = local_gene_id, gene2_id = nonlocal_gene_id)) %>%
   c(pleio_local_list, pleio_nonlocal_list) %>%
@@ -127,7 +129,7 @@ hot_annot <- local_annot2 %>%
   rename(gene1_symbol = symbol) %>%
   inner_join(hot_annot, by = c("gene2_id" = "annot.id")) %>%
   rename(gene2_symbol = symbol) %>%
-  select(gene1_symbol, gene2_symbol, pleiotropy_lod)
+  dplyr::select(gene1_symbol, gene2_symbol, pleiotropy_lod)
 )  
 ```
 
@@ -135,6 +137,27 @@ hot_annot <- local_annot2 %>%
 pm <- pleio_tib %>%
   tibble_to_matrix(symmetric = TRUE)
 ```
+
+```{r}
+med_tib %>%
+  filter(local_symbol == keller_mediator) %>%
+  inner_join(pleio_tib, by = c("nonlocal_symbol" = "gene2_symbol", "local_symbol" = "gene1_symbol")) %>%
+  dplyr::select(1, 2, 9, 5, 6, 3, 4) %>%
+  arrange(pleiotropy_lod, desc(lod_diff)) %>%
+  filter(nonlocal_symbol %in% c("Clrn3", "Zfp541", "Cdhr2", "Sema4g", "Agap2", "Cacnb3", "Tff3"))
+
+```
+
+```{r}
+med_tib %>%
+  filter(local_symbol == "Ttpal") %>%
+  inner_join(pleio_tib, by = c("nonlocal_symbol" = "gene2_symbol", "local_symbol" = "gene1_symbol")) %>%
+  dplyr::select(1, 2, 9, 5, 6, 3, 4) %>%
+  arrange(desc(lod_diff))
+
+```
+
+
 
 
 ## heatmaps for full matrix
@@ -146,13 +169,14 @@ library(heatmaply)
 
 ```{r make_scols-2}
 scols <- 1L + (rownames(pm) %in% local_annot2$symbol)
+scols2 <- rownames(pm) %in% (med_tib %>% filter(local_symbol == keller_mediator, lod_diff > 1.5))$nonlocal_symbol
 ```
 
 
 The vignette for `heatmaply` is quite helpful and includes discussion of its methods for ordering rows.
 
 ```{r heat-pleio-2}
-heatmaply(pm, symm = TRUE, cexRow = 0.2, cexCol = 0.2, row_side_colors = scols, limits = c(0,4))
+heatmaply(pm, symm = TRUE, cexRow = 0.2, cexCol = 0.2, row_side_colors = tibble(scols, scols2), limits = c(0,4))
 ```
 
 
@@ -164,12 +188,39 @@ heatmaply(pm, symm = TRUE, cexRow = 0.2, cexCol = 0.2, row_side_colors = scols, 
   heatmaply(cexRow = 0.2, cexCol = 0.2, symm = TRUE, row_side_colors = scols)
 ```
 
-```{r}
-pm %>%
+```{r heat4-2}
+foo <- pm %>%
   apply(FUN = hotspots::trunc2, MARGIN = 2, threshold = 5) %>%
   (function(x) {rownames(x) <- colnames(x); return(x)}) %>%
-  heatmaply(cexRow = 0.2, cexCol = 0.2, symm = TRUE, row_side_colors = scols, limits = c(0, 5))
+  heatmaply(cexRow = 0.2, 
+            cexCol = 0.2, 
+            symm = TRUE, 
+            row_side_colors = tibble(scols, scols2), 
+            #reorderfun = identity,
+            limits = c(0, 5)
 
+            )
+
+```
+
+```{r heat8-2}
+ord <- pm %>%
+  dist() %>%
+  hclust() %>%
+  as.dendrogram() %>%
+  dendextend::seriate_dendrogram(dist(pm)) %>%
+  order.dendrogram()
+## order pm (and sidecols!) according to dendrogram from above
+pm[ord, ord] %>%
+  apply(FUN = hotspots::trunc2, MARGIN = 2, threshold = 5) %>%
+  heatmaply(Rowv = FALSE, 
+            Colv = FALSE, 
+            cexRow = 0.2, 
+            cexCol = 0.2, 
+            symm = TRUE, 
+            row_side_colors = tibble(scols, scols2)[ord, ],
+            limits = c(0, 5)
+            )
 ```
 
 
@@ -194,11 +245,21 @@ pm_nonlocal %>%
   heatmaply(symm = TRUE, cexRow = 0.3, cexCol = 0.3)
 ```
 
+```{r heat7-2}
+pm_nonlocal %>%
+  apply(FUN = trunc2, MARGIN = 2, threshold = 5) %>%
+  (function(x) {rownames(x) <- colnames(x); return(x)}) %>%
+  heatmaply(symm = TRUE, cexRow = 0.3, cexCol = 0.3)
+```
+
+
+
 # Chr 5
 
 ```{r setup_continued-5}
 hot_chr <- 5
 hot_mid <- 146
+keller_mediator <- "Pdx1"
 ```
 
 ```{r more_setup-5}
@@ -306,12 +367,16 @@ pm <- pleio_tib %>%
 
 ```{r make_scols-5}
 scols <- 1L + (rownames(pm) %in% local_annot2$symbol)
+scols2 <- rownames(pm) %in% (med_tib %>% filter(local_symbol == keller_mediator, lod_diff > 1.5))$nonlocal_symbol
 ```
 
+
+The vignette for `heatmaply` is quite helpful and includes discussion of its methods for ordering rows.
 
 ```{r heat-pleio-5}
-heatmaply(pm, symm = TRUE, cexRow = 0.2, cexCol = 0.2, row_side_colors = scols)
+heatmaply(pm, symm = TRUE, cexRow = 0.2, cexCol = 0.2, row_side_colors = tibble(scols, scols2), limits = c(0,4))
 ```
+
 
 
 ```{r heat3-5}
@@ -321,6 +386,40 @@ heatmaply(pm, symm = TRUE, cexRow = 0.2, cexCol = 0.2, row_side_colors = scols)
   heatmaply(cexRow = 0.2, cexCol = 0.2, symm = TRUE, row_side_colors = scols)
 ```
 
+```{r heat4-5}
+foo <- pm %>%
+  apply(FUN = hotspots::trunc2, MARGIN = 2, threshold = 5) %>%
+  (function(x) {rownames(x) <- colnames(x); return(x)}) %>%
+  heatmaply(cexRow = 0.2, 
+            cexCol = 0.2, 
+            symm = TRUE, 
+            row_side_colors = tibble(scols, scols2), 
+            #reorderfun = identity,
+            limits = c(0, 5)
+
+            )
+
+```
+
+```{r heat8-5}
+ord <- pm %>%
+  dist() %>%
+  hclust() %>%
+  as.dendrogram() %>%
+  dendextend::seriate_dendrogram(dist(pm)) %>%
+  order.dendrogram()
+## order pm (and sidecols!) according to dendrogram from above
+pm[ord, ord] %>%
+  apply(FUN = hotspots::trunc2, MARGIN = 2, threshold = 5) %>%
+  heatmaply(Rowv = FALSE, 
+            Colv = FALSE, 
+            cexRow = 0.2, 
+            cexCol = 0.2, 
+            symm = TRUE, 
+            row_side_colors = tibble(scols, scols2)[ord, ],
+            limits = c(0, 5)
+            )
+```
 
 
 ## Heatmaps for matrix containing only nonlocal traits
@@ -341,11 +440,20 @@ pm_nonlocal %>%
   heatmaply(symm = TRUE, cexRow = 0.3, cexCol = 0.3)
 ```
 
+```{r heat7-5}
+pm_nonlocal %>%
+  apply(FUN = trunc2, MARGIN = 2, threshold = 5) %>%
+  (function(x) {rownames(x) <- colnames(x); return(x)}) %>%
+  heatmaply(symm = TRUE, cexRow = 0.3, cexCol = 0.3)
+```
+
+
 # Chr 7
 
 ```{r setup_continued-7}
 hot_chr <- 7
 hot_mid <- 46
+keller_mediator <- "Fam83e"
 ```
 
 ```{r more_setup-7}
@@ -454,19 +562,60 @@ pm <- pleio_tib %>%
 
 ```{r make_scols-7}
 scols <- 1L + (rownames(pm) %in% local_annot2$symbol)
+scols2 <- rownames(pm) %in% (med_tib %>% filter(local_symbol == keller_mediator, lod_diff > 1.5))$nonlocal_symbol
 ```
 
+
+The vignette for `heatmaply` is quite helpful and includes discussion of its methods for ordering rows.
+
 ```{r heat-pleio-7}
-heatmaply(pm, symm = TRUE, cexRow = 0.2, cexCol = 0.2)
+heatmaply(pm, symm = TRUE, cexRow = 0.2, cexCol = 0.2, row_side_colors = tibble(scols, scols2), limits = c(0,4))
 ```
+
 
 
 ```{r heat3-7}
 (pm > pleio_threshold) %>%
   apply(FUN = as.integer, MARGIN = 2) %>%
   (function(x) {rownames(x) <- colnames(x); return(x)}) %>%
-  heatmaply(cexRow = 0.2, cexCol = 0.2, symm = TRUE)
+  heatmaply(cexRow = 0.2, cexCol = 0.2, symm = TRUE, row_side_colors = scols)
 ```
+
+```{r heat4-7}
+foo <- pm %>%
+  apply(FUN = hotspots::trunc2, MARGIN = 2, threshold = 5) %>%
+  (function(x) {rownames(x) <- colnames(x); return(x)}) %>%
+  heatmaply(cexRow = 0.2, 
+            cexCol = 0.2, 
+            symm = TRUE, 
+            row_side_colors = tibble(scols, scols2), 
+            #reorderfun = identity,
+            limits = c(0, 5)
+
+            )
+
+```
+
+```{r heat8-7}
+ord <- pm %>%
+  dist() %>%
+  hclust() %>%
+  as.dendrogram() %>%
+  dendextend::seriate_dendrogram(dist(pm)) %>%
+  order.dendrogram()
+## order pm (and sidecols!) according to dendrogram from above
+pm[ord, ord] %>%
+  apply(FUN = hotspots::trunc2, MARGIN = 2, threshold = 5) %>%
+  heatmaply(Rowv = FALSE, 
+            Colv = FALSE, 
+            cexRow = 0.2, 
+            cexCol = 0.2, 
+            symm = TRUE, 
+            row_side_colors = tibble(scols, scols2)[ord, ],
+            limits = c(0, 5)
+            )
+```
+
 
 
 ## Heatmaps for matrix containing only nonlocal traits
@@ -487,6 +636,12 @@ pm_nonlocal %>%
   heatmaply(symm = TRUE, cexRow = 0.3, cexCol = 0.3)
 ```
 
+```{r heat7-7}
+pm_nonlocal %>%
+  apply(FUN = trunc2, MARGIN = 2, threshold = 5) %>%
+  (function(x) {rownames(x) <- colnames(x); return(x)}) %>%
+  heatmaply(symm = TRUE, cexRow = 0.3, cexCol = 0.3)
+```
 
 
 
@@ -496,6 +651,7 @@ pm_nonlocal %>%
 ```{r setup_continued-11}
 hot_chr <- 11
 hot_mid <- 71
+keller_mediator <- "Sat2"
 ```
 
 ```{r more_setup-11}
@@ -604,10 +760,14 @@ pm <- pleio_tib %>%
 
 ```{r make_scols-11}
 scols <- 1L + (rownames(pm) %in% local_annot2$symbol)
+scols2 <- rownames(pm) %in% (med_tib %>% filter(local_symbol == keller_mediator, lod_diff > 1.5))$nonlocal_symbol
 ```
 
+
+The vignette for `heatmaply` is quite helpful and includes discussion of its methods for ordering rows.
+
 ```{r heat-pleio-11}
-heatmaply(pm, symm = TRUE, cexRow = 0.2, cexCol = 0.2, row_side_colors = scols)
+heatmaply(pm, symm = TRUE, cexRow = 0.2, cexCol = 0.2, row_side_colors = tibble(scols, scols2), limits = c(0,4))
 ```
 
 
@@ -617,6 +777,41 @@ heatmaply(pm, symm = TRUE, cexRow = 0.2, cexCol = 0.2, row_side_colors = scols)
   apply(FUN = as.integer, MARGIN = 2) %>%
   (function(x) {rownames(x) <- colnames(x); return(x)}) %>%
   heatmaply(cexRow = 0.2, cexCol = 0.2, symm = TRUE, row_side_colors = scols)
+```
+
+```{r heat4-11}
+foo <- pm %>%
+  apply(FUN = hotspots::trunc2, MARGIN = 2, threshold = 5) %>%
+  (function(x) {rownames(x) <- colnames(x); return(x)}) %>%
+  heatmaply(cexRow = 0.2, 
+            cexCol = 0.2, 
+            symm = TRUE, 
+            row_side_colors = tibble(scols, scols2), 
+            #reorderfun = identity,
+            limits = c(0, 5)
+
+            )
+
+```
+
+```{r heat8-11}
+ord <- pm %>%
+  dist() %>%
+  hclust() %>%
+  as.dendrogram() %>%
+  dendextend::seriate_dendrogram(dist(pm)) %>%
+  order.dendrogram()
+## order pm (and sidecols!) according to dendrogram from above
+pm[ord, ord] %>%
+  apply(FUN = hotspots::trunc2, MARGIN = 2, threshold = 5) %>%
+  heatmaply(Rowv = FALSE, 
+            Colv = FALSE, 
+            cexRow = 0.2, 
+            cexCol = 0.2, 
+            symm = TRUE, 
+            row_side_colors = tibble(scols, scols2)[ord, ],
+            limits = c(0, 5)
+            )
 ```
 
 
@@ -639,6 +834,13 @@ pm_nonlocal %>%
   heatmaply(symm = TRUE, cexRow = 0.3, cexCol = 0.3)
 ```
 
+```{r heat7-11}
+pm_nonlocal %>%
+  apply(FUN = trunc2, MARGIN = 2, threshold = 5) %>%
+  (function(x) {rownames(x) <- colnames(x); return(x)}) %>%
+  heatmaply(symm = TRUE, cexRow = 0.3, cexCol = 0.3)
+```
+
 
 
 # Chr 13
@@ -646,6 +848,7 @@ pm_nonlocal %>%
 ```{r setup_continued-13}
 hot_chr <- 13
 hot_mid <- 112.5
+keller_mediator <- "Il6st"
 ```
 
 ```{r more_setup-13}
@@ -752,10 +955,14 @@ pm <- pleio_tib %>%
 
 ```{r make_scols-13}
 scols <- 1L + (rownames(pm) %in% local_annot2$symbol)
+scols2 <- rownames(pm) %in% (med_tib %>% filter(local_symbol == keller_mediator, lod_diff > 1.5))$nonlocal_symbol
 ```
 
+
+The vignette for `heatmaply` is quite helpful and includes discussion of its methods for ordering rows.
+
 ```{r heat-pleio-13}
-heatmaply(pm, symm = TRUE, cexRow = 0.2, cexCol = 0.2, row_side_colors = scols)
+heatmaply(pm, symm = TRUE, cexRow = 0.2, cexCol = 0.2, row_side_colors = tibble(scols, scols2), limits = c(0,4))
 ```
 
 
@@ -767,6 +974,40 @@ heatmaply(pm, symm = TRUE, cexRow = 0.2, cexCol = 0.2, row_side_colors = scols)
   heatmaply(cexRow = 0.2, cexCol = 0.2, symm = TRUE, row_side_colors = scols)
 ```
 
+```{r heat4-13}
+foo <- pm %>%
+  apply(FUN = hotspots::trunc2, MARGIN = 2, threshold = 5) %>%
+  (function(x) {rownames(x) <- colnames(x); return(x)}) %>%
+  heatmaply(cexRow = 0.2, 
+            cexCol = 0.2, 
+            symm = TRUE, 
+            row_side_colors = tibble(scols, scols2), 
+            #reorderfun = identity,
+            limits = c(0, 5)
+
+            )
+
+```
+
+```{r heat8-13}
+ord <- pm %>%
+  dist() %>%
+  hclust() %>%
+  as.dendrogram() %>%
+  dendextend::seriate_dendrogram(dist(pm)) %>%
+  order.dendrogram()
+## order pm (and sidecols!) according to dendrogram from above
+pm[ord, ord] %>%
+  apply(FUN = hotspots::trunc2, MARGIN = 2, threshold = 5) %>%
+  heatmaply(Rowv = FALSE, 
+            Colv = FALSE, 
+            cexRow = 0.2, 
+            cexCol = 0.2, 
+            symm = TRUE, 
+            row_side_colors = tibble(scols, scols2)[ord, ],
+            limits = c(0, 5)
+            )
+```
 
 
 ## Heatmaps for matrix containing only nonlocal traits
@@ -785,3 +1026,9 @@ pm_nonlocal %>%
   heatmaply(symm = TRUE, cexRow = 0.3, cexCol = 0.3)
 ```
 
+```{r heat7-13}
+pm_nonlocal %>%
+  apply(FUN = trunc2, MARGIN = 2, threshold = 5) %>%
+  (function(x) {rownames(x) <- colnames(x); return(x)}) %>%
+  heatmaply(symm = TRUE, cexRow = 0.3, cexCol = 0.3)
+```
