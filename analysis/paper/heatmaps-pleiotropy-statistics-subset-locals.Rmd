@@ -1,7 +1,7 @@
 ---
-title: "Heatmaps of pleiotropy test statistics - all nonlocals and all locals with LOD above 15"
+title: "Heatmaps of pleiotropy test statistics"
 author: "Frederick Boehm"
-date: "7/16/2019"
+date: "7/17/2019"
 output: 
   html_document:
     toc: true
@@ -138,24 +138,7 @@ pm <- pleio_tib %>%
   tibble_to_matrix(symmetric = TRUE)
 ```
 
-```{r}
-med_tib %>%
-  filter(local_symbol == keller_mediator) %>%
-  inner_join(pleio_tib, by = c("nonlocal_symbol" = "gene2_symbol", "local_symbol" = "gene1_symbol")) %>%
-  dplyr::select(1, 2, 9, 5, 6, 3, 4) %>%
-  arrange(pleiotropy_lod, desc(lod_diff)) %>%
-  filter(nonlocal_symbol %in% c("Clrn3", "Zfp541", "Cdhr2", "Sema4g", "Agap2", "Cacnb3", "Tff3"))
 
-```
-
-```{r}
-med_tib %>%
-  filter(local_symbol == "Ttpal") %>%
-  inner_join(pleio_tib, by = c("nonlocal_symbol" = "gene2_symbol", "local_symbol" = "gene1_symbol")) %>%
-  dplyr::select(1, 2, 9, 5, 6, 3, 4) %>%
-  arrange(desc(lod_diff))
-
-```
 
 
 
@@ -173,35 +156,9 @@ scols2 <- rownames(pm) %in% (med_tib %>% filter(local_symbol == keller_mediator,
 ```
 
 
-The vignette for `heatmaply` is quite helpful and includes discussion of its methods for ordering rows.
-
-```{r heat-pleio-2}
-heatmaply(pm, symm = TRUE, cexRow = 0.2, cexCol = 0.2, row_side_colors = tibble(scols, scols2), limits = c(0,4))
-```
+The vignette for `heatmaply` is quite helpful and includes discussion of its methods for ordering rows. For a discussion of ordering of rows in `heatmaply`, see this issue & its comments: <https://github.com/talgalili/heatmaply/issues/153>
 
 
-
-```{r heat3-2}
-(pm > pleio_threshold) %>%
-  apply(FUN = as.integer, MARGIN = 2) %>%
-  (function(x) {rownames(x) <- colnames(x); return(x)}) %>%
-  heatmaply(cexRow = 0.2, cexCol = 0.2, symm = TRUE, row_side_colors = scols)
-```
-
-```{r heat4-2}
-foo <- pm %>%
-  apply(FUN = hotspots::trunc2, MARGIN = 2, threshold = 5) %>%
-  (function(x) {rownames(x) <- colnames(x); return(x)}) %>%
-  heatmaply(cexRow = 0.2, 
-            cexCol = 0.2, 
-            symm = TRUE, 
-            row_side_colors = tibble(scols, scols2), 
-            #reorderfun = identity,
-            limits = c(0, 5)
-
-            )
-
-```
 
 ```{r heat8-2}
 ord <- pm %>%
@@ -211,6 +168,32 @@ ord <- pm %>%
   dendextend::seriate_dendrogram(dist(pm)) %>%
   order.dendrogram()
 ## order pm (and sidecols!) according to dendrogram from above
+```
+
+```{r make_scols-extra-2}
+scols_extra <- purrr::map(.x = local_annot2$symbol, 
+                                       .f = function(x) {rownames(pm) %in% (med_tib %>% filter(local_symbol == x, lod_diff > 1.5))$nonlocal_symbol}
+) %>% 
+  bind_cols() %>%
+  (function(x){colnames(x) <- local_annot2$symbol; x}) %>%
+  mutate(local = scols)
+```
+
+Instead of adding a column for *every* local trait, let's only add a column for those local traits that mediate at least, say, 4 traits at the 1.5 LOD difference value.
+
+```{r count_med}
+n_med_tr <- 4
+(n_med_per_local <- med_tib %>%
+  group_by(local_symbol) %>%
+  filter(lod_diff > 1.5) %>%
+  count() %>%
+  filter(n >= n_med_tr)
+  )
+scols <- scols_extra %>%
+  dplyr::select(local, n_med_per_local$local_symbol)
+```
+
+```{r heat9-2}
 pm[ord, ord] %>%
   apply(FUN = hotspots::trunc2, MARGIN = 2, threshold = 5) %>%
   heatmaply(Rowv = FALSE, 
@@ -218,7 +201,7 @@ pm[ord, ord] %>%
             cexRow = 0.2, 
             cexCol = 0.2, 
             symm = TRUE, 
-            row_side_colors = tibble(scols, scols2)[ord, ],
+            row_side_colors = scols[ord, ],
             limits = c(0, 5)
             )
 ```
@@ -226,31 +209,6 @@ pm[ord, ord] %>%
 
 
 
-
-## Heatmaps for matrix containing only nonlocal traits
-
-```{r heat5-2}
-pm_nonlocal <- pleio_tib %>%
-  filter(gene1_symbol %in% nonlocal_annot$symbol, gene2_symbol %in% nonlocal_annot$symbol) %>%
-  tibble_to_matrix(symmetric = TRUE)
-pm_nonlocal %>%
-  heatmaply(symm = TRUE, cexRow = 0.3, cexCol = 0.3)
-
-```
-
-```{r heat6-2}
-(pm_nonlocal > pleio_threshold) %>%
-  apply(FUN = as.integer, MARGIN = 2) %>%
-  (function(x) {rownames(x) <- colnames(x); return(x)}) %>%
-  heatmaply(symm = TRUE, cexRow = 0.3, cexCol = 0.3)
-```
-
-```{r heat7-2}
-pm_nonlocal %>%
-  apply(FUN = trunc2, MARGIN = 2, threshold = 5) %>%
-  (function(x) {rownames(x) <- colnames(x); return(x)}) %>%
-  heatmaply(symm = TRUE, cexRow = 0.3, cexCol = 0.3)
-```
 
 
 
@@ -262,77 +220,35 @@ hot_mid <- 146
 keller_mediator <- "Pdx1"
 ```
 
-```{r more_setup-5}
-hot_lower <- hot_mid - 2
-hot_upper <- hot_mid + 2
-fp <- paste0("../figures/Chr", hot_chr, "-")
-knitr::opts_chunk$set(fig.path = fp)
+```{r more_setup-5, ref.label = "more_setup-2"}
 ```
 
 ## Reading intermediate result files 
 
-Let's examine the Chr `r hot_chr` files for pleiotropy results.
 
-```{r readRDS-5}
-pleio_mixed_list <- readRDS(paste0("_cache/Chr", hot_chr, "_pleio.rds"))
-pleio_local_list <- readRDS(paste0("_cache/Chr", hot_chr, "_pleio_local.rds"))
-pleio_nonlocal_list <- readRDS(paste0("_cache/Chr", hot_chr, "_pleio_nonlocal.rds"))
-med_list <- readRDS(paste0("_cache/Chr", hot_chr, "_mediations.rds"))
+```{r readRDS-5, ref.label="readRDS-2"}
 ```
 
 
 
-```{r make_local_annot-5}
-local_annot <- dataset.islet.rnaseq$lod.peaks %>%
-  filter(chrom == hot_chr, pos <= hot_upper, pos >= hot_lower) %>%
-  left_join(y = dataset.islet.rnaseq$annots, by = c("annot.id" = "gene_id")) %>%
-  filter(!duplicated(annot.id)) %>%
-  filter(lod >= ult) %>%
-  mutate(local_tx = chr == hot_chr) %>%
-  filter(local_tx)
+```{r make_local_annot-5, ref.label="make_local_annot-2"}
 ```
 
 
-```{r make_nonlocal_annot-5}
-nonlocal_annot <- dataset.islet.rnaseq$lod.peaks %>%
-  filter(chrom == hot_chr, pos <= hot_upper, pos >= hot_lower) %>%
-  left_join(y = dataset.islet.rnaseq$annots, by = c("annot.id" = "gene_id")) %>%
-  filter(!duplicated(annot.id)) %>%
-#  filter(lod >= ult) %>% #genomewide threshold
-  mutate(local_tx = chr == hot_chr) %>%
-  filter(!local_tx) %>% 
-  filter(!is.na(hotspot))
+```{r make_nonlocal_annot-5, ref.label = "make_nonlocal_annot-2"}
 ```
 
 
-```{r, make_local_annot2-5}
-local_annot2 <- local_annot %>%
-  filter(middle <= hot_upper + 5, middle >= hot_lower - 5) %>%
-  arrange(desc(lod))
+```{r, make_local_annot2-5, ref.label = "make_local_annot2-2"}
 ```
 
-```{r subset_expr_matrix-5}
-hot_local <- dataset.islet.rnaseq$expr[, colnames(dataset.islet.rnaseq$expr) %in% local_annot2$annot.id]
-hot_nonlocal <- dataset.islet.rnaseq$expr[, colnames(dataset.islet.rnaseq$expr) %in% nonlocal_annot$annot.id]
-nnonlocal <- ncol(hot_nonlocal)
-nlocal <- ncol(hot_local)
+```{r subset_expr_matrix-5, ref.label = "subset_expr_matrix-2"}
 ```
 
 
 
 
-```{r tabulate-5, message=FALSE, warning = FALSE, eval = FALSE}
-med_tib <- med_list %>%
-  purrr::map(bind_rows) %>%
-  bind_rows() %>%
-  as_tibble() %>%
-  rename(lod_without_med = lod_no_med, lod_with_med = lod_med) %>%
-  mutate(lod_diff = lod_without_med - lod_with_med, lod_diff_proportion = lod_diff / lod_without_med) %>%
-  mutate(local_gene_id = rep(colnames(hot_local), each = nnonlocal), nonlocal_gene_id = rep(colnames(hot_nonlocal), times = nlocal)) %>%
-  left_join(local_annot2, by = c("local_gene_id" = "annot.id")) %>%
-  left_join(nonlocal_annot, by = c("nonlocal_gene_id" = "annot.id")) %>%
-  dplyr::select(symbol.x, symbol.y, lod_without_med, lod_with_med, lod_diff, lod_diff_proportion, local_gene_id, nonlocal_gene_id) %>%
-  rename(local_symbol = symbol.x, nonlocal_symbol = symbol.y)
+```{r tabulate-5, ref.label = "tabulate-2", message=FALSE, warning = FALSE}
 ```
 
 
@@ -340,113 +256,33 @@ med_tib <- med_list %>%
 
 
 
-```{r make_pleio_tib-5}
-hot_annot <- local_annot2 %>%
-  bind_rows(nonlocal_annot) %>%
-  select(annot.id, symbol)
-(pleio_tib <- pleio_mixed_list %>%
-  purrr::map(.f = function(x) rename(x, gene1_id = local_gene_id, gene2_id = nonlocal_gene_id)) %>%
-  c(pleio_local_list, pleio_nonlocal_list) %>%
-  bind_rows() %>%
-  rename(pleiotropy_lod = lod) %>%
-  inner_join(hot_annot, by = c("gene1_id" = "annot.id")) %>%
-  rename(gene1_symbol = symbol) %>%
-  inner_join(hot_annot, by = c("gene2_id" = "annot.id")) %>%
-  rename(gene2_symbol = symbol) %>%
-  select(gene1_symbol, gene2_symbol, pleiotropy_lod)
-)  
+```{r make_pleio_tib-5, ref.label="make_pleio_tib-2"}
 ```
 
-```{r make_pm-5}
-pm <- pleio_tib %>%
-  tibble_to_matrix(symmetric = TRUE)
+
+```{r make_pm-5, ref.label = "make_pm-2"}
 ```
 
 
 ## heatmaps for full matrix
 
-```{r make_scols-5}
-scols <- 1L + (rownames(pm) %in% local_annot2$symbol)
-scols2 <- rownames(pm) %in% (med_tib %>% filter(local_symbol == keller_mediator, lod_diff > 1.5))$nonlocal_symbol
-```
-
-
-The vignette for `heatmaply` is quite helpful and includes discussion of its methods for ordering rows.
-
-```{r heat-pleio-5}
-heatmaply(pm, symm = TRUE, cexRow = 0.2, cexCol = 0.2, row_side_colors = tibble(scols, scols2), limits = c(0,4))
+```{r make_scols-5, ref.label="make_scols-2"}
 ```
 
 
 
-```{r heat3-5}
-(pm > pleio_threshold) %>%
-  apply(FUN = as.integer, MARGIN = 2) %>%
-  (function(x) {rownames(x) <- colnames(x); return(x)}) %>%
-  heatmaply(cexRow = 0.2, cexCol = 0.2, symm = TRUE, row_side_colors = scols)
+```{r heat8-5, ref.label="heat8-2"}
 ```
 
-```{r heat4-5}
-foo <- pm %>%
-  apply(FUN = hotspots::trunc2, MARGIN = 2, threshold = 5) %>%
-  (function(x) {rownames(x) <- colnames(x); return(x)}) %>%
-  heatmaply(cexRow = 0.2, 
-            cexCol = 0.2, 
-            symm = TRUE, 
-            row_side_colors = tibble(scols, scols2), 
-            #reorderfun = identity,
-            limits = c(0, 5)
-
-            )
-
+```{r ref.label = "make_scols-extra-2"}
 ```
 
-```{r heat8-5}
-ord <- pm %>%
-  dist() %>%
-  hclust() %>%
-  as.dendrogram() %>%
-  dendextend::seriate_dendrogram(dist(pm)) %>%
-  order.dendrogram()
-## order pm (and sidecols!) according to dendrogram from above
-pm[ord, ord] %>%
-  apply(FUN = hotspots::trunc2, MARGIN = 2, threshold = 5) %>%
-  heatmaply(Rowv = FALSE, 
-            Colv = FALSE, 
-            cexRow = 0.2, 
-            cexCol = 0.2, 
-            symm = TRUE, 
-            row_side_colors = tibble(scols, scols2)[ord, ],
-            limits = c(0, 5)
-            )
+```{r ref.label = "count_med"}
 ```
 
 
-## Heatmaps for matrix containing only nonlocal traits
-
-```{r heat5-5}
-pm_nonlocal <- pleio_tib %>%
-  filter(gene1_symbol %in% nonlocal_annot$symbol, gene2_symbol %in% nonlocal_annot$symbol) %>%
-  tibble_to_matrix(symmetric = TRUE)
-pm_nonlocal %>%
-  heatmaply(symm = TRUE, cexRow = 0.3, cexCol = 0.3)
-
+```{r ref.label = "heat9-2"}
 ```
-
-```{r heat6-5}
-(pm_nonlocal > pleio_threshold) %>%
-  apply(FUN = as.integer, MARGIN = 2) %>%
-  (function(x) {rownames(x) <- colnames(x); return(x)}) %>%
-  heatmaply(symm = TRUE, cexRow = 0.3, cexCol = 0.3)
-```
-
-```{r heat7-5}
-pm_nonlocal %>%
-  apply(FUN = trunc2, MARGIN = 2, threshold = 5) %>%
-  (function(x) {rownames(x) <- colnames(x); return(x)}) %>%
-  heatmaply(symm = TRUE, cexRow = 0.3, cexCol = 0.3)
-```
-
 
 # Chr 7
 
@@ -456,77 +292,35 @@ hot_mid <- 46
 keller_mediator <- "Fam83e"
 ```
 
-```{r more_setup-7}
-hot_lower <- hot_mid - 2
-hot_upper <- hot_mid + 2
-fp <- paste0("../figures/Chr", hot_chr, "-")
-knitr::opts_chunk$set(fig.path = fp)
+```{r ref.label = "more_setup-2"}
 ```
 
 ## Reading intermediate result files 
 
-Let's examine the Chr `r hot_chr` files for pleiotropy results.
 
-```{r readRDS-7}
-pleio_mixed_list <- readRDS(paste0("_cache/Chr", hot_chr, "_pleio.rds"))
-pleio_local_list <- readRDS(paste0("_cache/Chr", hot_chr, "_pleio_local.rds"))
-pleio_nonlocal_list <- readRDS(paste0("_cache/Chr", hot_chr, "_pleio_nonlocal.rds"))
-med_list <- readRDS(paste0("_cache/Chr", hot_chr, "_mediations.rds"))
+```{r ref.label="readRDS-2"}
 ```
 
 
 
-```{r make_local_annot-7}
-local_annot <- dataset.islet.rnaseq$lod.peaks %>%
-  filter(chrom == hot_chr, pos <= hot_upper, pos >= hot_lower) %>%
-  left_join(y = dataset.islet.rnaseq$annots, by = c("annot.id" = "gene_id")) %>%
-  filter(!duplicated(annot.id)) %>%
-  filter(lod >= ult) %>%
-  mutate(local_tx = chr == hot_chr) %>%
-  filter(local_tx)
+```{r ref.label="make_local_annot-2"}
 ```
 
 
-```{r make_nonlocal_annot-7}
-nonlocal_annot <- dataset.islet.rnaseq$lod.peaks %>%
-  filter(chrom == hot_chr, pos <= hot_upper, pos >= hot_lower) %>%
-  left_join(y = dataset.islet.rnaseq$annots, by = c("annot.id" = "gene_id")) %>%
-  filter(!duplicated(annot.id)) %>%
-#  filter(lod >= ult) %>% #genomewide threshold
-  mutate(local_tx = chr == hot_chr) %>%
-  filter(!local_tx) %>% 
-  filter(!is.na(hotspot))
+```{r ref.label = "make_nonlocal_annot-2"}
 ```
 
 
-```{r, make_local_annot2-7}
-local_annot2 <- local_annot %>%
-  filter(middle <= hot_upper + 5, middle >= hot_lower - 5) %>%
-  arrange(desc(lod))
+```{r ref.label = "make_local_annot2-2"}
 ```
 
-```{r subset_expr_matrix-7}
-hot_local <- dataset.islet.rnaseq$expr[, colnames(dataset.islet.rnaseq$expr) %in% local_annot2$annot.id]
-hot_nonlocal <- dataset.islet.rnaseq$expr[, colnames(dataset.islet.rnaseq$expr) %in% nonlocal_annot$annot.id]
-nnonlocal <- ncol(hot_nonlocal)
-nlocal <- ncol(hot_local)
+```{r ref.label = "subset_expr_matrix-2"}
 ```
 
 
 
 
-```{r tabulate-7, message=FALSE, warning = FALSE, eval = FALSE}
-med_tib <- med_list %>%
-  purrr::map(bind_rows) %>%
-  bind_rows() %>%
-  as_tibble() %>%
-  rename(lod_without_med = lod_no_med, lod_with_med = lod_med) %>%
-  mutate(lod_diff = lod_without_med - lod_with_med, lod_diff_proportion = lod_diff / lod_without_med) %>%
-  mutate(local_gene_id = rep(colnames(hot_local), each = nnonlocal), nonlocal_gene_id = rep(colnames(hot_nonlocal), times = nlocal)) %>%
-  left_join(local_annot2, by = c("local_gene_id" = "annot.id")) %>%
-  left_join(nonlocal_annot, by = c("nonlocal_gene_id" = "annot.id")) %>%
-  dplyr::select(symbol.x, symbol.y, lod_without_med, lod_with_med, lod_diff, lod_diff_proportion, local_gene_id, nonlocal_gene_id) %>%
-  rename(local_symbol = symbol.x, nonlocal_symbol = symbol.y)
+```{r ref.label = "tabulate-2", message=FALSE, warning = FALSE}
 ```
 
 
@@ -534,115 +328,34 @@ med_tib <- med_list %>%
 
 
 
-```{r make_pleio_tib-7}
-hot_annot <- local_annot2 %>%
-  bind_rows(nonlocal_annot) %>%
-  select(annot.id, symbol)
-(pleio_tib <- pleio_mixed_list %>%
-  purrr::map(.f = function(x) rename(x, gene1_id = local_gene_id, gene2_id = nonlocal_gene_id)) %>%
-  c(pleio_local_list, pleio_nonlocal_list) %>%
-  bind_rows() %>%
-  rename(pleiotropy_lod = lod) %>%
-  inner_join(hot_annot, by = c("gene1_id" = "annot.id")) %>%
-  rename(gene1_symbol = symbol) %>%
-  inner_join(hot_annot, by = c("gene2_id" = "annot.id")) %>%
-  rename(gene2_symbol = symbol) %>%
-  select(gene1_symbol, gene2_symbol, pleiotropy_lod)
-)  
+```{r ref.label="make_pleio_tib-2"}
 ```
 
-```{r make_pm-7}
-pm <- pleio_tib %>%
-  tibble_to_matrix(symmetric = TRUE)
-```
 
+```{r ref.label = "make_pm-2"}
+```
 
 
 ## heatmaps for full matrix
 
-```{r make_scols-7}
-scols <- 1L + (rownames(pm) %in% local_annot2$symbol)
-scols2 <- rownames(pm) %in% (med_tib %>% filter(local_symbol == keller_mediator, lod_diff > 1.5))$nonlocal_symbol
-```
-
-
-The vignette for `heatmaply` is quite helpful and includes discussion of its methods for ordering rows.
-
-```{r heat-pleio-7}
-heatmaply(pm, symm = TRUE, cexRow = 0.2, cexCol = 0.2, row_side_colors = tibble(scols, scols2), limits = c(0,4))
+```{r ref.label="make_scols-2"}
 ```
 
 
 
-```{r heat3-7}
-(pm > pleio_threshold) %>%
-  apply(FUN = as.integer, MARGIN = 2) %>%
-  (function(x) {rownames(x) <- colnames(x); return(x)}) %>%
-  heatmaply(cexRow = 0.2, cexCol = 0.2, symm = TRUE, row_side_colors = scols)
+```{r ref.label="heat8-2"}
 ```
 
-```{r heat4-7}
-foo <- pm %>%
-  apply(FUN = hotspots::trunc2, MARGIN = 2, threshold = 5) %>%
-  (function(x) {rownames(x) <- colnames(x); return(x)}) %>%
-  heatmaply(cexRow = 0.2, 
-            cexCol = 0.2, 
-            symm = TRUE, 
-            row_side_colors = tibble(scols, scols2), 
-            #reorderfun = identity,
-            limits = c(0, 5)
-
-            )
-
+```{r ref.label = "make_scols-extra-2"}
 ```
 
-```{r heat8-7}
-ord <- pm %>%
-  dist() %>%
-  hclust() %>%
-  as.dendrogram() %>%
-  dendextend::seriate_dendrogram(dist(pm)) %>%
-  order.dendrogram()
-## order pm (and sidecols!) according to dendrogram from above
-pm[ord, ord] %>%
-  apply(FUN = hotspots::trunc2, MARGIN = 2, threshold = 5) %>%
-  heatmaply(Rowv = FALSE, 
-            Colv = FALSE, 
-            cexRow = 0.2, 
-            cexCol = 0.2, 
-            symm = TRUE, 
-            row_side_colors = tibble(scols, scols2)[ord, ],
-            limits = c(0, 5)
-            )
+```{r ref.label = "count_med"}
 ```
 
 
 
-## Heatmaps for matrix containing only nonlocal traits
-
-```{r heat5-7}
-pm_nonlocal <- pleio_tib %>%
-  filter(gene1_symbol %in% nonlocal_annot$symbol, gene2_symbol %in% nonlocal_annot$symbol) %>%
-  tibble_to_matrix(symmetric = TRUE)
-pm_nonlocal %>%
-  heatmaply(symm = TRUE, cexRow = 0.3, cexCol = 0.3)
-
+```{r ref.label = "heat9-2"}
 ```
-
-```{r heat6-7}
-(pm_nonlocal > pleio_threshold) %>%
-  apply(FUN = as.integer, MARGIN = 2) %>%
-  (function(x) {rownames(x) <- colnames(x); return(x)}) %>%
-  heatmaply(symm = TRUE, cexRow = 0.3, cexCol = 0.3)
-```
-
-```{r heat7-7}
-pm_nonlocal %>%
-  apply(FUN = trunc2, MARGIN = 2, threshold = 5) %>%
-  (function(x) {rownames(x) <- colnames(x); return(x)}) %>%
-  heatmaply(symm = TRUE, cexRow = 0.3, cexCol = 0.3)
-```
-
 
 
 
@@ -654,77 +367,35 @@ hot_mid <- 71
 keller_mediator <- "Sat2"
 ```
 
-```{r more_setup-11}
-hot_lower <- hot_mid - 2
-hot_upper <- hot_mid + 2
-fp <- paste0("../figures/Chr", hot_chr, "-")
-knitr::opts_chunk$set(fig.path = fp)
+```{r ref.label = "more_setup-2"}
 ```
 
 ## Reading intermediate result files 
 
-Let's examine the Chr `r hot_chr` files for pleiotropy results.
 
-```{r readRDS-11}
-pleio_mixed_list <- readRDS("_cache/Chr11_pleio.rds")
-pleio_local_list <- readRDS("_cache/Chr11_pleio_local.rds")
-pleio_nonlocal_list <- readRDS("_cache/Chr11_pleio_nonlocal.rds")
-med_list <- readRDS("_cache/Chr11_mediations.rds")
+```{r ref.label="readRDS-2"}
 ```
 
 
 
-```{r make_local_annot-11}
-local_annot <- dataset.islet.rnaseq$lod.peaks %>%
-  filter(chrom == hot_chr, pos <= hot_upper, pos >= hot_lower) %>%
-  left_join(y = dataset.islet.rnaseq$annots, by = c("annot.id" = "gene_id")) %>%
-  filter(!duplicated(annot.id)) %>%
-  filter(lod >= ult) %>%
-  mutate(local_tx = chr == hot_chr) %>%
-  filter(local_tx)
+```{r ref.label="make_local_annot-2"}
 ```
 
 
-```{r make_nonlocal_annot-11}
-nonlocal_annot <- dataset.islet.rnaseq$lod.peaks %>%
-  filter(chrom == hot_chr, pos <= hot_upper, pos >= hot_lower) %>%
-  left_join(y = dataset.islet.rnaseq$annots, by = c("annot.id" = "gene_id")) %>%
-  filter(!duplicated(annot.id)) %>%
-#  filter(lod >= ult) %>% #genomewide threshold
-  mutate(local_tx = chr == hot_chr) %>%
-  filter(!local_tx) %>% 
-  filter(!is.na(hotspot))
+```{r ref.label = "make_nonlocal_annot-2"}
 ```
 
 
-```{r, make_local_annot2-11}
-local_annot2 <- local_annot %>%
-  filter(middle <= hot_upper + 5, middle >= hot_lower - 5) %>%
-  arrange(desc(lod))
+```{r ref.label = "make_local_annot2-2"}
 ```
 
-```{r subset_expr_matrix-11}
-hot_local <- dataset.islet.rnaseq$expr[, colnames(dataset.islet.rnaseq$expr) %in% local_annot2$annot.id]
-hot_nonlocal <- dataset.islet.rnaseq$expr[, colnames(dataset.islet.rnaseq$expr) %in% nonlocal_annot$annot.id]
-nnonlocal <- ncol(hot_nonlocal)
-nlocal <- ncol(hot_local)
+```{r ref.label = "subset_expr_matrix-2"}
 ```
 
 
 
 
-```{r tabulate-11, message=FALSE, warning = FALSE, eval = FALSE}
-med_tib <- med_list %>%
-  purrr::map(bind_rows) %>%
-  bind_rows() %>%
-  as_tibble() %>%
-  rename(lod_without_med = lod_no_med, lod_with_med = lod_med) %>%
-  mutate(lod_diff = lod_without_med - lod_with_med, lod_diff_proportion = lod_diff / lod_without_med) %>%
-  mutate(local_gene_id = rep(colnames(hot_local), each = nnonlocal), nonlocal_gene_id = rep(colnames(hot_nonlocal), times = nlocal)) %>%
-  left_join(local_annot2, by = c("local_gene_id" = "annot.id")) %>%
-  left_join(nonlocal_annot, by = c("nonlocal_gene_id" = "annot.id")) %>%
-  dplyr::select(symbol.x, symbol.y, lod_without_med, lod_with_med, lod_diff, lod_diff_proportion, local_gene_id, nonlocal_gene_id) %>%
-  rename(local_symbol = symbol.x, nonlocal_symbol = symbol.y)
+```{r ref.label = "tabulate-2", message=FALSE, warning = FALSE}
 ```
 
 
@@ -732,115 +403,35 @@ med_tib <- med_list %>%
 
 
 
-```{r make_pleio_tib-11}
-hot_annot <- local_annot2 %>%
-  bind_rows(nonlocal_annot) %>%
-  select(annot.id, symbol)
-(pleio_tib <- pleio_mixed_list %>%
-  purrr::map(.f = function(x) rename(x, gene1_id = local_gene_id, gene2_id = nonlocal_gene_id)) %>%
-  c(pleio_local_list, pleio_nonlocal_list) %>%
-  bind_rows() %>%
-  rename(pleiotropy_lod = lod) %>%
-  inner_join(hot_annot, by = c("gene1_id" = "annot.id")) %>%
-  rename(gene1_symbol = symbol) %>%
-  inner_join(hot_annot, by = c("gene2_id" = "annot.id")) %>%
-  rename(gene2_symbol = symbol) %>%
-  select(gene1_symbol, gene2_symbol, pleiotropy_lod)
-)  
+```{r ref.label="make_pleio_tib-2"}
 ```
 
-```{r make_pm-11}
-pm <- pleio_tib %>%
-  tibble_to_matrix(symmetric = TRUE)
-```
 
+```{r ref.label = "make_pm-2"}
+```
 
 
 ## heatmaps for full matrix
 
-```{r make_scols-11}
-scols <- 1L + (rownames(pm) %in% local_annot2$symbol)
-scols2 <- rownames(pm) %in% (med_tib %>% filter(local_symbol == keller_mediator, lod_diff > 1.5))$nonlocal_symbol
-```
-
-
-The vignette for `heatmaply` is quite helpful and includes discussion of its methods for ordering rows.
-
-```{r heat-pleio-11}
-heatmaply(pm, symm = TRUE, cexRow = 0.2, cexCol = 0.2, row_side_colors = tibble(scols, scols2), limits = c(0,4))
+```{r ref.label="make_scols-2"}
 ```
 
 
 
-```{r heat3-11}
-(pm > pleio_threshold) %>%
-  apply(FUN = as.integer, MARGIN = 2) %>%
-  (function(x) {rownames(x) <- colnames(x); return(x)}) %>%
-  heatmaply(cexRow = 0.2, cexCol = 0.2, symm = TRUE, row_side_colors = scols)
+```{r ref.label="heat8-2"}
 ```
 
-```{r heat4-11}
-foo <- pm %>%
-  apply(FUN = hotspots::trunc2, MARGIN = 2, threshold = 5) %>%
-  (function(x) {rownames(x) <- colnames(x); return(x)}) %>%
-  heatmaply(cexRow = 0.2, 
-            cexCol = 0.2, 
-            symm = TRUE, 
-            row_side_colors = tibble(scols, scols2), 
-            #reorderfun = identity,
-            limits = c(0, 5)
-
-            )
-
+```{r ref.label = "make_scols-extra-2"}
 ```
 
-```{r heat8-11}
-ord <- pm %>%
-  dist() %>%
-  hclust() %>%
-  as.dendrogram() %>%
-  dendextend::seriate_dendrogram(dist(pm)) %>%
-  order.dendrogram()
-## order pm (and sidecols!) according to dendrogram from above
-pm[ord, ord] %>%
-  apply(FUN = hotspots::trunc2, MARGIN = 2, threshold = 5) %>%
-  heatmaply(Rowv = FALSE, 
-            Colv = FALSE, 
-            cexRow = 0.2, 
-            cexCol = 0.2, 
-            symm = TRUE, 
-            row_side_colors = tibble(scols, scols2)[ord, ],
-            limits = c(0, 5)
-            )
+
+```{r ref.label = "count_med"}
 ```
 
 
 
-## Heatmaps for matrix containing only nonlocal traits
-
-```{r heat5-11}
-pm_nonlocal <- pleio_tib %>%
-  filter(gene1_symbol %in% nonlocal_annot$symbol, gene2_symbol %in% nonlocal_annot$symbol) %>%
-  tibble_to_matrix(symmetric = TRUE)
-pm_nonlocal %>%
-  heatmaply(symm = TRUE, cexRow = 0.3, cexCol = 0.3)
-
+```{r ref.label = "heat9-2"}
 ```
-
-```{r heat6-11}
-(pm_nonlocal > pleio_threshold) %>%
-  apply(FUN = as.integer, MARGIN = 2) %>%
-  (function(x) {rownames(x) <- colnames(x); return(x)}) %>%
-  heatmaply(symm = TRUE, cexRow = 0.3, cexCol = 0.3)
-```
-
-```{r heat7-11}
-pm_nonlocal %>%
-  apply(FUN = trunc2, MARGIN = 2, threshold = 5) %>%
-  (function(x) {rownames(x) <- colnames(x); return(x)}) %>%
-  heatmaply(symm = TRUE, cexRow = 0.3, cexCol = 0.3)
-```
-
 
 
 # Chr 13
@@ -851,77 +442,35 @@ hot_mid <- 112.5
 keller_mediator <- "Il6st"
 ```
 
-```{r more_setup-13}
-hot_lower <- hot_mid - 2
-hot_upper <- hot_mid + 2
-fp <- paste0("../figures/Chr", hot_chr, "-")
-knitr::opts_chunk$set(fig.path = fp)
+```{r ref.label = "more_setup-2"}
 ```
 
 ## Reading intermediate result files 
 
-Let's examine the Chr `r hot_chr` files for pleiotropy results.
 
-```{r readRDS-13}
-pleio_mixed_list <- readRDS(paste0("_cache/Chr", hot_chr, "_pleio.rds"))
-pleio_local_list <- readRDS(paste0("_cache/Chr", hot_chr, "_pleio_local.rds"))
-pleio_nonlocal_list <- readRDS(paste0("_cache/Chr", hot_chr, "_pleio_nonlocal.rds"))
-med_list <- readRDS(paste0("_cache/Chr", hot_chr, "_mediations.rds"))
+```{r ref.label="readRDS-2"}
 ```
 
 
 
-```{r make_local_annot-13}
-local_annot <- dataset.islet.rnaseq$lod.peaks %>%
-  filter(chrom == hot_chr, pos <= hot_upper, pos >= hot_lower) %>%
-  left_join(y = dataset.islet.rnaseq$annots, by = c("annot.id" = "gene_id")) %>%
-  filter(!duplicated(annot.id)) %>%
-  filter(lod >= ult) %>%
-  mutate(local_tx = chr == hot_chr) %>%
-  filter(local_tx)
+```{r ref.label="make_local_annot-2"}
 ```
 
 
-```{r make_nonlocal_annot-13}
-nonlocal_annot <- dataset.islet.rnaseq$lod.peaks %>%
-  filter(chrom == hot_chr, pos <= hot_upper, pos >= hot_lower) %>%
-  left_join(y = dataset.islet.rnaseq$annots, by = c("annot.id" = "gene_id")) %>%
-  filter(!duplicated(annot.id)) %>%
-#  filter(lod >= ult) %>% #genomewide threshold
-  mutate(local_tx = chr == hot_chr) %>%
-  filter(!local_tx) %>% 
-  filter(!is.na(hotspot))
+```{r ref.label = "make_nonlocal_annot-2"}
 ```
 
 
-```{r, make_local_annot2-13}
-local_annot2 <- local_annot %>%
-  filter(middle <= hot_upper + 5, middle >= hot_lower - 5) %>%
-  arrange(desc(lod))
+```{r ref.label = "make_local_annot2-2"}
 ```
 
-```{r subset_expr_matrix-13}
-hot_local <- dataset.islet.rnaseq$expr[, colnames(dataset.islet.rnaseq$expr) %in% local_annot2$annot.id]
-hot_nonlocal <- dataset.islet.rnaseq$expr[, colnames(dataset.islet.rnaseq$expr) %in% nonlocal_annot$annot.id]
-nnonlocal <- ncol(hot_nonlocal)
-nlocal <- ncol(hot_local)
+```{r ref.label = "subset_expr_matrix-2"}
 ```
 
 
 
 
-```{r tabulate-13, message=FALSE, warning = FALSE, eval = FALSE}
-med_tib <- med_list %>%
-  purrr::map(bind_rows) %>%
-  bind_rows() %>%
-  as_tibble() %>%
-  rename(lod_without_med = lod_no_med, lod_with_med = lod_med) %>%
-  mutate(lod_diff = lod_without_med - lod_with_med, lod_diff_proportion = lod_diff / lod_without_med) %>%
-  mutate(local_gene_id = rep(colnames(hot_local), each = nnonlocal), nonlocal_gene_id = rep(colnames(hot_nonlocal), times = nlocal)) %>%
-  left_join(local_annot2, by = c("local_gene_id" = "annot.id")) %>%
-  left_join(nonlocal_annot, by = c("nonlocal_gene_id" = "annot.id")) %>%
-  dplyr::select(symbol.x, symbol.y, lod_without_med, lod_with_med, lod_diff, lod_diff_proportion, local_gene_id, nonlocal_gene_id) %>%
-  rename(local_symbol = symbol.x, nonlocal_symbol = symbol.y)
+```{r ref.label = "tabulate-2", message=FALSE, warning = FALSE}
 ```
 
 
@@ -929,106 +478,32 @@ med_tib <- med_list %>%
 
 
 
-```{r make_pleio_tib-13}
-hot_annot <- local_annot2 %>%
-  bind_rows(nonlocal_annot) %>%
-  select(annot.id, symbol)
-(pleio_tib <- pleio_mixed_list %>%
-  purrr::map(.f = function(x) rename(x, gene1_id = local_gene_id, gene2_id = nonlocal_gene_id)) %>%
-  c(pleio_local_list, pleio_nonlocal_list) %>%
-  bind_rows() %>%
-  rename(pleiotropy_lod = lod) %>%
-  inner_join(hot_annot, by = c("gene1_id" = "annot.id")) %>%
-  rename(gene1_symbol = symbol) %>%
-  inner_join(hot_annot, by = c("gene2_id" = "annot.id")) %>%
-  rename(gene2_symbol = symbol) %>%
-  select(gene1_symbol, gene2_symbol, pleiotropy_lod)
-)  
+```{r ref.label="make_pleio_tib-2"}
 ```
 
-```{r make_pm-13}
-pm <- pleio_tib %>%
-  tibble_to_matrix(symmetric = TRUE)
+
+```{r ref.label = "make_pm-2"}
 ```
+
 
 ## heatmaps for full matrix
 
-```{r make_scols-13}
-scols <- 1L + (rownames(pm) %in% local_annot2$symbol)
-scols2 <- rownames(pm) %in% (med_tib %>% filter(local_symbol == keller_mediator, lod_diff > 1.5))$nonlocal_symbol
-```
-
-
-The vignette for `heatmaply` is quite helpful and includes discussion of its methods for ordering rows.
-
-```{r heat-pleio-13}
-heatmaply(pm, symm = TRUE, cexRow = 0.2, cexCol = 0.2, row_side_colors = tibble(scols, scols2), limits = c(0,4))
+```{r ref.label="make_scols-2"}
 ```
 
 
 
-```{r heat3-13}
-(pm > pleio_threshold) %>%
-  apply(FUN = as.integer, MARGIN = 2) %>%
-  (function(x) {rownames(x) <- colnames(x); return(x)}) %>%
-  heatmaply(cexRow = 0.2, cexCol = 0.2, symm = TRUE, row_side_colors = scols)
+```{r ref.label="heat8-2"}
 ```
 
-```{r heat4-13}
-foo <- pm %>%
-  apply(FUN = hotspots::trunc2, MARGIN = 2, threshold = 5) %>%
-  (function(x) {rownames(x) <- colnames(x); return(x)}) %>%
-  heatmaply(cexRow = 0.2, 
-            cexCol = 0.2, 
-            symm = TRUE, 
-            row_side_colors = tibble(scols, scols2), 
-            #reorderfun = identity,
-            limits = c(0, 5)
-
-            )
-
+```{r ref.label = "make_scols-extra-2"}
 ```
 
-```{r heat8-13}
-ord <- pm %>%
-  dist() %>%
-  hclust() %>%
-  as.dendrogram() %>%
-  dendextend::seriate_dendrogram(dist(pm)) %>%
-  order.dendrogram()
-## order pm (and sidecols!) according to dendrogram from above
-pm[ord, ord] %>%
-  apply(FUN = hotspots::trunc2, MARGIN = 2, threshold = 5) %>%
-  heatmaply(Rowv = FALSE, 
-            Colv = FALSE, 
-            cexRow = 0.2, 
-            cexCol = 0.2, 
-            symm = TRUE, 
-            row_side_colors = tibble(scols, scols2)[ord, ],
-            limits = c(0, 5)
-            )
+```{r ref.label = "count_med"}
 ```
 
 
-## Heatmaps for matrix containing only nonlocal traits
 
-```{r heat5-13}
-pm_nonlocal <- pleio_tib %>%
-  filter(gene1_symbol %in% nonlocal_annot$symbol, gene2_symbol %in% nonlocal_annot$symbol) %>%
-  tibble_to_matrix(symmetric = TRUE)
-pm_nonlocal %>%
-  heatmaply(symm = TRUE, cexRow = 0.3, cexCol = 0.3)
+```{r ref.label = "heat9-2"}
 ```
 
-```{r heat6-13}
-(pm_nonlocal > pleio_threshold) %>%
-  apply(FUN = as.integer, MARGIN = 2) %>%
-  heatmaply(symm = TRUE, cexRow = 0.3, cexCol = 0.3)
-```
-
-```{r heat7-13}
-pm_nonlocal %>%
-  apply(FUN = trunc2, MARGIN = 2, threshold = 5) %>%
-  (function(x) {rownames(x) <- colnames(x); return(x)}) %>%
-  heatmaply(symm = TRUE, cexRow = 0.3, cexCol = 0.3)
-```
