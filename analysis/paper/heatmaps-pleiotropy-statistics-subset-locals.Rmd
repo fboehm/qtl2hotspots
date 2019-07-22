@@ -73,8 +73,9 @@ local_annot <- dataset.islet.rnaseq$lod.peaks %>%
 ```{r make_nonlocal_annot-2}
 nonlocal_annot <- dataset.islet.rnaseq$lod.peaks %>%
   filter(chrom == hot_chr, pos <= hot_upper, pos >= hot_lower) %>%
-  left_join(y = dataset.islet.rnaseq$annots, by = c("annot.id" = "gene_id")) %>%
+  inner_join(y = dataset.islet.rnaseq$annots, by = c("annot.id" = "gene_id")) %>%
   filter(!duplicated(annot.id)) %>%
+  filter(lod >= 7.18) %>%
   mutate(local_tx = chr == hot_chr) %>%
   filter(!local_tx) %>% 
   filter(!is.na(hotspot))
@@ -151,7 +152,7 @@ library(heatmaply)
 ```
 
 ```{r make_scols-2}
-scols <- 1L + (rownames(pm) %in% local_annot2$symbol)
+scols1 <- 1L + (rownames(pm) %in% local_annot2$symbol)
 scols2 <- rownames(pm) %in% (med_tib %>% filter(local_symbol == keller_mediator, lod_diff > 1.5))$nonlocal_symbol
 ```
 
@@ -161,39 +162,66 @@ The vignette for `heatmaply` is quite helpful and includes discussion of its met
 
 
 ```{r heat8-2}
-ord <- pm %>%
+# order the nonlocal traits first
+## indicator for being a nonlocal trait
+indic_nonlocal <- rownames(pm) %in% nonlocal_annot$symbol
+# define ord_nonlocal
+ord_nonlocal <- pm[indic_nonlocal, indic_nonlocal] %>%
   dist() %>%
   hclust() %>%
   as.dendrogram() %>%
-  dendextend::seriate_dendrogram(dist(pm)) %>%
+  dendextend::seriate_dendrogram(dist(pm[indic_nonlocal, indic_nonlocal])) %>%
   order.dendrogram()
-## order pm (and sidecols!) according to dendrogram from above
+rn_nonlocal <- rownames(pm[indic_nonlocal, indic_nonlocal][ord_nonlocal, ord_nonlocal])
+# define ord_local
+ord_local<- pm[!indic_nonlocal, !indic_nonlocal] %>%
+  dist() %>%
+  hclust() %>%
+  as.dendrogram() %>%
+  dendextend::seriate_dendrogram(dist(pm[!indic_nonlocal, !indic_nonlocal])) %>%
+  order.dendrogram()
+rn_local <- rownames(pm[!indic_nonlocal, !indic_nonlocal][ord_local, ord_local])
+rn <- c(rn_nonlocal, rn_local)
 ```
+
+
 
 ```{r make_scols-extra-2}
 scols_extra <- purrr::map(.x = local_annot2$symbol, 
-                                       .f = function(x) {rownames(pm) %in% (med_tib %>% filter(local_symbol == x, lod_diff > 1.5))$nonlocal_symbol}
+                          .f = function(x) {rownames(pm) %in% (med_tib %>% filter(local_symbol == x, lod_diff > 1.5))$nonlocal_symbol}
 ) %>% 
   bind_cols() %>%
   (function(x){colnames(x) <- local_annot2$symbol; x}) %>%
-  mutate(local = scols)
+  mutate(local = scols1)
 ```
 
 Instead of adding a column for *every* local trait, let's only add a column for those local traits that mediate at least, say, 4 traits at the 1.5 LOD difference value.
 
 ```{r count_med}
-n_med_tr <- 4
+n_med_tr <- 4 # arbitrary threshold
 (n_med_per_local <- med_tib %>%
   group_by(local_symbol) %>%
   filter(lod_diff > 1.5) %>%
   count() %>%
   filter(n >= n_med_tr)
   )
-scols <- scols_extra %>%
-  dplyr::select(local, n_med_per_local$local_symbol)
+scols_pre <- scols_extra %>%
+  dplyr::select(n_med_per_local$local_symbol)
+# get ordering for columns of scols_pre
+col_order <- scols_pre %>%
+  t() %>%
+  dist() %>%
+  hclust() %>%
+  as.dendrogram() %>%
+  dendextend::seriate_dendrogram(dist(t(scols_pre))) %>%
+  order.dendrogram()
+scols <- scols_pre[ , col_order] %>%
+  mutate(local = scols1)
 ```
 
 ```{r heat9-2}
+ord <- match(rn, rownames(pm))
+
 pm[ord, ord] %>%
   apply(FUN = hotspots::trunc2, MARGIN = 2, threshold = 5) %>%
   heatmaply(Rowv = FALSE, 
@@ -202,6 +230,7 @@ pm[ord, ord] %>%
             cexCol = 0.2, 
             symm = TRUE, 
             row_side_colors = scols[ord, ],
+            col_side_colors = scols1[ord],
             limits = c(0, 5)
             )
 ```
