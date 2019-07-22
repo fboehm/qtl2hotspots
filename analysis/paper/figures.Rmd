@@ -140,7 +140,18 @@ pm <- pleio_tib %>%
 ```
 
 
-
+```{r scatter-2}
+p <- pleio_mixed_list %>%
+  bind_rows() %>%
+  rename(pleiotropy_lod = lod) %>%
+  inner_join(med_tib, by = c("local_gene_id", "nonlocal_gene_id")) %>%
+  dplyr::select(local_symbol, nonlocal_symbol, pleiotropy_lod, lod_diff, lod_diff_proportion, lod_without_med, lod_with_med, filename, nonlocal_gene_id, local_gene_id) %>%
+  ggplot() + geom_point(mapping = aes(x = pleiotropy_lod, y = lod_diff, colour = local_symbol, nonlocal = nonlocal_symbol), size = 0.05)
+fnsvg <- paste0("Chr", hot_chr, "_scatter.svg")
+fnpdf <- paste0("Chr", hot_chr, "_scatter.pdf")
+ggsave(plot = p, filename = file.path("../figures", fnsvg))
+ggsave(plot = p, filename = file.path("../figures", fnpdf))
+```
 
 
 
@@ -236,6 +247,13 @@ pm[ord, ord] %>%
 ```
 
 
+## Scatter: index v QTL peak position
+
+```{r index-v-peak-position-2}
+tibble(symbol = rownames(pm[indic_nonlocal, indic_nonlocal])[ord_nonlocal], index = 1:length(symbol)) %>%
+  left_join(nonlocal_annot, by = "symbol") %>%
+  ggplot() + geom_point(aes(y = pos, x = index))
+```
 
 
 
@@ -292,6 +310,8 @@ keller_mediator <- "Pdx1"
 ```{r make_pm-5, ref.label = "make_pm-2"}
 ```
 
+```{r scatter-5, ref.label="scatter-2"}
+```
 
 ## heatmaps for full matrix
 
@@ -312,6 +332,13 @@ keller_mediator <- "Pdx1"
 
 ```{r ref.label = "heat9-2"}
 ```
+
+## Scatter: index v QTL peak position
+
+```{r ref.label = "index-v-peak-position-2"}
+```
+
+
 
 # Chr 7
 
@@ -365,6 +392,11 @@ keller_mediator <- "Fam83e"
 ```
 
 
+```{r scatter-7, ref.label="scatter-2"}
+```
+
+
+
 ## heatmaps for full matrix
 
 ```{r ref.label="make_scols-2"}
@@ -384,6 +416,13 @@ keller_mediator <- "Fam83e"
 
 
 ```{r ref.label = "heat9-2"}
+```
+
+
+
+## Scatter: index v QTL peak position
+
+```{r ref.label = "index-v-peak-position-2"}
 ```
 
 
@@ -440,6 +479,11 @@ keller_mediator <- "Sat2"
 ```
 
 
+```{r scatter-11, ref.label="scatter-2"}
+```
+
+
+
 ## heatmaps for full matrix
 
 ```{r ref.label="make_scols-2"}
@@ -461,6 +505,13 @@ keller_mediator <- "Sat2"
 
 ```{r ref.label = "heat9-2"}
 ```
+
+
+## Scatter: index v QTL peak position
+
+```{r ref.label = "index-v-peak-position-2"}
+```
+
 
 
 # Chr 13
@@ -515,6 +566,11 @@ keller_mediator <- "Il6st"
 ```
 
 
+```{r scatter-13, ref.label="scatter-2"}
+```
+
+
+
 ## heatmaps for full matrix
 
 ```{r ref.label="make_scols-2"}
@@ -536,3 +592,7 @@ keller_mediator <- "Il6st"
 ```{r ref.label = "heat9-2"}
 ```
 
+## Scatter: index v QTL peak position
+
+```{r ref.label = "index-v-peak-position-2"}
+```
