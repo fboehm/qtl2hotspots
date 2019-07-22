@@ -238,6 +238,9 @@ points in the upper right quadrant of the figure.
 That is, few pairs have high pleiotropy test statistics and
 high mediation LOD difference values.
 
+<<>>=
+include_graphics("../figures/Chr2_scatter.pdf")
+@
 
 \section{Discussion}
 
