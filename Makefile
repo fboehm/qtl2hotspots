@@ -1,6 +1,6 @@
 
 PAPER_DIR=analysis/paper
-
+FIGURE_DIR=analysis/figures
 # Tools
 LATEXMK = latexmk
 RM = rm -f
@@ -9,30 +9,18 @@ RM = rm -f
 
 all: $(PAPER_DIR)/paper.pdf
 
-interactive: $(PAPER_DIR)/Chr11-hclusterings.html $(PAPER_DIR)/Chr13-hclusterings.html $(PAPER_DIR)/Chr7-hclusterings.html $(PAPER_DIR)/Chr5-hclusterings.html $(PAPER_DIR)/Chr2-hclusterings.html
 
 # use tinytex to find and install needed latex packages
 $(PAPER_DIR)/paper.tex: $(PAPER_DIR)/paper.Rnw
 	R -e "devtools::install(dep = TRUE)"; cd $(PAPER_DIR); Rscript -e "knitr::knit('$(notdir $<)')"
 
-$(PAPER_DIR)/paper.pdf: $(PAPER_DIR)/paper.tex $(PAPER_DIR)/research.bib
+$(PAPER_DIR)/paper.pdf: $(PAPER_DIR)/paper.tex $(PAPER_DIR)/research.bib pdf_figures
 	cd $(PAPER_DIR); R -e "install.packages('tinytex', repos = 'https://cloud.r-project.org'); tinytex::tlmgr_update() ; tinytex::latexmk('$(notdir $<)', bib_engine = 'biber', install_packages = TRUE)"
 
-$(PAPER_DIR)/Chr11-hclusterings.html: $(PAPER_DIR)/Chr11-hclusterings.Rmd
-	cd $(PAPER_DIR); R -e "rmarkdown::render('$(<F)')"
+pdf_figures: $(FIGURE_DIR)/Chr2_scatter.pdf
 
-$(PAPER_DIR)/Chr13-hclusterings.html: $(PAPER_DIR)/Chr13-hclusterings.Rmd
-	cd $(PAPER_DIR); R -e "rmarkdown::render('$(<F)')"
-
-$(PAPER_DIR)/Chr7-hclusterings.html: $(PAPER_DIR)/Chr7-hclusterings.Rmd
-	cd $(PAPER_DIR); R -e "rmarkdown::render('$(<F)')"
-
-$(PAPER_DIR)/Chr5-hclusterings.html: $(PAPER_DIR)/Chr5-hclusterings.Rmd
-	cd $(PAPER_DIR); R -e "rmarkdown::render('$(<F)')"
-
-$(PAPER_DIR)/Chr2-hclusterings.html: $(PAPER_DIR)/Chr2-hclusterings.Rmd
-	cd $(PAPER_DIR); R -e "rmarkdown::render('$(<F)')"
-
+$(FIGURE_DIR)/Chr2_scatter.pdf: $(PAPER_DIR)/figures.Rmd
+	cd $(PAPER_DIR); R -e "rmarkdown::render('$(notdir $<)')"
 
 mostlyclean:
 	cd $(PAPER_DIR); $(LATEXMK) -silent -c
