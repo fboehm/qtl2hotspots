@@ -238,9 +238,56 @@ points in the upper right quadrant of the figure.
 That is, few pairs have high pleiotropy test statistics and
 high mediation LOD difference values.
 
-<<fig.cap="Scatter plot of mediation LOD difference against pleiotropy LOD for all nonlocal traits mapping to Chromosome 2 hotspot.">>=
+<<fig.cap="Scatter plot of mediation LOD difference against pleiotropy LOD for all nonlocal-local trait pairs mapping to Chromosome 2 hotspot.">>=
 include_graphics("../figures/Chr2_scatter.pdf")
 @
+
+<<fig.cap = "Chr 2 hotspot scatter plots of mediation LOD difference against pleiotropy LOD, separated by local trait.">>=
+include_graphics("../figures/Chr2_scatter-panel.pdf")
+@
+
+
+<<fig.cap="Scatter plot of mediation LOD difference against pleiotropy LOD for all nonlocal-local trait pairs mapping to Chromosome 5 hotspot.">>=
+include_graphics("../figures/Chr5_scatter.pdf")
+@
+
+<<fig.cap = "Chr 5 hotspot scatter plots of mediation LOD difference against pleiotropy LOD, separated by local trait.">>=
+include_graphics("../figures/Chr5_scatter-panel.pdf")
+@
+
+
+
+<<fig.cap="Scatter plot of mediation LOD difference against pleiotropy LOD for all nonlocal-local trait pairs mapping to Chromosome 7 hotspot.">>=
+include_graphics("../figures/Chr7_scatter.pdf")
+@
+
+<<fig.cap = "Chr 7 hotspot scatter plots of mediation LOD difference against pleiotropy LOD, separated by local trait.">>=
+include_graphics("../figures/Chr7_scatter-panel.pdf")
+@
+
+
+
+<<fig.cap="Scatter plot of mediation LOD difference against pleiotropy LOD for all nonlocal-local trait pairs mapping to Chromosome 11 hotspot.">>=
+include_graphics("../figures/Chr11_scatter.pdf")
+@
+
+<<fig.cap = "Chr 11 hotspot scatter plots of mediation LOD difference against pleiotropy LOD, separated by local trait.">>=
+include_graphics("../figures/Chr11_scatter-panel.pdf")
+@
+
+
+
+
+<<fig.cap="Scatter plot of mediation LOD difference against pleiotropy LOD for all nonlocal-local trait pairs mapping to Chromosome 13 hotspot.">>=
+include_graphics("../figures/Chr13_scatter.pdf")
+@
+
+<<fig.cap = "Chr 13 hotspot scatter plots of mediation LOD difference against pleiotropy LOD, separated by local trait.">>=
+include_graphics("../figures/Chr13_scatter-panel.pdf")
+@
+
+
+
 
 \section{Discussion}
 

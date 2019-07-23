@@ -146,13 +146,31 @@ p <- pleio_mixed_list %>%
   rename(pleiotropy_lod = lod) %>%
   inner_join(med_tib, by = c("local_gene_id", "nonlocal_gene_id")) %>%
   dplyr::select(local_symbol, nonlocal_symbol, pleiotropy_lod, lod_diff, lod_diff_proportion, lod_without_med, lod_with_med, filename, nonlocal_gene_id, local_gene_id) %>%
-  ggplot() + geom_point(mapping = aes(x = pleiotropy_lod, y = lod_diff, xlab = "Pleiotropy LOD", ylab = "Mediation LOD difference", colour = local_symbol, nonlocal = nonlocal_symbol), size = 0.05) + theme(legend.position = "none")
+  ggplot() + geom_point(mapping = aes(x = pleiotropy_lod, y = lod_diff, colour = local_symbol == keller_mediator, nonlocal = nonlocal_symbol), size = 0.05) + theme(legend.position = "none") + xlab("Pleiotropy LOD") + ylab("Mediation LOD difference")
 fnsvg <- paste0("Chr", hot_chr, "_scatter.svg")
 fnpdf <- paste0("Chr", hot_chr, "_scatter.pdf")
 ggsave(plot = p, filename = file.path("../figures", fnsvg))
 ggsave(plot = p, filename = file.path("../figures", fnpdf))
 ```
 
+```{r, scatter_by_local-2}
+p <- pleio_mixed_list %>%
+  bind_rows() %>%
+  rename(pleiotropy_lod = lod) %>%
+  inner_join(med_tib, by = c("local_gene_id", "nonlocal_gene_id")) %>%
+  dplyr::select(local_symbol, nonlocal_symbol, pleiotropy_lod, lod_diff, lod_diff_proportion, lod_without_med, lod_with_med, filename, nonlocal_gene_id, local_gene_id) %>%
+  ggplot() + 
+  geom_point(mapping = aes(x = pleiotropy_lod, y = lod_diff, colour = nonlocal_symbol, nonlocal = nonlocal_symbol), size = 0.1) + 
+  facet_wrap(. ~ local_symbol, nrow = ceiling(nlocal / 2), ncol = 2) +
+  broman::karl_theme(strip.placement = "inside") + 
+  theme(legend.position = "none") +
+  xlab("Pleiotropy LOD") + 
+  ylab("Mediation LOD difference")
+fnsvg <- paste0("Chr", hot_chr, "_scatter-panel.svg")
+fnpdf <- paste0("Chr", hot_chr, "_scatter-panel.pdf")
+ggsave(plot = p, filename = file.path("../figures", fnsvg), height = ceiling(nlocal / 2))
+ggsave(plot = p, filename = file.path("../figures", fnpdf), height = ceiling(nlocal / 2))
+```
 
 
 ## heatmaps for full matrix
@@ -313,6 +331,10 @@ keller_mediator <- "Pdx1"
 ```{r scatter-5, ref.label="scatter-2"}
 ```
 
+```{r, ref.label = "scatter_by_local-2"}
+```
+
+
 ## heatmaps for full matrix
 
 ```{r make_scols-5, ref.label="make_scols-2"}
@@ -395,6 +417,10 @@ keller_mediator <- "Fam83e"
 ```{r scatter-7, ref.label="scatter-2"}
 ```
 
+
+
+```{r, ref.label = "scatter_by_local-2"}
+```
 
 
 ## heatmaps for full matrix
@@ -483,6 +509,9 @@ keller_mediator <- "Sat2"
 ```
 
 
+```{r, ref.label = "scatter_by_local-2"}
+```
+
 
 ## heatmaps for full matrix
 
@@ -567,6 +596,11 @@ keller_mediator <- "Il6st"
 
 
 ```{r scatter-13, ref.label="scatter-2"}
+```
+
+
+
+```{r, ref.label = "scatter_by_local-2"}
 ```
 
 

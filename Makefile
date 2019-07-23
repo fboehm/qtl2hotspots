@@ -17,9 +17,7 @@ $(PAPER_DIR)/paper.tex: $(PAPER_DIR)/paper.Rnw
 $(PAPER_DIR)/paper.pdf: $(PAPER_DIR)/paper.tex $(PAPER_DIR)/research.bib pdf_figures
 	cd $(PAPER_DIR); R -e "install.packages('tinytex', repos = 'https://cloud.r-project.org')"; R -e "tinytex::latexmk('$(notdir $<)', bib_engine = 'biber')"
 
-pdf_figures: $(FIGURE_DIR)/Chr2_scatter.pdf
-
-$(FIGURE_DIR)/Chr2_scatter.pdf: $(PAPER_DIR)/figures.Rmd
+pdf_figures: $(PAPER_DIR)/figures.Rmd
 	cd $(PAPER_DIR); R -e "rmarkdown::render('$(notdir $<)')"
 
 mostlyclean:
@@ -31,8 +29,11 @@ clean: mostlyclean
 	$(RM) $(PAPER_DIR)/*.run.xml $(PAPER_DIR)/*.synctex.gz
 	$(RM) $(PAPER_DIR)/*.d
 	$(RM) $(PAPER_DIR)/paper.tex
+  $(RM) $(FIGURE_DIR)/*.*
 
 .PHONY: all clean mostlyclean pdf_figures
+
+
 
 # Include auto-generated dependencies
 #-include *.d
