@@ -32,7 +32,7 @@ clean: mostlyclean
 	$(RM) $(PAPER_DIR)/*.d
 	$(RM) $(PAPER_DIR)/paper.tex
 
-.PHONY: all clean doc mostlyclean pdf
+.PHONY: all clean mostlyclean pdf_figures
 
 # Include auto-generated dependencies
 #-include *.d
