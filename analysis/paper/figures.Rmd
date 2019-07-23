@@ -146,7 +146,7 @@ p <- pleio_mixed_list %>%
   rename(pleiotropy_lod = lod) %>%
   inner_join(med_tib, by = c("local_gene_id", "nonlocal_gene_id")) %>%
   dplyr::select(local_symbol, nonlocal_symbol, pleiotropy_lod, lod_diff, lod_diff_proportion, lod_without_med, lod_with_med, filename, nonlocal_gene_id, local_gene_id) %>%
-  ggplot() + geom_point(mapping = aes(x = pleiotropy_lod, y = lod_diff, colour = local_symbol, nonlocal = nonlocal_symbol), size = 0.05) + theme(legend.position = "none")
+  ggplot() + geom_point(mapping = aes(x = pleiotropy_lod, y = lod_diff, xlab = "Pleiotropy LOD", ylab = "Mediation LOD difference", colour = local_symbol, nonlocal = nonlocal_symbol), size = 0.05) + theme(legend.position = "none")
 fnsvg <- paste0("Chr", hot_chr, "_scatter.svg")
 fnpdf <- paste0("Chr", hot_chr, "_scatter.pdf")
 ggsave(plot = p, filename = file.path("../figures", fnsvg))

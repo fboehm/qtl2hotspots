@@ -238,7 +238,7 @@ points in the upper right quadrant of the figure.
 That is, few pairs have high pleiotropy test statistics and
 high mediation LOD difference values.
 
-<<>>=
+<<fig.cap="Scatter plot of mediation LOD difference against pleiotropy LOD for all nonlocal traits mapping to Chromosome 2 hotspot.">>=
 include_graphics("../figures/Chr2_scatter.pdf")
 @
 
