@@ -238,52 +238,120 @@ points in the upper right quadrant of the figure.
 That is, few pairs have high pleiotropy test statistics and
 high mediation LOD difference values.
 
+<<>>=
+hot_chr <- 2
+@
+
 <<fig.cap="Scatter plot of mediation LOD difference against pleiotropy LOD for all nonlocal-local trait pairs mapping to Chromosome 2 hotspot.">>=
-include_graphics("../figures/Chr2_scatter.pdf")
+include_graphics(paste0("../figures/Chr", hot_chr, "_scatter.pdf"))
 @
 
-<<fig.cap = "Chr 2 hotspot scatter plots of mediation LOD difference against pleiotropy LOD, separated by local trait.">>=
-include_graphics("../figures/Chr2_scatter-panel.pdf")
+<<define_nfig>>=
+nfig <- c(2, 2, 3, 3, 1) # number of panel figs per hotspot
+names(nfig) <- paste0("Chr", c(2, 5, 7, 11, 13))
 @
 
+
+
+<<panel1, fig.cap = paste0("Chr", hot_chr, "hotspot scatter plots of mediation LOD difference against pleiotropy LOD, separated by local trait.")>>=
+include_graphics(paste0("../figures/Chr", hot_chr, "_scatter-panel1.pdf"))
+@
+
+
+<<panel2, eval = nfig[which(names(nfig) == paste0("Chr", hot_chr))] > 1>>=
+include_graphics(paste0("../figures/Chr", hot_chr, "_scatter-panel2.pdf"))
+@
+
+<<panel3, eval = nfig[which(names(nfig) == paste0("Chr", hot_chr))] > 2>>=
+include_graphics(paste0("../figures/Chr", hot_chr, "_scatter-panel3.pdf"))
+@
+
+
+<<>>=
+hot_chr <- 5
+@
 
 <<fig.cap="Scatter plot of mediation LOD difference against pleiotropy LOD for all nonlocal-local trait pairs mapping to Chromosome 5 hotspot.">>=
 include_graphics("../figures/Chr5_scatter.pdf")
 @
 
-<<fig.cap = "Chr 5 hotspot scatter plots of mediation LOD difference against pleiotropy LOD, separated by local trait.">>=
-include_graphics("../figures/Chr5_scatter-panel.pdf")
+
+
+<<ref.label = "panel1", fig.cap = paste0("Chr", hot_chr, "hotspot scatter plots of mediation LOD difference against pleiotropy LOD, separated by local trait.")>>=
 @
 
+
+<<ref.label = "panel2", eval = nfig[which(names(nfig) == paste0("Chr", hot_chr))] > 1>>=
+@
+
+<<ref.label = "panel3", eval = nfig[which(names(nfig) == paste0("Chr", hot_chr))] > 2>>=
+@
+
+
+<<>>=
+hot_chr <- 7
+@
 
 
 <<fig.cap="Scatter plot of mediation LOD difference against pleiotropy LOD for all nonlocal-local trait pairs mapping to Chromosome 7 hotspot.">>=
 include_graphics("../figures/Chr7_scatter.pdf")
 @
 
-<<fig.cap = "Chr 7 hotspot scatter plots of mediation LOD difference against pleiotropy LOD, separated by local trait.">>=
-include_graphics("../figures/Chr7_scatter-panel.pdf")
+<<ref.label = "panel1", fig.cap = paste0("Chr", hot_chr, "hotspot scatter plots of mediation LOD difference against pleiotropy LOD, separated by local trait.")>>=
 @
 
+
+<<ref.label = "panel2", eval = nfig[which(names(nfig) == paste0("Chr", hot_chr))] > 1>>=
+@
+
+<<ref.label = "panel3", eval = nfig[which(names(nfig) == paste0("Chr", hot_chr))] > 2>>=
+@
+
+
+
+
+
+<<>>=
+hot_chr <- 11
+@
 
 
 <<fig.cap="Scatter plot of mediation LOD difference against pleiotropy LOD for all nonlocal-local trait pairs mapping to Chromosome 11 hotspot.">>=
 include_graphics("../figures/Chr11_scatter.pdf")
 @
 
-<<fig.cap = "Chr 11 hotspot scatter plots of mediation LOD difference against pleiotropy LOD, separated by local trait.">>=
-include_graphics("../figures/Chr11_scatter-panel.pdf")
+<<ref.label = "panel1", fig.cap = paste0("Chr", hot_chr, "hotspot scatter plots of mediation LOD difference against pleiotropy LOD, separated by local trait.")>>=
 @
 
 
+<<ref.label = "panel2", eval = nfig[which(names(nfig) == paste0("Chr", hot_chr))] > 1>>=
+@
+
+<<ref.label = "panel3", eval = nfig[which(names(nfig) == paste0("Chr", hot_chr))] > 2>>=
+@
+
+
+
+
+
+
+<<>>=
+hot_chr <- 13
+@
 
 
 <<fig.cap="Scatter plot of mediation LOD difference against pleiotropy LOD for all nonlocal-local trait pairs mapping to Chromosome 13 hotspot.">>=
 include_graphics("../figures/Chr13_scatter.pdf")
 @
 
-<<fig.cap = "Chr 13 hotspot scatter plots of mediation LOD difference against pleiotropy LOD, separated by local trait.">>=
-include_graphics("../figures/Chr13_scatter-panel.pdf")
+<<ref.label = "panel1", fig.cap = paste0("Chr", hot_chr, "hotspot scatter plots of mediation LOD difference against pleiotropy LOD, separated by local trait.")>>=
+@
+
+
+<<ref.label = "panel2", eval = nfig[which(names(nfig) == paste0("Chr", hot_chr))] > 1>>=
+@
+
+<<ref.label = "panel3", eval = nfig[which(names(nfig) == paste0("Chr", hot_chr))] > 2>>=
 @
 
 

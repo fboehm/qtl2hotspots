@@ -154,22 +154,58 @@ ggsave(plot = p, filename = file.path("../figures", fnpdf))
 ```
 
 ```{r, scatter_by_local-2}
-p <- pleio_mixed_list %>%
+foo <- pleio_mixed_list %>%
   bind_rows() %>%
   rename(pleiotropy_lod = lod) %>%
   inner_join(med_tib, by = c("local_gene_id", "nonlocal_gene_id")) %>%
-  dplyr::select(local_symbol, nonlocal_symbol, pleiotropy_lod, lod_diff, lod_diff_proportion, lod_without_med, lod_with_med, filename, nonlocal_gene_id, local_gene_id) %>%
+  dplyr::select(local_symbol, nonlocal_symbol, pleiotropy_lod, lod_diff, lod_diff_proportion, lod_without_med, lod_with_med, filename, nonlocal_gene_id, local_gene_id)
+p <- foo %>%
   ggplot() + 
   geom_point(mapping = aes(x = pleiotropy_lod, y = lod_diff, colour = nonlocal_symbol, nonlocal = nonlocal_symbol), size = 0.1) + 
   facet_wrap(. ~ local_symbol, nrow = ceiling(nlocal / 2), ncol = 2) +
   broman::karl_theme(strip.placement = "inside") + 
   theme(legend.position = "none") +
+  theme(
+    strip.background = element_blank(),
+    strip.text.x = element_blank()
+) + 
   xlab("Pleiotropy LOD") + 
-  ylab("Mediation LOD difference")
+  ylab("Mediation LOD difference") + 
+  geom_text(aes(x = 1, y = 1, label = local_symbol), inherit.aes=FALSE)
+
 fnsvg <- paste0("Chr", hot_chr, "_scatter-panel.svg")
 fnpdf <- paste0("Chr", hot_chr, "_scatter-panel.pdf")
 ggsave(plot = p, filename = file.path("../figures", fnsvg), height = ceiling(nlocal / 2))
 ggsave(plot = p, filename = file.path("../figures", fnpdf), height = ceiling(nlocal / 2))
+
+# put in multiple figures, if there are many local traits
+n_figs <- 1 + nlocal %/% 18 # 18 is the number of panels per page in pdf
+n_last <- nlocal %% 18 # number of panels on last figure
+max_pleio_lod <- max(foo$pleiotropy_lod)
+max_med_lod_difference <- max(foo$lod_diff) 
+min_med_lod_difference <- min(foo$lod_diff)
+
+for (i in 1:n_figs){
+  n_panels <- 18 * (i < n_figs) + n_last * (i == n_figs)
+  foo %>%
+    filter(local_symbol %in% local_annot2$symbol[((i - 1) * 18 + 1): (18 * i)]) %>%
+    ggplot() + 
+      geom_point(mapping = aes(x = pleiotropy_lod, y = lod_diff, colour = nonlocal_symbol, nonlocal = nonlocal_symbol), size = 0.1) + 
+      facet_wrap(. ~ local_symbol, nrow = ceiling(n_panels / 2), ncol = 2) +
+      broman::karl_theme() + 
+      theme(legend.position = "none") +
+      theme(
+        strip.background = element_blank(),
+        strip.text.x = element_blank()
+    ) + 
+      xlab("Pleiotropy LOD") + xlim(c(0, max_pleio_lod)) + ylim(c(min_med_lod_difference, max_med_lod_difference)) + 
+      ylab("Mediation LOD difference") + 
+      geom_text(vjust = 0.9, hjust = 0.9, size = 3, aes(x = max_pleio_lod / 2, y = 2 * max_med_lod_difference / 3, label = local_symbol), inherit.aes=FALSE)
+  fnsvg <- paste0("Chr", hot_chr, "_scatter-panel", i, ".svg")
+  fnpdf <- paste0("Chr", hot_chr, "_scatter-panel", i, ".pdf")
+  ggsave(filename = file.path("../figures", fnsvg), height = 9)
+  ggsave(filename = file.path("../figures", fnpdf), height = 9)
+}
 ```
 
 

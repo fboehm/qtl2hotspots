@@ -29,7 +29,6 @@ clean: mostlyclean
 	$(RM) $(PAPER_DIR)/*.run.xml $(PAPER_DIR)/*.synctex.gz
 	$(RM) $(PAPER_DIR)/*.d
 	$(RM) $(PAPER_DIR)/paper.tex
-  $(RM) $(FIGURE_DIR)/*.*
 
 .PHONY: all clean mostlyclean pdf_figures
 
