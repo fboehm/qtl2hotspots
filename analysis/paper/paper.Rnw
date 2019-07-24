@@ -252,7 +252,7 @@ That is, few pairs have high pleiotropy test statistics and
 high mediation LOD difference values.
 
 <<setup>>=
-library(hotspots)
+library(qtl2hotspots)
 pleio_threshold <- 4
 ult <- 15 # univariate lod threshold
 @
@@ -357,7 +357,7 @@ pleio_tib <- pleio_mixed_list %>%
 
 <<make_pm-2>>=
 pm <- pleio_tib %>%
-  hotspots::tibble_to_matrix(symmetric = TRUE)
+  tibble_to_matrix(symmetric = TRUE)
 @
 
 
@@ -508,7 +508,7 @@ scols <- scols_pre[ , col_order] %>%
 ord <- match(rn, rownames(pm))
 
 pm[ord, ord] %>%
-  apply(FUN = hotspots::trunc2, MARGIN = 2, threshold = 5) %>%
+  apply(FUN = trunc2, MARGIN = 2, threshold = 5) %>%
   heatmaply(Rowv = FALSE,
             Colv = FALSE,
             cexRow = 0.2,
