@@ -4,7 +4,7 @@ FROM rocker/verse:3.5.3
 # required
 MAINTAINER Frederick Boehm <frederick.boehm@gmail.com>
 
-COPY . /home/rstudio/hotspots
+COPY . /home/rstudio/qtl2hotspots
 
 # go into the repo directory
 RUN . /etc/environment \
@@ -14,4 +14,4 @@ RUN . /etc/environment \
   && sudo apt-get update \
   && sudo apt-get install libudunits2-dev -y \
   # build this compendium package
-  && cd /home/rstudio/hotspots; make
+  && cd /home/rstudio/qtl2hotspots; make

@@ -2,7 +2,7 @@
 
 env:
   global:
-  - REPO=$DOCKER_USER/hotspots
+  - REPO=$DOCKER_USER/qtl2hotspots
 
 sudo: required
 
@@ -23,6 +23,6 @@ deploy:
 
 before_install:
     # create & run container using our dockerfile, i.e. compile pkg and render Rmd to Word doc
-  - docker build -t fjboehm/hotspots:$TRAVIS_COMMIT .
-  - docker tag fjboehm/hotspots:$TRAVIS_COMMIT fjboehm/hotspots:travis-$TRAVIS_BUILD_NUMBER
+  - docker build -t fjboehm/qtl2hotspots:$TRAVIS_COMMIT .
+  - docker tag fjboehm/qtl2hotspots:$TRAVIS_COMMIT fjboehm/qtl2hotspots:travis-$TRAVIS_BUILD_NUMBER
 
