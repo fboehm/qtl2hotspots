@@ -1,6 +1,6 @@
 
 PAPER_DIR=analysis/paper
-FIGURE_DIR=analysis/figures
+
 # Tools
 LATEXMK = latexmk
 RM = rm -f
@@ -14,11 +14,9 @@ all: $(PAPER_DIR)/paper.pdf
 $(PAPER_DIR)/paper.tex: $(PAPER_DIR)/paper.Rnw
 	R -e "devtools::install(dep = TRUE)"; cd $(PAPER_DIR); Rscript -e "knitr::knit('$(notdir $<)')"
 
-$(PAPER_DIR)/paper.pdf: $(PAPER_DIR)/paper.tex $(PAPER_DIR)/research.bib pdf_figures
+$(PAPER_DIR)/paper.pdf: $(PAPER_DIR)/paper.tex $(PAPER_DIR)/research.bib
 	cd $(PAPER_DIR); R -e "install.packages('tinytex', repos = 'https://cloud.r-project.org')"; R -e "tinytex::latexmk('$(notdir $<)', bib_engine = 'biber')"
 
-pdf_figures: $(PAPER_DIR)/figures.Rmd
-	cd $(PAPER_DIR); R -e "rmarkdown::render('$(notdir $<)')"
 
 mostlyclean:
 	cd $(PAPER_DIR); $(LATEXMK) -silent -c
@@ -30,7 +28,7 @@ clean: mostlyclean
 	$(RM) $(PAPER_DIR)/*.d
 	$(RM) $(PAPER_DIR)/paper.tex
 
-.PHONY: all clean mostlyclean pdf_figures
+.PHONY: all clean mostlyclean
 
 
 
