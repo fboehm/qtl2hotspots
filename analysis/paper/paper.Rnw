@@ -114,6 +114,7 @@ unique QTL in a genomic region of interest.
 
 <<load-broman>>=
 library(broman)
+library(here)
 @
 
 
@@ -266,25 +267,30 @@ hot_mid <- 165.5
 keller_mediator <- "Hnf4a"
 @
 
+
 <<more_setup-2>>=
 hot_lower <- hot_mid - 2
 hot_upper <- hot_mid + 2
-fp <- paste0("../figures/Chr", hot_chr, "-")
-knitr::opts_chunk$set(fig.path = fp)
+fp <- paste0("Chr", hot_chr, "-")
+knitr::opts_chunk$set(fig.path = here("analysis", "figures", fp))
 @
 
+
 <<readRDS-2>>=
-pleio_mixed_list <- readRDS(paste0("_cache/Chr", hot_chr, "_pleio.rds"))
-pleio_local_list <- readRDS(paste0("_cache/Chr", hot_chr, "_pleio_local.rds"))
-pleio_nonlocal_list <- readRDS(paste0("_cache/Chr", hot_chr, "_pleio_nonlocal.rds"))
-med_list <- readRDS(paste0("_cache/Chr", hot_chr, "_mediations.rds"))
+pleio_mixed_list <- readRDS(here("analysis", "data", paste0("Chr", hot_chr, "_pleio.rds")))
+pleio_local_list <- readRDS(here("analysis", "data", paste0("Chr", hot_chr, "_pleio_local.rds")))
+pleio_nonlocal_list <- readRDS(here("analysis", "data", paste0("Chr", hot_chr, "_pleio_nonlocal.rds")))
+med_list <- readRDS(here("analysis", "data", paste0("Chr", hot_chr, "_mediations.rds")))
 @
+
 
 <<load_attie>>=
 load("~/Box Sync/attie/keller2018-chr2-hotspot-chtc/data-to-ignore/Attie_DO378_eQTL_viewer_v1.Rdata")
 library(tidyverse)
 options(tibble.print_max = 50, tibble.print_min = 20)
 @
+
+
 
 <<make_local_annot-2>>=
 local_annot <- dataset.islet.rnaseq$lod.peaks %>%

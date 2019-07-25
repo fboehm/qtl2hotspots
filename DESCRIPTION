@@ -1,9 +1,9 @@
 Package: qtl2hotspots
 Type: Package
-Title: What the Package Does (Title Case)
+Title: Analysis of Expression Trait Hotspots
 Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
+Author: Frederick J. Boehm
+Maintainer: Frederick J. Boehm <frederick.boehm@gmail.com>
 Description: More about what it does (maybe more than one line)
     Use four spaces when indenting paragraphs within the Description.
 License: MIT + file LICENSE
