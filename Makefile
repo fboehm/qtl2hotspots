@@ -15,7 +15,7 @@ $(PAPER_DIR)/paper.tex: $(PAPER_DIR)/paper.Rnw
 	R -e "devtools::install(dep = TRUE)"; cd $(PAPER_DIR); Rscript -e "knitr::knit('$(notdir $<)')"
 
 $(PAPER_DIR)/paper.pdf: $(PAPER_DIR)/paper.tex $(PAPER_DIR)/research.bib
-	cd $(PAPER_DIR); R -e "install.packages('tinytex', repos = 'https://cloud.r-project.org')"; R -e "tinytex::tlmgr_update()"; R -e "tinytex::latexmk('$(notdir $<)', bib_engine = 'biber')"
+	cd $(PAPER_DIR); R -e "install.packages('tinytex', repos = 'https://cloud.r-project.org')"; R -e "tinytex::tlmgr_update()"; R -e "tinytex::latexmk('$(notdir $<)')"
 
 
 mostlyclean:
