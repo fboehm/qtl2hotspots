@@ -6,7 +6,7 @@
 <!-- badges: start -->
 
 [![Travis-CI Build
-Status](https://travis-ci.org/fboehm/hotspots.svg?branch=master)](https://travis-ci.org/fboehm/hotspots)
+Status](https://travis-ci.org/fboehm/qtl2hotspots.svg?branch=master)](https://travis-ci.org/fboehm/qtl2hotspots)
 
 <!-- badges: end -->
 
