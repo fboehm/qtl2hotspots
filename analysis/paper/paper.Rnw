@@ -68,7 +68,9 @@ echo = FALSE,
 fig.lp = "fig:",
 warning = FALSE,
 message = FALSE,
-comment = NA
+comment = NA,
+fig.dim = c(7, 7),
+out.width = "\\linewidth"
 )
 def.chunk.hook  <- knitr::knit_hooks$get("chunk")
 knitr::knit_hooks$set(chunk = function(x, options) {
@@ -488,6 +490,9 @@ n_med_per_local <- med_tib %>%
   filter(lod_diff > 1.5) %>%
   count() %>%
   filter(n >= n_med_tr)
+n_med_per_local %>%
+  arrange(desc(n)) %>%
+  knitr::kable()
 
 scols_pre <- scols_extra %>%
   dplyr::select(n_med_per_local$local_symbol)
@@ -504,10 +509,10 @@ scols <- scols_pre[ , col_order] %>%
 @
 
 
-<<heat9-2>>=
+<<heat9-2, fig.height = 7, fig.width = 7, out.width = "\\textwidth">>=
 ord <- match(rn, rownames(pm))
 
-pm[ord, ord] %>%
+p <- pm[ord, ord] %>%
   apply(FUN = trunc2, MARGIN = 2, threshold = 5) %>%
   heatmaply(Rowv = FALSE,
             Colv = FALSE,
@@ -515,10 +520,20 @@ pm[ord, ord] %>%
             cexCol = 0.2,
             symm = TRUE,
             row_side_colors = scols[ord, ],
-            col_side_colors = scols1[ord],
+            col_side_colors = tibble(local = scols1[ord]),
             limits = c(0, 5)
-            )
+            ) %>%
+  hide_guides()
+fnsvg <- paste0("Chr", hot_chr, "_heat", ".svg")
+fnpdf <- paste0("Chr", hot_chr, "_heat", ".pdf")
+plotly::orca(p, file.path("../figures", fnsvg))
+plotly::orca(p, file.path("../figures", fnpdf))
+p
 @
+
+
+
+
 
 
 <<index-v-peak-position-2>>=
@@ -574,7 +589,7 @@ keller_mediator <- "Pdx1"
 @
 
 
-<<ref.label = "scatter_by_local-2">>=
+<<scatter_by_local-5, ref.label = "scatter_by_local-2">>=
 @
 
 
@@ -585,16 +600,16 @@ keller_mediator <- "Pdx1"
 <<heat8-5, ref.label="heat8-2">>=
 @
 
-<<ref.label = "make_scols-extra-2">>=
+<<make_scols-extra-5, ref.label = "make_scols-extra-2">>=
 @
 
-<<ref.label = "count_med">>=
+<<count_med-5, ref.label = "count_med">>=
 @
 
-<<ref.label = "heat9-2">>=
+<<heat9-5, ref.label = "heat9-2">>=
 @
 
-<<ref.label = "index-v-peak-position-2">>=
+<<index-v-peak-position-5, ref.label = "index-v-peak-position-2">>=
 @
 
 <<setup_continued-7>>=
@@ -603,32 +618,30 @@ hot_mid <- 46
 keller_mediator <- "Fam83e"
 @
 
-<<ref.label = "more_setup-2">>=
+<<more_setup-7, ref.label = "more_setup-2">>=
 @
 
-<<ref.label="readRDS-2">>=
+<<readRDS-7, ref.label="readRDS-2">>=
 @
 
-<<ref.label="make_local_annot-2">>=
-@
-
-<<ref.label = "make_nonlocal_annot-2">>=
-@
-
-<<ref.label = "make_local_annot2-2">>=
-@
-
-<<ref.label = "subset_expr_matrix-2">>=
-@
-
-<<ref.label = "tabulate-2", message=FALSE, warning = FALSE>>=
-@
-
-<<ref.label="make_pleio_tib-2">>=
+<<make_local_annot-7, ref.label="make_local_annot-2">>=
 @
 
 
-<<ref.label = "make_pm-2">>=
+<<make_local_annot2-7, ref.label = "make_local_annot2-2">>=
+@
+
+<<subset_expr_matrix-7, ref.label = "subset_expr_matrix-2">>=
+@
+
+<<tabulate-7, ref.label = "tabulate-2", message=FALSE, warning = FALSE>>=
+@
+
+<<make_pleio_tib-7, ref.label="make_pleio_tib-2">>=
+@
+
+
+<<make_pm-7, ref.label = "make_pm-2">>=
 @
 
 
@@ -636,31 +649,31 @@ keller_mediator <- "Fam83e"
 @
 
 
-<<ref.label = "scatter_by_local-2">>=
+<<scatter_by_local-7, ref.label = "scatter_by_local-2">>=
 @
 
 
-<<ref.label="make_scols-2">>=
+<<make_scols-7, ref.label="make_scols-2">>=
 @
 
 
-<<ref.label="heat8-2">>=
+<<heat8-7, ref.label="heat8-2">>=
 @
 
 
-<<ref.label = "make_scols-extra-2">>=
+<<make_scols-extra-7, ref.label = "make_scols-extra-2">>=
 @
 
 
-<<ref.label = "count_med">>=
+<<count_med-7, ref.label = "count_med">>=
 @
 
 
-<<ref.label = "heat9-2">>=
+<<heat9-7, ref.label = "heat9-2">>=
 @
 
 
-<<ref.label = "index-v-peak-position-2">>=
+<<index-v-peak-position-7, ref.label = "index-v-peak-position-2">>=
 @
 
 
@@ -671,70 +684,67 @@ keller_mediator <- "Sat2"
 @
 
 
-<<ref.label = "more_setup-2">>=
+<<more_setup-11, ref.label = "more_setup-2">>=
 @
 
 
-<<ref.label="readRDS-2">>=
+<<readRDS-11, ref.label="readRDS-2">>=
 @
 
 
-<<ref.label="make_local_annot-2">>=
+<<make_local_annot-11, ref.label="make_local_annot-2">>=
 @
 
 
-<<ref.label = "make_nonlocal_annot-2">>=
+
+<<make_local_annot2-11, ref.label = "make_local_annot2-2">>=
 @
 
 
-<<ref.label = "make_local_annot2-2">>=
+<<subset_expr_matrix-11, ref.label = "subset_expr_matrix-2">>=
 @
 
 
-<<ref.label = "subset_expr_matrix-2">>=
+<<tabulate-11, ref.label = "tabulate-2", message=FALSE, warning = FALSE>>=
 @
 
 
-<<ref.label = "tabulate-2", message=FALSE, warning = FALSE>>=
+<<make_pleio_tib-11, ref.label="make_pleio_tib-2">>=
 @
 
 
-<<ref.label="make_pleio_tib-2">>=
-@
-
-
-<<ref.label = "make_pm-2">>=
+<<make_pm-11, ref.label = "make_pm-2">>=
 @
 
 <<scatter-11, ref.label="scatter-2">>=
 @
 
 
-<<ref.label = "scatter_by_local-2">>=
+<<scatter_by_local-11, ref.label = "scatter_by_local-2">>=
 @
 
 
-<<ref.label="make_scols-2">>=
+<<make_scols-11, ref.label="make_scols-2">>=
 @
 
 
-<<ref.label="heat8-2">>=
+<<heat8-11, ref.label="heat8-2">>=
 @
 
 
-<<ref.label = "make_scols-extra-2">>=
+<<make_scols_extra-11, ref.label = "make_scols-extra-2">>=
 @
 
 
-<<ref.label = "count_med">>=
+<<count_med-11, ref.label = "count_med">>=
 @
 
 
-<<ref.label = "heat9-2">>=
+<<heat9-11, ref.label = "heat9-2">>=
 @
 
 
-<<ref.label = "index-v-peak-position-2">>=
+<<index-v-peak-position-11, ref.label = "index-v-peak-position-2">>=
 @
 
 
@@ -745,39 +755,37 @@ keller_mediator <- "Il6st"
 @
 
 
-<<ref.label = "more_setup-2">>=
+<<more_setup-13, ref.label = "more_setup-2">>=
 @
 
 
-<<ref.label="readRDS-2">>=
+<<readRDS-13, ref.label="readRDS-2">>=
 @
 
 
-<<ref.label="make_local_annot-2">>=
+<<make_local_annot-13, ref.label="make_local_annot-2">>=
 @
 
 
-<<ref.label = "make_nonlocal_annot-2">>=
+
+
+<<make_local_annot2-13, ref.label = "make_local_annot2-2">>=
 @
 
 
-<<ref.label = "make_local_annot2-2">>=
+<<subset_expr_matrix-13, ref.label = "subset_expr_matrix-2">>=
 @
 
 
-<<ref.label = "subset_expr_matrix-2">>=
+<<tabulate-13, ref.label = "tabulate-2", message=FALSE, warning = FALSE>>=
 @
 
 
-<<ref.label = "tabulate-2", message=FALSE, warning = FALSE>>=
+<<make_pleio_tib-13, ref.label="make_pleio_tib-2">>=
 @
 
 
-<<ref.label="make_pleio_tib-2">>=
-@
-
-
-<<ref.label = "make_pm-2">>=
+<<make_pm-13, ref.label = "make_pm-2">>=
 @
 
 
@@ -785,30 +793,30 @@ keller_mediator <- "Il6st"
 @
 
 
-<<ref.label = "scatter_by_local-2">>=
+<<scatter_by_local-13, ref.label = "scatter_by_local-2">>=
 @
 
 
-<<ref.label="make_scols-2">>=
+<<make_scols-13, ref.label="make_scols-2">>=
 @
 
 
-<<ref.label="heat8-2">>=
+<<heat8-13, ref.label="heat8-2">>=
 @
 
 
-<<ref.label = "make_scols-extra-2">>=
+<<make_scols-extra-13, ref.label = "make_scols-extra-2">>=
 @
 
 
-<<ref.label = "count_med">>=
+<<count_med-13, ref.label = "count_med">>=
 @
 
 
-<<ref.label = "heat9-2">>=
+<<heat9-13, ref.label = "heat9-2">>=
 @
 
-<<ref.label = "index-v-peak-position-2">>=
+<<index-v-peak-position-13, ref.label = "index-v-peak-position-2">>=
 @
 
 
@@ -816,7 +824,7 @@ keller_mediator <- "Il6st"
 
 
 
-<<>>=
+<<def-2>>=
 hot_chr <- 2
 @
 
@@ -845,7 +853,7 @@ include_graphics(paste0("../figures/Chr", hot_chr, "_scatter-panel3.pdf"))
 @
 
 
-<<>>=
+<<def-5>>=
 hot_chr <- 5
 @
 
@@ -866,7 +874,7 @@ include_graphics("../figures/Chr5_scatter.pdf")
 @
 
 
-<<>>=
+<<def-7>>=
 hot_chr <- 7
 @
 
@@ -889,7 +897,7 @@ include_graphics("../figures/Chr7_scatter.pdf")
 
 
 
-<<>>=
+<<def-11>>=
 hot_chr <- 11
 @
 
@@ -913,7 +921,7 @@ include_graphics("../figures/Chr11_scatter.pdf")
 
 
 
-<<>>=
+<<def-13>>=
 hot_chr <- 13
 @
 
