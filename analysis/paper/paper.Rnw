@@ -243,7 +243,7 @@ statistical computing environment \citep{r}.
 
 \section{Results}
 
-We generated scatter plots of pleiotropy test statistics vs. mediation LOD difference values for each of the five hotspots (Figure~\ref{}, \ref{}).
+We generated scatter plots of pleiotropy test statistics vs. mediation LOD difference values for each of the five hotspots (Figure).
 Each point represents a pairing of a local trait with a nonlocal trait.
 The mediation LOD difference value is that observed when the local trait is considered
 as a candidate mediator of the QTL-nonlocal trait association.
