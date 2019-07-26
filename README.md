@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# hotspots
+# qtl2hotspots
 
 <!-- badges: start -->
 
@@ -10,15 +10,15 @@ Status](https://travis-ci.org/fboehm/qtl2hotspots.svg?branch=master)](https://tr
 
 <!-- badges: end -->
 
-The goal of hotspots is to analyze the Keller et al. (2018) expression
-trait hotspots.
+The goal of qtl2hotspots is to analyze the Keller et al. (2018)
+expression trait hotspots.
 
 ## Installation
 
 Install from Dockerhub with this command:
 
 ``` bash
-docker pull fjboehm/hotspots
+docker pull fjboehm/qtl2hotspots
 ```
 
 Alternatively, if you wish to install the package directly from Github,
@@ -26,7 +26,7 @@ use `devtools`.
 
 ``` r
 install.packages("devtools")
-devtools::install_github("fboehm/hotspots")
+devtools::install_github("fboehm/qtl2hotspots")
 ```
 
 ## Keller, et al. (2018)’s hotspots table
@@ -51,7 +51,7 @@ table 1](https://figshare.com/articles/Supplemental_Material_for_Attie_et_al_201
 This is a basic example which shows you how to solve a common problem:
 
 ``` r
-#library(hotspots)
+#library(qtl2hotspots)
 ## basic example code
 ```
 
@@ -74,6 +74,6 @@ make
 
 ## Code of Conduct
 
-Please note that the ‘hotspots’ project is released with a [Contributor
-Code of Conduct](.github/CODE_OF_CONDUCT.md). By contributing to this
-project, you agree to abide by its terms.
+Please note that the ‘qtl2hotspots’ project is released with a
+[Contributor Code of Conduct](.github/CODE_OF_CONDUCT.md). By
+contributing to this project, you agree to abide by its terms.
