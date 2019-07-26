@@ -277,15 +277,33 @@ knitr::opts_chunk$set(fig.path = here("analysis", "figures", fp))
 
 
 <<readRDS-2>>=
-pleio_mixed_list <- readRDS(here("analysis", "data", paste0("Chr", hot_chr, "_pleio.rds")))
-pleio_local_list <- readRDS(here("analysis", "data", paste0("Chr", hot_chr, "_pleio_local.rds")))
-pleio_nonlocal_list <- readRDS(here("analysis", "data", paste0("Chr", hot_chr, "_pleio_nonlocal.rds")))
-med_list <- readRDS(here("analysis", "data", paste0("Chr", hot_chr, "_mediations.rds")))
+pleio_mixed_list <- readRDS(here("analysis", "data", "derived_data", paste0("Chr", hot_chr, "_pleio.rds")))
+pleio_local_list <- readRDS(here("analysis", "data", "derived_data", paste0("Chr", hot_chr, "_pleio_local.rds")))
+pleio_nonlocal_list <- readRDS(here("analysis", "data", "derived_data", paste0("Chr", hot_chr, "_pleio_nonlocal.rds")))
+med_list <- readRDS(here("analysis", "data", "derived_data", paste0("Chr", hot_chr, "_mediations.rds")))
 @
 
 
-<<load_attie>>=
-load("~/Box Sync/attie/keller2018-chr2-hotspot-chtc/data-to-ignore/Attie_DO378_eQTL_viewer_v1.Rdata")
+
+
+<<load_attie, eval=!file.exists(here("analysis", "data", "raw_data", "Attie_DO378_eQTL_viewer_v1.Rdata"))>>=
+download.file("https://datadryad.org/bitstream/handle/10255/dryad.166774/Attie_DO378_eQTL_viewer_v1.Rdata?sequence=2",
+              destfile = here("analysis", "data", "raw_data", "Attie_DO378_eQTL_viewer_v1.Rdata")
+              )
+load(here("analysis", "data", "raw_data", "Attie_DO378_eQTL_viewer_v1.Rdata"))
+saveRDS(dataset.islet.rnaseq$lod.peaks, here("analysis", "data", "derived_data", "lod_peaks.rds"))
+saveRDS(dataset.islet.rnaseq$annots, here("analysis", "data", "derived_data", "annots.rds"))
+saveRDS(dataset.islet.rnaseq$expr, here("analysis", "data", "derived_data", "expr.rds"))
+@
+
+<<read_attie_files>>=
+lod_peaks <- readRDS(here("analysis", "data", "derived_data", "lod_peaks.rds"))
+annots <- readRDS(here("analysis", "data", "derived_data", "annots.rds"))
+@
+
+
+
+<<load_tidyverse>>=
 library(tidyverse)
 options(tibble.print_max = 50, tibble.print_min = 20)
 @
@@ -293,9 +311,9 @@ options(tibble.print_max = 50, tibble.print_min = 20)
 
 
 <<make_local_annot-2>>=
-local_annot <- dataset.islet.rnaseq$lod.peaks %>%
+local_annot <- lod_peaks %>%
   filter(chrom == hot_chr, pos <= hot_upper, pos >= hot_lower) %>%
-  left_join(y = dataset.islet.rnaseq$annots, by = c("annot.id" = "gene_id")) %>%
+  left_join(y = annots, by = c("annot.id" = "gene_id")) %>%
   filter(!duplicated(annot.id)) %>%
   filter(lod >= ult) %>%
   mutate(local_tx = chr == hot_chr) %>%
@@ -304,9 +322,9 @@ local_annot <- dataset.islet.rnaseq$lod.peaks %>%
 
 
 <<make_nonlocal_annot-2>>=
-nonlocal_annot <- dataset.islet.rnaseq$lod.peaks %>%
+nonlocal_annot <- lod_peaks %>%
   filter(chrom == hot_chr, pos <= hot_upper, pos >= hot_lower) %>%
-  inner_join(y = dataset.islet.rnaseq$annots, by = c("annot.id" = "gene_id")) %>%
+  inner_join(y = annots, by = c("annot.id" = "gene_id")) %>%
   filter(!duplicated(annot.id)) %>%
   filter(lod >= 7.18) %>%
   mutate(local_tx = chr == hot_chr) %>%
@@ -324,8 +342,8 @@ local_annot2 <- local_annot %>%
 
 
 <<subset_expr_matrix-2>>=
-hot_local <- dataset.islet.rnaseq$expr[, colnames(dataset.islet.rnaseq$expr) %in% local_annot2$annot.id]
-hot_nonlocal <- dataset.islet.rnaseq$expr[, colnames(dataset.islet.rnaseq$expr) %in% nonlocal_annot$annot.id]
+hot_local <- expr[, colnames(expr) %in% local_annot2$annot.id]
+hot_nonlocal <- expr[, colnames(expr) %in% nonlocal_annot$annot.id]
 nnonlocal <- nrow(nonlocal_annot)
 nlocal <- nrow(local_annot2)
 @
@@ -378,8 +396,8 @@ p <- pleio_mixed_list %>%
   ggplot() + geom_point(mapping = aes(x = pleiotropy_lod, y = lod_diff, colour = local_symbol == keller_mediator, nonlocal = nonlocal_symbol), size = 0.05) + theme(legend.position = "none") + xlab("Pleiotropy LOD") + ylab("Mediation LOD difference")
 fnsvg <- paste0("Chr", hot_chr, "_scatter.svg")
 fnpdf <- paste0("Chr", hot_chr, "_scatter.pdf")
-ggsave(plot = p, filename = file.path("../figures", fnsvg))
-ggsave(plot = p, filename = file.path("../figures", fnpdf))
+ggsave(plot = p, filename = here("analysis", "figures", fnsvg))
+ggsave(plot = p, filename = here("analysis", "figures", fnpdf))
 p
 @
 
@@ -406,8 +424,8 @@ p <- foo %>%
 
 fnsvg <- paste0("Chr", hot_chr, "_scatter-panel.svg")
 fnpdf <- paste0("Chr", hot_chr, "_scatter-panel.pdf")
-ggsave(plot = p, filename = file.path("../figures", fnsvg), height = ceiling(nlocal / 2))
-ggsave(plot = p, filename = file.path("../figures", fnpdf), height = ceiling(nlocal / 2))
+ggsave(plot = p, filename = here("analysis", "figures", fnsvg), height = ceiling(nlocal / 2))
+ggsave(plot = p, filename = here("analysis", "figures", fnpdf), height = ceiling(nlocal / 2))
 
 # put in multiple figures, if there are many local traits
 n_figs <- 1 + nlocal %/% 18 # 18 is the number of panels per page in pdf
@@ -434,8 +452,8 @@ for (i in 1:n_figs){
       geom_text(size = 2, aes(x = max_pleio_lod / 2, y = 2 * max_med_lod_difference / 3, label = local_symbol), inherit.aes=FALSE)
   fnsvg <- paste0("Chr", hot_chr, "_scatter-panel", i, ".svg")
   fnpdf <- paste0("Chr", hot_chr, "_scatter-panel", i, ".pdf")
-  ggsave(filename = file.path("../figures", fnsvg), height = ceiling(n_panels / 2))
-  ggsave(filename = file.path("../figures", fnpdf), height = ceiling(n_panels / 2))
+  ggsave(filename = here("analysis", "figures", fnsvg), height = ceiling(n_panels / 2))
+  ggsave(filename = here("analysis", "figures", fnpdf), height = ceiling(n_panels / 2))
 }
 @
 
@@ -532,8 +550,8 @@ p <- pm[ord, ord] %>%
   hide_guides()
 fnsvg <- paste0("Chr", hot_chr, "_heat", ".svg")
 fnpdf <- paste0("Chr", hot_chr, "_heat", ".pdf")
-plotly::orca(p, file.path("../figures", fnsvg))
-plotly::orca(p, file.path("../figures", fnpdf))
+plotly::orca(p, here("analysis", "figures", fnsvg))
+plotly::orca(p, here("analysis", "figures", fnpdf))
 p
 @
 

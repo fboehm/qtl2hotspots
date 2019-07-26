@@ -12,7 +12,12 @@ LazyData: true
 Imports: 
     bookdown,
     broman,
-    here
+    here,
+    heatmaply,
+    purrr,
+    dplyr,
+    dendextend,
+    plotly
 Suggests: 
     testthat (>= 2.1.0)
 RoxygenNote: 6.1.1
