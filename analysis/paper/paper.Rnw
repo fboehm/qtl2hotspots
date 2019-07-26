@@ -316,6 +316,7 @@ saveRDS(dataset.islet.rnaseq$expr, here("analysis", "data", "derived_data", "exp
 <<read_attie_files>>=
 lod_peaks <- readRDS(here("analysis", "data", "derived_data", "lod_peaks.rds"))
 annots <- readRDS(here("analysis", "data", "derived_data", "annots.rds"))
+expr <- readRDS(here("analysis", "data", "derived_data", "expr.rds"))
 @
 
 
