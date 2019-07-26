@@ -2,7 +2,7 @@
 FROM rocker/verse:3.5.3
 
 # required
-MAINTAINER Frederick Boehm <frederick.boehm@gmail.com>
+MAINTAINER Frederick J. Boehm <frederick.boehm@gmail.com>
 
 COPY . /home/rstudio/qtl2hotspots
 
