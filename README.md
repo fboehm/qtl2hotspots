@@ -10,8 +10,9 @@ Status](https://travis-ci.org/fboehm/qtl2hotspots.svg?branch=master)](https://tr
 
 <!-- badges: end -->
 
-The goal of qtl2hotspots is to analyze the Keller et al. (2018)
-expression trait hotspots.
+The goal of `qtl2hotspots` is to analyze the Keller et al. (2018)
+expression trait hotspots with both mediation methods and pleiotropy
+tests.
 
 ## Installation
 
@@ -58,7 +59,7 @@ This is a basic example which shows you how to solve a common problem:
 ## Build the manuscript `paper.Rnw`
 
 To render the manuscript `paper.Rnw`, into pdf, use a shell to enter the
-following text from the ‘hotspots’ directory:
+following text from the `qtl2hotspots` directory:
 
 ``` bash
 docker build .
@@ -66,7 +67,7 @@ docker build .
 
 If you’re not using Docker, and have cloned the repository from Github,
 you can use the Makefile to render `paper.Rnw`. Just type `make` in the
-shell (from within the `hotspots` directory):
+shell (from within the `qtl2hotspots` directory):
 
 ``` bash
 make
@@ -74,6 +75,6 @@ make
 
 ## Code of Conduct
 
-Please note that the ‘qtl2hotspots’ project is released with a
+Please note that the `qtl2hotspots` project is released with a
 [Contributor Code of Conduct](.github/CODE_OF_CONDUCT.md). By
 contributing to this project, you agree to abide by its terms.
