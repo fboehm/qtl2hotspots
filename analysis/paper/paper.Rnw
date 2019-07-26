@@ -551,10 +551,12 @@ scols <- scols_pre[ , col_order] %>%
 @
 
 
-<<heat9-2, fig.height = 7, fig.width = 7, out.width = "\\textwidth">>=
+\begin{landscape}
+
+<<heat9-2, fig.height = 7, fig.width = 10, out.width = "\\textwidth">>=
 ord <- match(rn, rownames(pm))
 
-p <- pm[ord, ord] %>%
+pm[ord, ord] %>%
   apply(FUN = trunc2, MARGIN = 2, threshold = 5) %>%
   heatmaply(Rowv = FALSE,
             Colv = FALSE,
@@ -566,10 +568,9 @@ p <- pm[ord, ord] %>%
             limits = c(0, 5)
             ) %>%
   hide_guides()
-p
 @
 
-
+\end{landscape}
 
 
 
@@ -646,8 +647,12 @@ keller_mediator <- "Pdx1"
 <<count_med-5, ref.label = "count_med">>=
 @
 
-<<heat9-5, ref.label = "heat9-2">>=
+\begin{landscape}
+
+<<heat9-5, ref.label = "heat9-2", fig.height = 7, fig.width = 10, out.width="\\textwidth">>=
 @
+
+\end{landscape}
 
 <<index-v-peak-position-5, ref.label = "index-v-peak-position-2">>=
 @
@@ -709,9 +714,12 @@ keller_mediator <- "Fam83e"
 @
 
 
-<<heat9-7, ref.label = "heat9-2">>=
+\begin{landscape}
+
+<<heat9-7, ref.label = "heat9-2", fig.height = 7, fig.width = 10, out.width="\\textwidth">>=
 @
 
+\end{landscape}
 
 <<index-v-peak-position-7, ref.label = "index-v-peak-position-2">>=
 @
@@ -779,10 +787,12 @@ keller_mediator <- "Sat2"
 <<count_med-11, ref.label = "count_med">>=
 @
 
+\begin{landscape}
 
-<<heat9-11, ref.label = "heat9-2">>=
+<<heat9-11, ref.label = "heat9-2", fig.height = 7, fig.width = 10, out.width="\\textwidth">>=
 @
 
+\end{landscape}
 
 <<index-v-peak-position-11, ref.label = "index-v-peak-position-2">>=
 @
@@ -852,9 +862,12 @@ keller_mediator <- "Il6st"
 <<count_med-13, ref.label = "count_med">>=
 @
 
+\begin{landscape}
 
-<<heat9-13, ref.label = "heat9-2">>=
+<<heat9-13, ref.label = "heat9-2", fig.height = 7, fig.width = 10, out.width="\\textwidth">>=
 @
+
+\end{landscape}
 
 <<index-v-peak-position-13, ref.label = "index-v-peak-position-2">>=
 @
