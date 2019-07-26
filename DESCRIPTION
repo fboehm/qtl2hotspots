@@ -4,20 +4,19 @@ Title: Analysis of Expression Trait Hotspots
 Version: 0.1.0
 Author: Frederick J. Boehm
 Maintainer: Frederick J. Boehm <frederick.boehm@gmail.com>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
+Description: Analyzes each of five expression trait hotspots with both pleiotropy tests and mediation analyses.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Imports: 
-    bookdown,
     broman,
     here,
     heatmaply,
     purrr,
     dplyr,
     dendextend,
-    plotly
+    plotly,
+    svglite
 Suggests: 
     testthat (>= 2.1.0)
 RoxygenNote: 6.1.1

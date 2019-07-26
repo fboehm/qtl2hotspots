@@ -64,7 +64,7 @@
 library(knitr)
 opts_chunk$set(
 concordance=TRUE,
-echo = FALSE,
+echo = TRUE,
 fig.lp = "fig:",
 warning = FALSE,
 message = FALSE,
@@ -134,7 +134,7 @@ genes on the same chromosome as the hotspot and within 4 Mb of the hotspot
 center. We ignored transcripts for genes on the hotspot chromosome but not within 4 Mb of
 the hotspot center.
 
-
+\todo[inline]{add a "table 1" detailing the keller hotspot data. Columns: number of local traits, number of nonlocal traits, center position, keller mediator, number of nonlocal traits mediated by keller mediator}
 
 \subsection{Pleiotropy testing}
 
@@ -238,7 +238,24 @@ is the mean trait value, and $E$ is a vector of normally distributed random erro
 \subsection{Visualizations}
 
 We created scatter plots with the {\tt ggplot2} package \citep{ggplot2} for the R
-statistical computing environment \citep{r}.
+statistical computing environment \citep{r}. We initially plotted all local-nonlocal pairs for each hotspot. We highlighted in blue those points that correspond to pairs involving the putative mediator per \citet{keller2018genetic}.
+
+We created heatmaps to examine patterns among pleiotropy test results in each hotspot.
+We represented the pleiotropy test statistics as a symmetric matrix, where each row was one expression
+trait and each column was an expression trait. Each cell, then, contained the pleiotropy test statistic
+from the analysis involving the row's expression trait and the column's expression trait.
+To create a heatmap, we first performed two hierarchical clusterings, one on the submatrix involving only
+nonlocal expression traits and a second on the submatrix involving only local expression traits. We
+calculated the Euclidean distances between all trait pairs before clustering. We ordered the rows and
+columns according to optimal leaf ordering \todo[inline]{what is the OLO citation?} We then combined the
+local and nonlocal traits into a single heatmap. To achieve greater coloring contrasts in the heatmaps, we
+set the color spectrum limits at 0 (dark blue) and 5 (yellow). Test statistics above 5 are represented by
+yellow.
+
+
+
+
+
 
 
 
@@ -286,7 +303,7 @@ med_list <- readRDS(here("analysis", "data", "derived_data", paste0("Chr", hot_c
 
 
 
-<<load_attie, eval=!file.exists(here("analysis", "data", "raw_data", "Attie_DO378_eQTL_viewer_v1.Rdata"))>>=
+<<load_attie, eval=!file.exists(here("analysis", "data", "derived_data", "expr.rds"))>>=
 download.file("https://datadryad.org/bitstream/handle/10255/dryad.166774/Attie_DO378_eQTL_viewer_v1.Rdata?sequence=2",
               destfile = here("analysis", "data", "raw_data", "Attie_DO378_eQTL_viewer_v1.Rdata")
               )

@@ -6,6 +6,16 @@ MAINTAINER Frederick Boehm <frederick.boehm@gmail.com>
 
 COPY . /home/rstudio/qtl2hotspots
 
+# Install R packages
+RUN install2.r --error \
+    broman \
+    here \
+    heatmaply \
+    dendextend \
+    plotly \
+    svglite
+
+
 # go into the repo directory
 RUN . /etc/environment \
   \
