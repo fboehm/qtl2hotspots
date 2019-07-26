@@ -566,12 +566,10 @@ p <- pm[ord, ord] %>%
             limits = c(0, 5)
             ) %>%
   hide_guides()
-fnsvg <- paste0("Chr", hot_chr, "_heat", ".svg")
-fnpdf <- paste0("Chr", hot_chr, "_heat", ".pdf")
-plotly::orca(p, here("analysis", "figures", fnsvg))
-plotly::orca(p, here("analysis", "figures", fnpdf))
 p
 @
+
+
 
 
 
