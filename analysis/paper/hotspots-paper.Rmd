@@ -4,10 +4,10 @@ author: "Frederick J. Boehm, Brian S. Yandell, and Karl W. Broman"
 date: "7/27/2019"
 bibliography: research.bib
 output: 
-  - bookdown::html_document2
   - github_document:
       toc: true
       toc_depth: 2
+  - bookdown::html_document2
 ---
 
 # Introduction
@@ -336,17 +336,17 @@ fnsvg <- paste0("Chr", hot_chr, "_scatter.svg")
 fnpdf <- paste0("Chr", hot_chr, "_scatter.pdf")
 ggsave(plot = p, filename = here("analysis", "figures", fnsvg))
 ggsave(plot = p, filename = here("analysis", "figures", fnpdf))
-p
+plotly::ggplotly(p)
 ```
 
 
-```{r scatter_by_local-2}
+```{r scatter_by_local-2, fig.height = ceiling(nlocal / 2)}
 foo <- pleio_mixed_list %>%
   bind_rows() %>%
   rename(pleiotropy_lod = lod) %>%
   inner_join(med_tib, by = c("local_gene_id", "nonlocal_gene_id")) %>%
   dplyr::select(local_symbol, nonlocal_symbol, pleiotropy_lod, lod_diff, lod_diff_proportion, lod_without_med, lod_with_med, filename, nonlocal_gene_id, local_gene_id)
-foo %>%
+p <- foo %>%
   ggplot() +
   geom_point(mapping = aes(x = pleiotropy_lod, y = lod_diff, colour = nonlocal_symbol, nonlocal = nonlocal_symbol), size = 0.1) +
   facet_wrap(. ~ local_symbol, nrow = ceiling(nlocal / 2), ncol = 2) +
@@ -362,9 +362,12 @@ foo %>%
 
 fnsvg <- paste0("Chr", hot_chr, "_scatter-panel.svg")
 fnpdf <- paste0("Chr", hot_chr, "_scatter-panel.pdf")
-ggsave(filename = here("analysis", "figures", fnsvg), height = ceiling(nlocal / 2))
-ggsave(filename = here("analysis", "figures", fnpdf), height = ceiling(nlocal / 2))
+ggsave(p, filename = here("analysis", "figures", fnsvg), height = ceiling(nlocal / 2))
+ggsave(p, filename = here("analysis", "figures", fnpdf), height = ceiling(nlocal / 2))
+plotly::ggplotly(p)
+```
 
+```{r multipanel_scatter-2, eval = FALSE}
 # put in multiple figures, if there are many local traits
 n_figs <- 1 + nlocal %/% 18 # 18 is the number of panels per page in pdf
 n_last <- nlocal %% 18 # number of panels on last figure
@@ -470,10 +473,10 @@ fnhtml <- here("analysis", "figures", paste0("Chr", hot_chr, "hm.html"))
 
 
 
-```{r heat9-2, eval = !file.exists(fnhtml)}
+```{r heat9-2, eval = TRUE}
 ord <- match(rn, rownames(pm))
 
-p <- pm[ord, ord] %>%
+(p <- pm[ord, ord] %>%
   apply(FUN = trunc2, MARGIN = 2, threshold = 5) %>%
   heatmaply(Rowv = FALSE,
             Colv = FALSE,
@@ -485,17 +488,21 @@ p <- pm[ord, ord] %>%
             limits = c(0, 5)
             ) %>%
   hide_guides()
+)
 fnpdf <- here("analysis", "figures", paste0("Chr", hot_chr, "hm.pdf"))
-htmlwidgets::saveWidget(widget = p,
+htmlwidgets::saveWidget(widget = p, 
                         file = fnhtml
                         )
+```
+
+```{r webshot-2, eval = FALSE}
 webshot::webshot(url = fnhtml,
                  file = fnpdf,
                  cliprect = "viewport"
                  )
 ```
 
-```{r heat10-2}
+```{r heat10-2, eval = FALSE}
 webshot::webshot(fnhtml)
 ```
 
@@ -558,6 +565,10 @@ keller_mediator <- "Pdx1"
 ```
 
 
+```{r multipanel_scatter-5, ref.label = "multipanel_scatter-2", eval = FALSE}
+```
+
+
 ```{r make_scols-5, ref.label="make_scols-2"}
 ```
 
@@ -572,7 +583,7 @@ keller_mediator <- "Pdx1"
 ```
 
 
-```{r heat9-5, ref.label = "heat9-2", eval = !file.exists(fnhtml)}
+```{r heat9-5, ref.label = "heat9-2", eval = TRUE}
 ```
 
 ```{r heat10-5, ref.label="heat10-2"}
@@ -632,6 +643,10 @@ keller_mediator <- "Fam83e"
 ```{r scatter_by_local-7, ref.label = "scatter_by_local-2"}
 ```
 
+```{r multipanel_scatter-7, ref.label = "multipanel_scatter-2", eval = FALSE}
+```
+
+
 
 ```{r make_scols-7, ref.label="make_scols-2"}
 ```
@@ -649,7 +664,7 @@ keller_mediator <- "Fam83e"
 ```
 
 
-```{r heat9-7, ref.label = "heat9-2", eval = !file.exists(fnhtml)}
+```{r heat9-7, ref.label = "heat9-2", eval = TRUE}
 ```
 
 ```{r heat10-7, ref.label="heat10-2"}
@@ -709,6 +724,10 @@ keller_mediator <- "Sat2"
 ```{r scatter_by_local-11, ref.label = "scatter_by_local-2"}
 ```
 
+```{r multipanel_scatter-11, ref.label = "multipanel_scatter-2", eval = FALSE}
+```
+
+
 
 ```{r make_scols-11, ref.label="make_scols-2"}
 ```
@@ -727,7 +746,7 @@ keller_mediator <- "Sat2"
 
 
 
-```{r heat9-11, ref.label = "heat9-2", eval = !file.exists(fnhtml)}
+```{r heat9-11, ref.label = "heat9-2", eval = TRUE}
 ```
 
 
@@ -789,6 +808,10 @@ keller_mediator <- "Il6st"
 ```{r scatter_by_local-13, ref.label = "scatter_by_local-2"}
 ```
 
+```{r multipanel_scatter-13, ref.label = "multipanel_scatter-2", eval = FALSE}
+```
+
+
 
 ```{r make_scols-13, ref.label="make_scols-2"}
 ```
@@ -806,7 +829,7 @@ keller_mediator <- "Il6st"
 ```
 
 
-```{r heat9-13, ref.label = "heat9-2", eval = !file.exists(fnhtml)}
+```{r heat9-13, ref.label = "heat9-2", eval = TRUE}
 ```
 
 
