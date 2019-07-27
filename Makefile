@@ -1,9 +1,6 @@
 
 PAPER_DIR=analysis/paper
 
-# Tools
-LATEXMK = latexmk
-RM = rm -f
 
 # Rules
 
