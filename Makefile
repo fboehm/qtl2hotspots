@@ -7,7 +7,7 @@ PAPER_DIR=analysis/paper
 all: $(PAPER_DIR)/hotspots-paper.html
 
 $(PAPER_DIR)/hotspots-paper.html: $(PAPER_DIR)/hotspots-paper.Rmd
-	cd $(PAPER_DIR); R -e "rmarkdown::render('$(notdir $<)', output_format = 'all')"
+	R -e "devtools::install(dep = TRUE)"; cd $(PAPER_DIR); R -e "rmarkdown::render('$(notdir $<)', output_format = 'all')"
 
 
 
