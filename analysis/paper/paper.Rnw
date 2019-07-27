@@ -38,7 +38,8 @@
 %\usepackage{longtable}
 %\usepackage[outdir=./figs/]{epstopdf}
 %\usepackage{etoolbox} % for messing with page style & title pages
-\usepackage{lscape}
+%\usepackage{lscape}
+\usepackage{pdflscape}
 \usepackage{fancyhdr}
 \setlength{\headheight}{15.2pt}
 \pagestyle{fancyplain}
@@ -551,12 +552,11 @@ scols <- scols_pre[ , col_order] %>%
 @
 
 
-\begin{landscape}
 
-<<heat9-2, fig.height = 7, fig.width = 10, out.width = "\\textwidth">>=
+<<heat9-2>>=
 ord <- match(rn, rownames(pm))
 
-pm[ord, ord] %>%
+p <- pm[ord, ord] %>%
   apply(FUN = trunc2, MARGIN = 2, threshold = 5) %>%
   heatmaply(Rowv = FALSE,
             Colv = FALSE,
@@ -568,6 +568,23 @@ pm[ord, ord] %>%
             limits = c(0, 5)
             ) %>%
   hide_guides()
+fnhtml <- here("analysis", "figures", paste0("Chr", hot_chr, "hm.html"))
+fnpdf <- here("analysis", "figures", paste0("Chr", hot_chr, "hm.pdf"))
+htmlwidgets::saveWidget(widget = p,
+                        file = fnhtml
+                        )
+webshot::webshot(url = fnhtml,
+                 file = fnpdf,
+                 cliprect = "viewport"
+                 )
+@
+
+\newpage
+\begin{landscape}
+
+
+<<hm_plot-2>>=
+knitr::include_graphics(path = paste0("../figures/Chr", hot_chr, "hm.pdf"))
 @
 
 \end{landscape}
@@ -647,10 +664,18 @@ keller_mediator <- "Pdx1"
 <<count_med-5, ref.label = "count_med">>=
 @
 
+
+<<heat9-5, ref.label = "heat9-2">>=
+@
+
+\newpage
 \begin{landscape}
 
-<<heat9-5, ref.label = "heat9-2", fig.height = 7, fig.width = 10, out.width="\\textwidth">>=
+<<hm_plot-5, ref.label = "hm_plot-2">>=
+
 @
+
+
 
 \end{landscape}
 
@@ -671,6 +696,10 @@ keller_mediator <- "Fam83e"
 
 <<make_local_annot-7, ref.label="make_local_annot-2">>=
 @
+
+<<make_nonlocal_annot-7, ref.label = "make_nonlocal_annot-2">>=
+@
+
 
 
 <<make_local_annot2-7, ref.label = "make_local_annot2-2">>=
@@ -714,9 +743,14 @@ keller_mediator <- "Fam83e"
 @
 
 
+<<heat9-7, ref.label = "heat9-2">>=
+@
+
+\newpage
 \begin{landscape}
 
-<<heat9-7, ref.label = "heat9-2", fig.height = 7, fig.width = 10, out.width="\\textwidth">>=
+<<hm_plot-7, ref.label = "hm_plot-2">>=
+
 @
 
 \end{landscape}
@@ -743,6 +777,8 @@ keller_mediator <- "Sat2"
 <<make_local_annot-11, ref.label="make_local_annot-2">>=
 @
 
+<<make_nonlocal_annot-11, ref.label = "make_nonlocal_annot-2">>=
+@
 
 
 <<make_local_annot2-11, ref.label = "make_local_annot2-2">>=
@@ -787,9 +823,16 @@ keller_mediator <- "Sat2"
 <<count_med-11, ref.label = "count_med">>=
 @
 
+
+
+<<heat9-11, ref.label = "heat9-2">>=
+@
+
+\newpage
 \begin{landscape}
 
-<<heat9-11, ref.label = "heat9-2", fig.height = 7, fig.width = 10, out.width="\\textwidth">>=
+<<hm_plot-11, ref.label = "hm_plot-2">>=
+
 @
 
 \end{landscape}
@@ -816,6 +859,8 @@ keller_mediator <- "Il6st"
 <<make_local_annot-13, ref.label="make_local_annot-2">>=
 @
 
+<<make_nonlocal_annot-13, ref.label = "make_nonlocal_annot-2">>=
+@
 
 
 
@@ -862,9 +907,15 @@ keller_mediator <- "Il6st"
 <<count_med-13, ref.label = "count_med">>=
 @
 
+
+<<heat9-13, ref.label = "heat9-2">>=
+@
+
+\newpage
 \begin{landscape}
 
-<<heat9-13, ref.label = "heat9-2", fig.height = 7, fig.width = 10, out.width="\\textwidth">>=
+<<hm_plot-13, ref.label = "hm_plot-2">>=
+
 @
 
 \end{landscape}

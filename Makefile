@@ -21,6 +21,7 @@ $(PAPER_DIR)/paper.pdf: $(PAPER_DIR)/paper.tex $(PAPER_DIR)/research.bib
 mostlyclean:
 	cd $(PAPER_DIR); $(LATEXMK) -silent -c
 	$(RM) $(PAPER_DIR)/*.bbl
+	$(RM) $(PAPER_DIR)/*.tdo
 
 clean: mostlyclean
 	cd $(PAPER_DIR); $(LATEXMK) -silent -C
