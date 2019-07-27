@@ -223,14 +223,16 @@ med_list <- readRDS(here("analysis", "data", "derived_data", paste0("Chr", hot_c
 
 
 
-```{r load_attie, eval=!file.exists(here("analysis", "data", "derived_data", "expr.rds"))}
-download.file("https://datadryad.org/bitstream/handle/10255/dryad.166774/Attie_DO378_eQTL_viewer_v1.Rdata?sequence=2",
+```{r load_attie}
+if (!file.exists(here("analysis", "data", "derived_data", "expr.rds"))){
+  download.file("https://datadryad.org/bitstream/handle/10255/dryad.166774/Attie_DO378_eQTL_viewer_v1.Rdata?sequence=2",
               destfile = here("analysis", "data", "raw_data", "Attie_DO378_eQTL_viewer_v1.Rdata")
               )
-load(here("analysis", "data", "raw_data", "Attie_DO378_eQTL_viewer_v1.Rdata"))
-saveRDS(dataset.islet.rnaseq$lod.peaks, here("analysis", "data", "derived_data", "lod_peaks.rds"))
-saveRDS(dataset.islet.rnaseq$annots, here("analysis", "data", "derived_data", "annots.rds"))
-saveRDS(dataset.islet.rnaseq$expr, here("analysis", "data", "derived_data", "expr.rds"))
+  load(here("analysis", "data", "raw_data", "Attie_DO378_eQTL_viewer_v1.Rdata"))
+  saveRDS(dataset.islet.rnaseq$lod.peaks, here("analysis", "data", "derived_data", "lod_peaks.rds"))
+  saveRDS(dataset.islet.rnaseq$annots, here("analysis", "data", "derived_data", "annots.rds"))
+  saveRDS(dataset.islet.rnaseq$expr, here("analysis", "data", "derived_data", "expr.rds"))
+}
 ```
 
 ```{r read_attie_files}
@@ -331,7 +333,7 @@ p <- pleio_mixed_list %>%
   rename(pleiotropy_lod = lod) %>%
   inner_join(med_tib, by = c("local_gene_id", "nonlocal_gene_id")) %>%
   dplyr::select(local_symbol, nonlocal_symbol, pleiotropy_lod, lod_diff, lod_diff_proportion, lod_without_med, lod_with_med, filename, nonlocal_gene_id, local_gene_id) %>%
-  ggplot() + geom_point(mapping = aes(x = pleiotropy_lod, y = lod_diff, colour = local_symbol == keller_mediator, nonlocal = nonlocal_symbol), size = 0.05) + theme(legend.position = "none") + xlab("Pleiotropy LOD") + ylab("Mediation LOD difference")
+  ggplot() + geom_point(mapping = aes(x = pleiotropy_lod, y = lod_diff, colour = local_symbol == keller_mediator, nonlocal = nonlocal_symbol, local = local_symbol), size = 0.05) + theme(legend.position = "none") + xlab("Pleiotropy LOD") + ylab("Mediation LOD difference")
 fnsvg <- paste0("Chr", hot_chr, "_scatter.svg")
 fnpdf <- paste0("Chr", hot_chr, "_scatter.pdf")
 ggsave(plot = p, filename = here("analysis", "figures", fnsvg))
@@ -348,7 +350,7 @@ foo <- pleio_mixed_list %>%
   dplyr::select(local_symbol, nonlocal_symbol, pleiotropy_lod, lod_diff, lod_diff_proportion, lod_without_med, lod_with_med, filename, nonlocal_gene_id, local_gene_id)
 p <- foo %>%
   ggplot() +
-  geom_point(mapping = aes(x = pleiotropy_lod, y = lod_diff, colour = nonlocal_symbol, nonlocal = nonlocal_symbol), size = 0.1) +
+  geom_point(mapping = aes(x = pleiotropy_lod, y = lod_diff, colour = nonlocal_symbol), size = 0.1) +
   facet_wrap(. ~ local_symbol, nrow = ceiling(nlocal / 2), ncol = 2) +
   broman::karl_theme(strip.placement = "inside") +
   theme(legend.position = "none") +
@@ -380,7 +382,7 @@ for (i in 1:n_figs){
   foo %>%
     filter(local_symbol %in% local_annot2$symbol[((i - 1) * 18 + 1): (18 * i)]) %>%
     ggplot() +
-      geom_point(mapping = aes(x = pleiotropy_lod, y = lod_diff, colour = nonlocal_symbol, nonlocal = nonlocal_symbol), size = 0.1) +
+      geom_point(mapping = aes(x = pleiotropy_lod, y = lod_diff, colour = nonlocal_symbol), size = 0.1) +
       facet_wrap(. ~ local_symbol, nrow = ceiling(n_panels / 2), ncol = 2) +
       broman::karl_theme() +
       theme(legend.position = "none") +
