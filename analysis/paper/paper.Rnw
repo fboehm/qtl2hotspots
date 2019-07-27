@@ -944,16 +944,16 @@ names(nfig) <- paste0("Chr", c(2, 5, 7, 11, 13))
 
 
 <<panel1, fig.cap = paste0("Chr", hot_chr, "hotspot scatter plots of mediation LOD difference against pleiotropy LOD, separated by local trait.")>>=
-#include_graphics(paste0("../figures/Chr", hot_chr, "_scatter-panel1.pdf"))
+include_graphics(paste0("../figures/Chr", hot_chr, "_scatter-panel1.pdf"))
 @
 
 
 <<panel2, eval = nfig[which(names(nfig) == paste0("Chr", hot_chr))] > 1>>=
-#include_graphics(paste0("../figures/Chr", hot_chr, "_scatter-panel2.pdf"))
+include_graphics(paste0("../figures/Chr", hot_chr, "_scatter-panel2.pdf"))
 @
 
 <<panel3, eval = nfig[which(names(nfig) == paste0("Chr", hot_chr))] > 2>>=
-#include_graphics(paste0("../figures/Chr", hot_chr, "_scatter-panel3.pdf"))
+include_graphics(paste0("../figures/Chr", hot_chr, "_scatter-panel3.pdf"))
 @
 
 
