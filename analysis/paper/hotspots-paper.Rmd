@@ -4,7 +4,10 @@ author: "Frederick J. Boehm, Brian S. Yandell, and Karl W. Broman"
 date: "7/27/2019"
 bibliography: research.bib
 output: 
-  bookdown::html_document2
+  - bookdown::html_document2
+  - github_document:
+      toc: true
+      toc_depth: 2
 ---
 
 # Introduction
@@ -825,118 +828,14 @@ hot_chr <- 2
 #include_graphics(paste0("../figures/Chr", hot_chr, "_scatter.pdf"))
 ```
 
-```{r define_nfig}
-nfig <- c(2, 2, 3, 3, 1) # number of panel figs per hotspot
-names(nfig) <- paste0("Chr", c(2, 5, 7, 11, 13))
-```
-
-
-
-```{r panel1, fig.cap = paste0("Chr", hot_chr, "hotspot scatter plots of mediation LOD difference against pleiotropy LOD, separated by local trait.")}
-include_graphics(paste0("../figures/Chr", hot_chr, "_scatter-panel1.pdf"))
-```
-
-
-```{r panel2, eval = nfig[which(names(nfig) == paste0("Chr", hot_chr))] > 1}
-include_graphics(paste0("../figures/Chr", hot_chr, "_scatter-panel2.pdf"))
-```
-
-```{r panel3, eval = nfig[which(names(nfig) == paste0("Chr", hot_chr))] > 2}
-include_graphics(paste0("../figures/Chr", hot_chr, "_scatter-panel3.pdf"))
-```
-
-
-```{r def-5}
-hot_chr <- 5
-```
-
-```{r fig.cap="Scatter plot of mediation LOD difference against pleiotropy LOD for all nonlocal-local trait pairs mapping to Chromosome 5 hotspot."}
-#include_graphics("../figures/Chr5_scatter.pdf")
-```
-
-
-
-```{r ref.label = "panel1", fig.cap = paste0("Chr", hot_chr, "hotspot scatter plots of mediation LOD difference against pleiotropy LOD, separated by local trait.")}
-```
-
-
-```{r ref.label = "panel2", eval = nfig[which(names(nfig) == paste0("Chr", hot_chr))] > 1}
-```
-
-```{r ref.label = "panel3", eval = nfig[which(names(nfig) == paste0("Chr", hot_chr))] > 2}
-```
-
-
-```{r def-7}
-hot_chr <- 7
-```
-
-
-```{r fig.cap="Scatter plot of mediation LOD difference against pleiotropy LOD for all nonlocal-local trait pairs mapping to Chromosome 7 hotspot."}
-#include_graphics("../figures/Chr7_scatter.pdf")
-```
-
-```{r ref.label = "panel1", fig.cap = paste0("Chr", hot_chr, "hotspot scatter plots of mediation LOD difference against pleiotropy LOD, separated by local trait.")}
-```
-
-
-```{r ref.label = "panel2", eval = nfig[which(names(nfig) == paste0("Chr", hot_chr))] > 1}
-```
-
-```{r ref.label = "panel3", eval = nfig[which(names(nfig) == paste0("Chr", hot_chr))] > 2}
-```
-
-
-
-
-
-```{r def-11}
-hot_chr <- 11
-```
-
-
-```{r fig.cap="Scatter plot of mediation LOD difference against pleiotropy LOD for all nonlocal-local trait pairs mapping to Chromosome 11 hotspot."}
-#include_graphics("../figures/Chr11_scatter.pdf")
-```
-
-```{r ref.label = "panel1", fig.cap = paste0("Chr", hot_chr, "hotspot scatter plots of mediation LOD difference against pleiotropy LOD, separated by local trait.")}
-```
-
-
-```{r ref.label = "panel2", eval = nfig[which(names(nfig) == paste0("Chr", hot_chr))] > 1}
-```
-
-```{r ref.label = "panel3", eval = nfig[which(names(nfig) == paste0("Chr", hot_chr))] > 2}
-```
 
 
 
 
 
 
-```{r def-13}
-hot_chr <- 13
-```
 
-
-```{r fig.cap="Scatter plot of mediation LOD difference against pleiotropy LOD for all nonlocal-local trait pairs mapping to Chromosome 13 hotspot."}
-#include_graphics("../figures/Chr13_scatter.pdf")
-```
-
-```{r ref.label = "panel1", fig.cap = paste0("Chr", hot_chr, "hotspot scatter plots of mediation LOD difference against pleiotropy LOD, separated by local trait.")}
-```
-
-
-```{r ref.label = "panel2", eval = nfig[which(names(nfig) == paste0("Chr", hot_chr))] > 1}
-```
-
-```{r ref.label = "panel3", eval = nfig[which(names(nfig) == paste0("Chr", hot_chr))] > 2}
-```
-
-
-
-
-\section{Discussion}
+# Discussion
 
 Pleiotropy tests complement mediation analyses in the following manner. When considering a
 collection of potential mediators for a nonlocal trait, mediation analyses clearly identify the
@@ -948,35 +847,20 @@ an answer about the number of underlying QTL. A drawback of pleiotropy testing i
 
 
 
-\printbibliography
-
-
-```{r install_here}
-install.packages("here", repos = "https://cloud.r-project.org")
-```
 
 
 
-\subsection{Colophon}
 
-This report was generated on \Sexpr{Sys.time()} using the following computational environment and dependencies:
 
-\begin{singlespacing}
-%\begin{landscape}
+# Colophon
+
+This report was generated on ` r Sys.time()` using the following computational environment and dependencies:
+
 ```{r colophon, cache = FALSE, echo = TRUE, tidy.opts=list(width.cutoff=50), size = "tiny", results = "markup"}
 # which R packages and versions?
-foo <- devtools::session_info()
-readr::write_csv(x = foo$packages, path = "packages.csv")
-knitr::kable(tibble(field = names(foo$platform), value = unlist(foo$platform)))
-foo$packages %>%
-  as_tibble() %>%
-  dplyr::select(-4, -5, -10, -11) %>%
-  knitr::kable()
+devtools::session_info()
 ```
 
-%\end{landscape}
-
-\end{singlespacing}
 
 The current Git commit details are:
 
