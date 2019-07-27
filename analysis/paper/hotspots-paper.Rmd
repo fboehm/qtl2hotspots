@@ -66,36 +66,36 @@ For each hotspot, we tested all pairs of traits, regardless of whether the trait
 two-dimensional, two-QTL scan over a genomic region that included the entirety of the
 hotspot. We fitted bivariate linear mixed effects models at each ordered pair of markers in a two-dimensional grid [@boehm2019testing].
 
-\begin{equation}
+$$
 vec(Y) = X vec(B) + vec(G) + vec(E)
 \label{eq:mvlmm}
-\end{equation}
+$$
 
-\begin{equation}
+$$
 G \sim MN_{n x 2}(0, K, V_g)
-\end{equation}
+$$
 
-\begin{equation}
+$$
 E \sim MN_{n x 2}(0, I_n, V_e)
-\end{equation}
+$$
 
 and $G$ and $E$ are independent.
 
-\begin{equation}
+$$
 \hat B = (X^T\hat \Sigma^{-1}X)^{-1}X^T\hat\Sigma^{-1}Y
 \label{eq:Bhat}
-\end{equation}
+$$
 
-\begin{equation}
+$$
 \hat \Sigma = \hat V_g \otimes \hat K + \hat V_e \otimes I_n
 \label{eq:Sigmahat}
-\end{equation}
+$$
 
 
-\begin{equation}
+$$
 l_{10}(\hat B, \hat \Sigma) = - \frac{1}{2}\log_{10}\left((Y - X\hat B)^T\hat \Sigma^{-1}(Y - X\hat B)\right) - n\log_{10}(2\pi) - \log_{10}|\hat \Sigma|
 \label{eq:loglik}
-\end{equation}
+$$
 
 
 For $n$ mice, $\Sigma$ is a $2n$ by $2n$ covariance matrix, while $V_g$ and $V_e$ are $2$ by $2$ covariance matrices. Estimates $\hat V_g$ and $\hat V_e$ are obtained via an expectation-maximization algorithm [@zhou2014efficient;@gemma2].
@@ -109,14 +109,14 @@ we worked directly with the test statistic values.
 
 
 
-\begin{equation}
+$$
 LOD = \log_{10} \left(\frac{\max_{\lambda_1, \lambda_2}L(B, \Sigma, \lambda_1, \lambda_2)}{\max_{\lambda}L(B, \Sigma, \lambda, \lambda)} \right)
 \label{eq:lrt}
-\end{equation}
+$$
 
-\begin{equation}
+$$
 ll(\lambda_1, \lambda_2)
-\end{equation}
+$$
 
 
 ## Mediation analysis
@@ -126,25 +126,25 @@ A mediation analysis in systems genetics begins with an identified QTL-expressio
 For each hotspot and each local trait - nonlocal trait pair, we also performed a
 mediation analysis to assess the extent which the local trait mediates the QTL effect on the nonlocal trait. Each mediation analysis involved fitting four linear models (Equations~\ref{model1}, \ref{model2}, \ref{model3}, \ref{model4}) [@chick2016defining].
 
-\begin{equation}
+$$
 Y = \alpha 1 + WC + E
 \label{model1}
-\end{equation}
+$$
 
-\begin{equation}
+$$
 Y = XB + WC + E
 \label{model2}
-\end{equation}
+$$
 
-\begin{equation}
+$$
 Y = \alpha 1 + WC + M\beta + E
 \label{model3}
-\end{equation}
+$$
 
-\begin{equation}
+$$
 Y = XB + WC + M\beta + E
 \label{model4}
-\end{equation}
+$$
 
 In all mediation analyses, the nonlocal transcripts are the targets, while the local
 transcripts serve as candidate mediators of the QTL-target relationship.
@@ -465,11 +465,12 @@ col_order <- scols_pre %>%
   order.dendrogram()
 scols <- scols_pre[ , col_order] %>%
   mutate(local = scols1)
+fnhtml <- here("analysis", "figures", paste0("Chr", hot_chr, "hm.html"))
 ```
 
 
 
-```{r heat9-2}
+```{r heat9-2, eval = !file.exists(fnhtml)}
 ord <- match(rn, rownames(pm))
 
 p <- pm[ord, ord] %>%
@@ -484,7 +485,6 @@ p <- pm[ord, ord] %>%
             limits = c(0, 5)
             ) %>%
   hide_guides()
-fnhtml <- here("analysis", "figures", paste0("Chr", hot_chr, "hm.html"))
 fnpdf <- here("analysis", "figures", paste0("Chr", hot_chr, "hm.pdf"))
 htmlwidgets::saveWidget(widget = p,
                         file = fnhtml
@@ -495,6 +495,9 @@ webshot::webshot(url = fnhtml,
                  )
 ```
 
+```{r heat10-2}
+webshot::webshot(fnhtml)
+```
 
 
 
@@ -569,12 +572,14 @@ keller_mediator <- "Pdx1"
 ```
 
 
-```{r heat9-5, ref.label = "heat9-2"}
+```{r heat9-5, ref.label = "heat9-2", eval = !file.exists(fnhtml)}
+```
+
+```{r heat10-5, ref.label="heat10-2"}
 ```
 
 
-```{r hm_plot-5, ref.label = "hm_plot-2"}
-```
+
 
 
 
@@ -644,13 +649,12 @@ keller_mediator <- "Fam83e"
 ```
 
 
-```{r heat9-7, ref.label = "heat9-2"}
+```{r heat9-7, ref.label = "heat9-2", eval = !file.exists(fnhtml)}
 ```
 
-
-```{r hm_plot-7, ref.label = "hm_plot-2"}
-
+```{r heat10-7, ref.label="heat10-2"}
 ```
+
 
 
 ```{r index-v-peak-position-7, ref.label = "index-v-peak-position-2"}
@@ -723,12 +727,11 @@ keller_mediator <- "Sat2"
 
 
 
-```{r heat9-11, ref.label = "heat9-2"}
+```{r heat9-11, ref.label = "heat9-2", eval = !file.exists(fnhtml)}
 ```
 
 
-```{r hm_plot-11, ref.label = "hm_plot-2"}
-
+```{r heat10-11, ref.label="heat10-2"}
 ```
 
 
@@ -803,12 +806,11 @@ keller_mediator <- "Il6st"
 ```
 
 
-```{r heat9-13, ref.label = "heat9-2"}
+```{r heat9-13, ref.label = "heat9-2", eval = !file.exists(fnhtml)}
 ```
 
 
-```{r hm_plot-13, ref.label = "hm_plot-2"}
-
+```{r heat10-13, ref.label="heat10-2"}
 ```
 
 
@@ -818,15 +820,6 @@ keller_mediator <- "Il6st"
 
 
 
-
-
-```{r def-2}
-hot_chr <- 2
-```
-
-```{r fig.cap="Scatter plot of mediation LOD difference against pleiotropy LOD for all nonlocal-local trait pairs mapping to Chromosome 2 hotspot."}
-#include_graphics(paste0("../figures/Chr", hot_chr, "_scatter.pdf"))
-```
 
 
 
