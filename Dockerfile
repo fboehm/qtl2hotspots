@@ -13,7 +13,18 @@ RUN install2.r --error \
     heatmaply \
     dendextend \
     plotly \
-    svglite
+    svglite \
+    bookdown \
+    webshot \
+    knitr \
+    purrr \
+    dplyr \
+    htmlwidgets \
+    devtools \
+    git2r \
+    tidyverse
+
+
 
 
 # go into the repo directory
