@@ -3,36 +3,17 @@ title: "Expression QTL hotspot dissection with mediation analysis and pleiotropy
 author: "Frederick J. Boehm, Brian S. Yandell, and Karl W. Broman"
 date: "7/27/2019"
 bibliography: research.bib
+numberSections: true
+autoEqnLabels: true
 output: 
-  - github_document:
-      toc: true
-      toc_depth: 2
-  - bookdown::html_document2
+  bookdown::html_document2:
+    pandoc_args: 
+      - --filter
+      - /usr/local/Cellar/pandoc-crossref/0.3.4.1/bin/pandoc-crossref
 ---
 
-# Introduction
-
-Genetics studies in model organisms like mice can identify
-genomic regions that affect complex traits, such as systolic blood pressure and body weight [@sax1923association;@soller1976power;@lander1989mapping;@broman2009guide;@jansen2007quantitative]. 
-These genomic regions are called "quantitative trait loci" or "QTL".
-A genome-wide QTL "scan" reveals
-associations between genotypes and phenotypes by considering each position along the genome,
-one at a time, as a candidate QTL for the trait of interest.
-A region with strong evidence of association with a complex trait, then, defines a QTL (for that trait).
-Because nearby markers have correlated
-genotypes, a QTL in a two-parent cross often spans multiple megabases in length
-and may contain more than a hundred genes.
-Identification of a causal gene (for a given complex trait) from among those genes near the QTL is
-challenging and may require costly and time-consuming experiments.
-The growing need for greater QTL mapping resolution fueled development over the
-last two decades of model organism multiparental populations for high-resolution QTL mapping [@de2017back;@churchill2004collaborative;@svenson2012high;@huang2012multiparent;@shivakumar2018soybean;@huang2011analysis;@kover2009multiparent;@tisne2017identification;@stanley2017genetic].
-With experimentalists now measuring tens of thousands of biomolecular traits
-in multiparental populations, the systems genetics community needs multivariate
-statistical tools to fully examine the large volumes of data [@keller2018genetic;@chick2016defining].
-Identifying loci that affect multiple traits can aid in identifying biomolecular interactions and in clarifying complex trait genetic architecture. A QTL that affects more than one trait is called a "pleiotropic" QTL.
-A test of pleiotropy vs. separate QTL is one multivariate statistical tool that will inform
-complex trait genetics by enabling researchers to identify the number of
-unique QTL in a genomic region of interest.
+```{r child="intro.Rmd"}
+```
 
 
 ```{r load-broman}
@@ -41,138 +22,8 @@ library(here)
 ```
 
 
-\section{Methods}
-
-@keller2018genetic identified five expression trait hotspots in their
-study of pancreatic islet gene expression in 378 Diversity Outbred mice. They
-defined a hotspot to be a 4-Mb region that affects at least 100 nonlocal expression
-traits.
-
-For each hotspot, we identified a set of local expression traits and a
-set of nonlocal expression traits. All traits demonstrated LOD peaks that met
-the genome-wide significance threshold, 7.18 [@keller2018genetic].
-The nonlocal expression traits arose from genes
-on other chromosomes, while the local traits reflected expression levels for
-genes on the same chromosome as the hotspot and within 4 Mb of the hotspot
-center. We ignored transcripts for genes on the hotspot chromosome but not within 4 Mb of
-the hotspot center.
-
-
-## Pleiotropy testing
-
-### Two-dimensional, two-QTL scans
-
-For each hotspot, we tested all pairs of traits, regardless of whether the traits were local or nonlocal. We performed a
-two-dimensional, two-QTL scan over a genomic region that included the entirety of the
-hotspot. We fitted bivariate linear mixed effects models at each ordered pair of markers in a two-dimensional grid [@boehm2019testing].
-
-$$
-vec(Y) = X vec(B) + vec(G) + vec(E)
-\label{eq:mvlmm}
-$$
-
-$$
-G \sim MN_{n x 2}(0, K, V_g)
-$$
-
-$$
-E \sim MN_{n x 2}(0, I_n, V_e)
-$$
-
-and $G$ and $E$ are independent.
-
-$$
-\hat B = (X^T\hat \Sigma^{-1}X)^{-1}X^T\hat\Sigma^{-1}Y
-\label{eq:Bhat}
-$$
-
-$$
-\hat \Sigma = \hat V_g \otimes \hat K + \hat V_e \otimes I_n
-\label{eq:Sigmahat}
-$$
-
-
-$$
-l_{10}(\hat B, \hat \Sigma) = - \frac{1}{2}\log_{10}\left((Y - X\hat B)^T\hat \Sigma^{-1}(Y - X\hat B)\right) - n\log_{10}(2\pi) - \log_{10}|\hat \Sigma|
-\label{eq:loglik}
-$$
-
-
-For $n$ mice, $\Sigma$ is a $2n$ by $2n$ covariance matrix, while $V_g$ and $V_e$ are $2$ by $2$ covariance matrices. Estimates $\hat V_g$ and $\hat V_e$ are obtained via an expectation-maximization algorithm [@zhou2014efficient;@gemma2].
-
-
-### Calculating likelihood ratio test statistics}
-From the two-dimensional scans, we calculated pleiotropy likelihood ratio test statistics for each
-pair of traits [@jiang1995multiple;@boehm2019testing;@boehm2019thesis]. Because of the required
-computing time for bootstrap analyses, we didn't obtain p-values for the pleiotropy tests. Instead,
-we worked directly with the test statistic values.
-
-
-
-$$
-LOD = \log_{10} \left(\frac{\max_{\lambda_1, \lambda_2}L(B, \Sigma, \lambda_1, \lambda_2)}{\max_{\lambda}L(B, \Sigma, \lambda, \lambda)} \right)
-\label{eq:lrt}
-$$
-
-$$
-ll(\lambda_1, \lambda_2)
-$$
-
-
-## Mediation analysis
-
-A mediation analysis in systems genetics begins with an identified QTL-expression trait association. In our case, we choose a QTL that affects a nonlocal trait.
-
-For each hotspot and each local trait - nonlocal trait pair, we also performed a
-mediation analysis to assess the extent which the local trait mediates the QTL effect on the nonlocal trait. Each mediation analysis involved fitting four linear models (Equations~\ref{model1}, \ref{model2}, \ref{model3}, \ref{model4}) [@chick2016defining].
-
-$$
-Y = \alpha 1 + WC + E
-\label{model1}
-$$
-
-$$
-Y = XB + WC + E
-\label{model2}
-$$
-
-$$
-Y = \alpha 1 + WC + M\beta + E
-\label{model3}
-$$
-
-$$
-Y = XB + WC + M\beta + E
-\label{model4}
-$$
-
-In all mediation analyses, the nonlocal transcripts are the targets, while the local
-transcripts serve as candidate mediators of the QTL-target relationship.
-In Equations~\ref{model1} through \ref{model4}, $X$ is a matrix of founder allele dosages,
-$B$ is a matrix
-of founder allele effects, $W$ is a matrix of covariates, $C$ is a matrix of covariate
-effects, $M$ is a vector of values for a single candidate mediator, $\beta$ is the effect
-of the mediator on the complex trait, 1 is a vector with all entries set to 1, $\alpha$
-is the mean trait value, and $E$ is a vector of normally distributed random errors. 
-
-## Visualizations
-
-We created scatter plots with the `ggplot2` package [@ggplot2] for the R
-statistical computing environment [@r]. We initially plotted all local-nonlocal pairs for each hotspot. We highlighted in blue those points that correspond to pairs involving the putative mediator per [@keller2018genetic].
-
-We created heatmaps to examine patterns among pleiotropy test results in each hotspot.
-We represented the pleiotropy test statistics as a symmetric matrix, where each row was one expression
-trait and each column was an expression trait. Each cell, then, contained the pleiotropy test statistic
-from the analysis involving the row's expression trait and the column's expression trait.
-To create a heatmap, we first performed two hierarchical clusterings, one on the submatrix involving only
-nonlocal expression traits and a second on the submatrix involving only local expression traits. We
-calculated the Euclidean distances between all trait pairs before clustering. We ordered the rows and
-columns according to optimal leaf ordering. We then combined the
-local and nonlocal traits into a single heatmap. To achieve greater coloring contrasts in the heatmaps, we
-set the color spectrum limits at 0 (dark blue) and 5 (yellow). Test statistics above 5 are represented by
-yellow.
-
-
+```{r child="methods.Rmd"}
+```
 
 
 
@@ -197,209 +48,10 @@ pleio_threshold <- 4
 ult <- 15 # univariate lod threshold
 ```
 
-
-```{r setup_continued-2}
-hot_chr <- 2
-hot_mid <- 165.5
-keller_mediator <- "Hnf4a"
-```
-
-
-```{r more_setup-2}
-hot_lower <- hot_mid - 2
-hot_upper <- hot_mid + 2
-fp <- paste0("Chr", hot_chr, "-")
-knitr::opts_chunk$set(fig.path = here("analysis", "figures", fp))
-```
-
-
-```{r readRDS-2}
-pleio_mixed_list <- readRDS(here("analysis", "data", "derived_data", paste0("Chr", hot_chr, "_pleio.rds")))
-pleio_local_list <- readRDS(here("analysis", "data", "derived_data", paste0("Chr", hot_chr, "_pleio_local.rds")))
-pleio_nonlocal_list <- readRDS(here("analysis", "data", "derived_data", paste0("Chr", hot_chr, "_pleio_nonlocal.rds")))
-med_list <- readRDS(here("analysis", "data", "derived_data", paste0("Chr", hot_chr, "_mediations.rds")))
-```
-
-
-
-
-```{r load_attie}
-if (!file.exists(here("analysis", "data", "derived_data", "expr.rds"))){
-  download.file("https://datadryad.org/bitstream/handle/10255/dryad.166774/Attie_DO378_eQTL_viewer_v1.Rdata?sequence=2",
-              destfile = here("analysis", "data", "raw_data", "Attie_DO378_eQTL_viewer_v1.Rdata")
-              )
-  load(here("analysis", "data", "raw_data", "Attie_DO378_eQTL_viewer_v1.Rdata"))
-  saveRDS(dataset.islet.rnaseq$lod.peaks, here("analysis", "data", "derived_data", "lod_peaks.rds"))
-  saveRDS(dataset.islet.rnaseq$annots, here("analysis", "data", "derived_data", "annots.rds"))
-  saveRDS(dataset.islet.rnaseq$expr, here("analysis", "data", "derived_data", "expr.rds"))
-}
-```
-
-```{r read_attie_files}
-lod_peaks <- readRDS(here("analysis", "data", "derived_data", "lod_peaks.rds"))
-annots <- readRDS(here("analysis", "data", "derived_data", "annots.rds"))
-expr <- readRDS(here("analysis", "data", "derived_data", "expr.rds"))
-```
-
-
-
 ```{r load_tidyverse}
 library(tidyverse)
 options(tibble.print_max = 50, tibble.print_min = 20)
 ```
-
-
-
-```{r make_local_annot-2}
-local_annot <- lod_peaks %>%
-  filter(chrom == hot_chr, pos <= hot_upper, pos >= hot_lower) %>%
-  left_join(y = annots, by = c("annot.id" = "gene_id")) %>%
-  filter(!duplicated(annot.id)) %>%
-  filter(lod >= ult) %>%
-  mutate(local_tx = chr == hot_chr) %>%
-  filter(local_tx)
-```
-
-
-```{r make_nonlocal_annot-2}
-nonlocal_annot <- lod_peaks %>%
-  filter(chrom == hot_chr, pos <= hot_upper, pos >= hot_lower) %>%
-  inner_join(y = annots, by = c("annot.id" = "gene_id")) %>%
-  filter(!duplicated(annot.id)) %>%
-  filter(lod >= 7.18) %>%
-  mutate(local_tx = chr == hot_chr) %>%
-  filter(!local_tx) %>%
-  filter(!is.na(hotspot))
-```
-
-
-
-```{r make_local_annot2-2}
-local_annot2 <- local_annot %>%
-  filter(middle <= hot_upper + 5, middle >= hot_lower - 5) %>%
-  arrange(desc(lod))
-```
-
-
-```{r subset_expr_matrix-2}
-hot_local <- expr[, colnames(expr) %in% local_annot2$annot.id]
-hot_nonlocal <- expr[, colnames(expr) %in% nonlocal_annot$annot.id]
-nnonlocal <- nrow(nonlocal_annot)
-nlocal <- nrow(local_annot2)
-```
-
-
-```{r tabulate-2, message=FALSE, warning = FALSE}
-med_tib <- med_list %>%
-  purrr::map(bind_rows) %>%
-  bind_rows() %>%
-  as_tibble() %>%
-  rename(lod_without_med = lod_no_med, lod_with_med = lod_med) %>%
-  mutate(lod_diff = lod_without_med - lod_with_med, lod_diff_proportion = lod_diff / lod_without_med) %>%
-  left_join(local_annot2, by = c("local_gene_id" = "annot.id")) %>%
-  left_join(nonlocal_annot, by = c("nonlocal_gene_id" = "annot.id")) %>%
-  dplyr::select(symbol.x, symbol.y, lod_without_med, lod_with_med, lod_diff, lod_diff_proportion, local_gene_id, nonlocal_gene_id) %>%
-  rename(local_symbol = symbol.x, nonlocal_symbol = symbol.y) %>%
-  filter(!is.na(local_symbol))
-```
-
-
-```{r make_pleio_tib-2}
-hot_annot <- local_annot2 %>%
-  bind_rows(nonlocal_annot) %>%
-  dplyr::select(annot.id, symbol)
-pleio_tib <- pleio_mixed_list %>%
-  purrr::map(.f = function(x) rename(x, gene1_id = local_gene_id, gene2_id = nonlocal_gene_id)) %>%
-  c(pleio_local_list, pleio_nonlocal_list) %>%
-  bind_rows() %>%
-  rename(pleiotropy_lod = lod) %>%
-  inner_join(hot_annot, by = c("gene1_id" = "annot.id")) %>%
-  rename(gene1_symbol = symbol) %>%
-  inner_join(hot_annot, by = c("gene2_id" = "annot.id")) %>%
-  rename(gene2_symbol = symbol) %>%
-  dplyr::select(gene1_symbol, gene2_symbol, pleiotropy_lod)
-```
-
-
-```{r make_pm-2}
-pm <- pleio_tib %>%
-  tibble_to_matrix(symmetric = TRUE)
-```
-
-
-```{r scatter-2}
-p <- pleio_mixed_list %>%
-  bind_rows() %>%
-  rename(pleiotropy_lod = lod) %>%
-  inner_join(med_tib, by = c("local_gene_id", "nonlocal_gene_id")) %>%
-  dplyr::select(local_symbol, nonlocal_symbol, pleiotropy_lod, lod_diff, lod_diff_proportion, lod_without_med, lod_with_med, filename, nonlocal_gene_id, local_gene_id) %>%
-  ggplot() + geom_point(mapping = aes(x = pleiotropy_lod, y = lod_diff, colour = local_symbol == keller_mediator, nonlocal = nonlocal_symbol, local = local_symbol), size = 0.05) + theme(legend.position = "none") + xlab("Pleiotropy LOD") + ylab("Mediation LOD difference")
-fnsvg <- paste0("Chr", hot_chr, "_scatter.svg")
-fnpdf <- paste0("Chr", hot_chr, "_scatter.pdf")
-ggsave(plot = p, filename = here("analysis", "figures", fnsvg))
-ggsave(plot = p, filename = here("analysis", "figures", fnpdf))
-plotly::ggplotly(p)
-```
-
-
-```{r scatter_by_local-2, fig.height = ceiling(nlocal / 2)}
-foo <- pleio_mixed_list %>%
-  bind_rows() %>%
-  rename(pleiotropy_lod = lod) %>%
-  inner_join(med_tib, by = c("local_gene_id", "nonlocal_gene_id")) %>%
-  dplyr::select(local_symbol, nonlocal_symbol, pleiotropy_lod, lod_diff, lod_diff_proportion, lod_without_med, lod_with_med, filename, nonlocal_gene_id, local_gene_id)
-p <- foo %>%
-  ggplot() +
-  geom_point(mapping = aes(x = pleiotropy_lod, y = lod_diff, colour = nonlocal_symbol), size = 0.1) +
-  facet_wrap(. ~ local_symbol, nrow = ceiling(nlocal / 2), ncol = 2) +
-  broman::karl_theme(strip.placement = "inside") +
-  theme(legend.position = "none") +
-  theme(
-    strip.background = element_blank(),
-    strip.text.x = element_blank()
-) +
-  xlab("Pleiotropy LOD") +
-  ylab("Mediation LOD difference") +
-  geom_text(aes(x = 1, y = 1, label = local_symbol), inherit.aes=FALSE)
-
-fnsvg <- paste0("Chr", hot_chr, "_scatter-panel.svg")
-fnpdf <- paste0("Chr", hot_chr, "_scatter-panel.pdf")
-ggsave(p, filename = here("analysis", "figures", fnsvg), height = ceiling(nlocal / 2))
-ggsave(p, filename = here("analysis", "figures", fnpdf), height = ceiling(nlocal / 2))
-plotly::ggplotly(p)
-```
-
-```{r multipanel_scatter-2, eval = FALSE}
-# put in multiple figures, if there are many local traits
-n_figs <- 1 + nlocal %/% 18 # 18 is the number of panels per page in pdf
-n_last <- nlocal %% 18 # number of panels on last figure
-max_pleio_lod <- max(foo$pleiotropy_lod)
-max_med_lod_difference <- max(foo$lod_diff)
-min_med_lod_difference <- min(foo$lod_diff)
-
-for (i in 1:n_figs){
-  n_panels <- 18 * (i < n_figs) + n_last * (i == n_figs)
-  foo %>%
-    filter(local_symbol %in% local_annot2$symbol[((i - 1) * 18 + 1): (18 * i)]) %>%
-    ggplot() +
-      geom_point(mapping = aes(x = pleiotropy_lod, y = lod_diff, colour = nonlocal_symbol), size = 0.1) +
-      facet_wrap(. ~ local_symbol, nrow = ceiling(n_panels / 2), ncol = 2) +
-      broman::karl_theme() +
-      theme(legend.position = "none") +
-      theme(
-        strip.background = element_blank(),
-        strip.text.x = element_blank()
-    ) +
-      xlab("Pleiotropy LOD") + xlim(c(0, max_pleio_lod)) + ylim(c(min_med_lod_difference, max_med_lod_difference)) +
-      ylab("Mediation LOD difference") +
-      geom_text(size = 2, aes(x = max_pleio_lod / 2, y = 2 * max_med_lod_difference / 3, label = local_symbol), inherit.aes=FALSE)
-  fnsvg <- paste0("Chr", hot_chr, "_scatter-panel", i, ".svg")
-  fnpdf <- paste0("Chr", hot_chr, "_scatter-panel", i, ".pdf")
-  ggsave(filename = here("analysis", "figures", fnsvg), height = ceiling(n_panels / 2))
-  ggsave(filename = here("analysis", "figures", fnpdf), height = ceiling(n_panels / 2))
-}
-```
-
 
 
 ```{r load_heatmaply}
@@ -407,114 +59,15 @@ library(heatmaply)
 ```
 
 
-```{r make_scols-2}
-scols1 <- 1L + (rownames(pm) %in% local_annot2$symbol)
-scols2 <- rownames(pm) %in% (med_tib %>% filter(local_symbol == keller_mediator, lod_diff > 1.5))$nonlocal_symbol
+```{r setup_continued-2}
+hot_chr <- 2
+hot_mid <- 165.5
+keller_mediator <- "Hnf4a"
 ```
 
-
-```{r heat8-2}
-# order the nonlocal traits first
-## indicator for being a nonlocal trait
-indic_nonlocal <- rownames(pm) %in% nonlocal_annot$symbol
-# define ord_nonlocal
-ord_nonlocal <- pm[indic_nonlocal, indic_nonlocal] %>%
-  dist() %>%
-  hclust() %>%
-  as.dendrogram() %>%
-  dendextend::seriate_dendrogram(dist(pm[indic_nonlocal, indic_nonlocal])) %>%
-  order.dendrogram()
-rn_nonlocal <- rownames(pm[indic_nonlocal, indic_nonlocal][ord_nonlocal, ord_nonlocal])
-# define ord_local
-ord_local<- pm[!indic_nonlocal, !indic_nonlocal] %>%
-  dist() %>%
-  hclust() %>%
-  as.dendrogram() %>%
-  dendextend::seriate_dendrogram(dist(pm[!indic_nonlocal, !indic_nonlocal])) %>%
-  order.dendrogram()
-rn_local <- rownames(pm[!indic_nonlocal, !indic_nonlocal][ord_local, ord_local])
-rn <- c(rn_nonlocal, rn_local)
+```{r child="hotspot-one-chromosome.Rmd"}
 ```
 
-
-```{r make_scols-extra-2}
-scols_extra <- purrr::map(.x = local_annot2$symbol,
-                          .f = function(x) {rownames(pm) %in% (med_tib %>% filter(local_symbol == x, lod_diff > 1.5))$nonlocal_symbol}
-) %>%
-  bind_cols() %>%
-  (function(x){colnames(x) <- local_annot2$symbol; x}) %>%
-  mutate(local = scols1)
-```
-
-
-```{r count_med}
-n_med_tr <- 4 # arbitrary threshold
-n_med_per_local <- med_tib %>%
-  group_by(local_symbol) %>%
-  filter(lod_diff > 1.5) %>%
-  count() %>%
-  filter(n >= n_med_tr)
-n_med_per_local %>%
-  arrange(desc(n)) %>%
-  knitr::kable()
-
-scols_pre <- scols_extra %>%
-  dplyr::select(n_med_per_local$local_symbol)
-# get ordering for columns of scols_pre
-col_order <- scols_pre %>%
-  t() %>%
-  dist() %>%
-  hclust() %>%
-  as.dendrogram() %>%
-  dendextend::seriate_dendrogram(dist(t(scols_pre))) %>%
-  order.dendrogram()
-scols <- scols_pre[ , col_order] %>%
-  mutate(local = scols1)
-fnhtml <- here("analysis", "figures", paste0("Chr", hot_chr, "hm.html"))
-```
-
-
-
-```{r heat9-2, eval = TRUE}
-ord <- match(rn, rownames(pm))
-
-(p <- pm[ord, ord] %>%
-  apply(FUN = trunc2, MARGIN = 2, threshold = 5) %>%
-  heatmaply(Rowv = FALSE,
-            Colv = FALSE,
-            cexRow = 0.2,
-            cexCol = 0.2,
-            symm = TRUE,
-            row_side_colors = scols[ord, ],
-            col_side_colors = tibble(local = scols1[ord]),
-            limits = c(0, 5)
-            ) %>%
-  hide_guides()
-)
-fnpdf <- here("analysis", "figures", paste0("Chr", hot_chr, "hm.pdf"))
-htmlwidgets::saveWidget(widget = p, 
-                        file = fnhtml
-                        )
-```
-
-```{r webshot-2, eval = FALSE}
-webshot::webshot(url = fnhtml,
-                 file = fnpdf,
-                 cliprect = "viewport"
-                 )
-```
-
-```{r heat10-2, eval = FALSE}
-webshot::webshot(fnhtml)
-```
-
-
-
-```{r index-v-peak-position-2}
-tibble(symbol = rownames(pm[indic_nonlocal, indic_nonlocal])[ord_nonlocal], index = 1:length(symbol)) %>%
-  left_join(nonlocal_annot, by = "symbol") %>%
-  ggplot() + geom_point(aes(y = pos, x = index))
-```
 
 
 ```{r setup_continued-5}
@@ -523,83 +76,12 @@ hot_mid <- 146
 keller_mediator <- "Pdx1"
 ```
 
-
-```{r more_setup-5, ref.label = "more_setup-2"}
-```
-
-
-```{r readRDS-5, ref.label="readRDS-2"}
-```
-
-
-```{r make_local_annot-5, ref.label="make_local_annot-2"}
-```
-
-
-```{r make_nonlocal_annot-5, ref.label = "make_nonlocal_annot-2"}
-```
-
-
-```{r make_local_annot2-5, ref.label = "make_local_annot2-2"}
-```
-
-```{r subset_expr_matrix-5, ref.label = "subset_expr_matrix-2"}
-```
-
-
-```{r tabulate-5, ref.label = "tabulate-2", message=FALSE, warning = FALSE}
-```
-
-
-```{r make_pleio_tib-5, ref.label="make_pleio_tib-2"}
-```
-
-
-```{r make_pm-5, ref.label = "make_pm-2"}
-```
-
-
-```{r scatter-5, ref.label="scatter-2"}
-```
-
-
-```{r scatter_by_local-5, ref.label = "scatter_by_local-2"}
-```
-
-
-```{r multipanel_scatter-5, ref.label = "multipanel_scatter-2", eval = FALSE}
-```
-
-
-```{r make_scols-5, ref.label="make_scols-2"}
-```
-
-
-```{r heat8-5, ref.label="heat8-2"}
-```
-
-```{r make_scols-extra-5, ref.label = "make_scols-extra-2"}
-```
-
-```{r count_med-5, ref.label = "count_med"}
-```
-
-
-```{r heat9-5, ref.label = "heat9-2", eval = TRUE}
-```
-
-```{r heat10-5, ref.label="heat10-2"}
+```{r child="hotspot-one-chromosome.Rmd"}
 ```
 
 
 
 
-
-
-
-
-```{r index-v-peak-position-5, ref.label = "index-v-peak-position-2"}
-```
 
 ```{r setup_continued-7}
 hot_chr <- 7
@@ -607,75 +89,9 @@ hot_mid <- 46
 keller_mediator <- "Fam83e"
 ```
 
-```{r more_setup-7, ref.label = "more_setup-2"}
+```{r child="hotspot-one-chromosome.Rmd"}
 ```
 
-```{r readRDS-7, ref.label="readRDS-2"}
-```
-
-```{r make_local_annot-7, ref.label="make_local_annot-2"}
-```
-
-```{r make_nonlocal_annot-7, ref.label = "make_nonlocal_annot-2"}
-```
-
-
-
-```{r make_local_annot2-7, ref.label = "make_local_annot2-2"}
-```
-
-```{r subset_expr_matrix-7, ref.label = "subset_expr_matrix-2"}
-```
-
-```{r tabulate-7, ref.label = "tabulate-2", message=FALSE, warning = FALSE}
-```
-
-```{r make_pleio_tib-7, ref.label="make_pleio_tib-2"}
-```
-
-
-```{r make_pm-7, ref.label = "make_pm-2"}
-```
-
-
-```{r scatter-7, ref.label="scatter-2"}
-```
-
-
-```{r scatter_by_local-7, ref.label = "scatter_by_local-2"}
-```
-
-```{r multipanel_scatter-7, ref.label = "multipanel_scatter-2", eval = FALSE}
-```
-
-
-
-```{r make_scols-7, ref.label="make_scols-2"}
-```
-
-
-```{r heat8-7, ref.label="heat8-2"}
-```
-
-
-```{r make_scols-extra-7, ref.label = "make_scols-extra-2"}
-```
-
-
-```{r count_med-7, ref.label = "count_med"}
-```
-
-
-```{r heat9-7, ref.label = "heat9-2", eval = TRUE}
-```
-
-```{r heat10-7, ref.label="heat10-2"}
-```
-
-
-
-```{r index-v-peak-position-7, ref.label = "index-v-peak-position-2"}
-```
 
 
 ```{r setup_continued-11}
@@ -684,80 +100,9 @@ hot_mid <- 71
 keller_mediator <- "Sat2"
 ```
 
-
-```{r more_setup-11, ref.label = "more_setup-2"}
+```{r child="hotspot-one-chromosome.Rmd"}
 ```
 
-
-```{r readRDS-11, ref.label="readRDS-2"}
-```
-
-
-```{r make_local_annot-11, ref.label="make_local_annot-2"}
-```
-
-```{r make_nonlocal_annot-11, ref.label = "make_nonlocal_annot-2"}
-```
-
-
-```{r make_local_annot2-11, ref.label = "make_local_annot2-2"}
-```
-
-
-```{r subset_expr_matrix-11, ref.label = "subset_expr_matrix-2"}
-```
-
-
-```{r tabulate-11, ref.label = "tabulate-2", message=FALSE, warning = FALSE}
-```
-
-
-```{r make_pleio_tib-11, ref.label="make_pleio_tib-2"}
-```
-
-
-```{r make_pm-11, ref.label = "make_pm-2"}
-```
-
-```{r scatter-11, ref.label="scatter-2"}
-```
-
-
-```{r scatter_by_local-11, ref.label = "scatter_by_local-2"}
-```
-
-```{r multipanel_scatter-11, ref.label = "multipanel_scatter-2", eval = FALSE}
-```
-
-
-
-```{r make_scols-11, ref.label="make_scols-2"}
-```
-
-
-```{r heat8-11, ref.label="heat8-2"}
-```
-
-
-```{r make_scols_extra-11, ref.label = "make_scols-extra-2"}
-```
-
-
-```{r count_med-11, ref.label = "count_med"}
-```
-
-
-
-```{r heat9-11, ref.label = "heat9-2", eval = TRUE}
-```
-
-
-```{r heat10-11, ref.label="heat10-2"}
-```
-
-
-```{r index-v-peak-position-11, ref.label = "index-v-peak-position-2"}
-```
 
 
 ```{r setup_continued-13}
@@ -766,82 +111,8 @@ hot_mid <- 112.5
 keller_mediator <- "Il6st"
 ```
 
-
-```{r more_setup-13, ref.label = "more_setup-2"}
+```{r child="hotspot-one-chromosome.Rmd"}
 ```
-
-
-```{r readRDS-13, ref.label="readRDS-2"}
-```
-
-
-```{r make_local_annot-13, ref.label="make_local_annot-2"}
-```
-
-```{r make_nonlocal_annot-13, ref.label = "make_nonlocal_annot-2"}
-```
-
-
-
-```{r make_local_annot2-13, ref.label = "make_local_annot2-2"}
-```
-
-
-```{r subset_expr_matrix-13, ref.label = "subset_expr_matrix-2"}
-```
-
-
-```{r tabulate-13, ref.label = "tabulate-2", message=FALSE, warning = FALSE}
-```
-
-
-```{r make_pleio_tib-13, ref.label="make_pleio_tib-2"}
-```
-
-
-```{r make_pm-13, ref.label = "make_pm-2"}
-```
-
-
-```{r scatter-13, ref.label="scatter-2"}
-```
-
-
-```{r scatter_by_local-13, ref.label = "scatter_by_local-2"}
-```
-
-```{r multipanel_scatter-13, ref.label = "multipanel_scatter-2", eval = FALSE}
-```
-
-
-
-```{r make_scols-13, ref.label="make_scols-2"}
-```
-
-
-```{r heat8-13, ref.label="heat8-2"}
-```
-
-
-```{r make_scols-extra-13, ref.label = "make_scols-extra-2"}
-```
-
-
-```{r count_med-13, ref.label = "count_med"}
-```
-
-
-```{r heat9-13, ref.label = "heat9-2", eval = TRUE}
-```
-
-
-```{r heat10-13, ref.label="heat10-2"}
-```
-
-
-```{r index-v-peak-position-13, ref.label = "index-v-peak-position-2"}
-```
-
 
 
 

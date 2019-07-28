@@ -1,0 +1,240 @@
+---
+title: "Expression QTL hotspot dissection with mediation analysis and pleiotropy testing"
+author: "Frederick J. Boehm, Brian S. Yandell, and Karl W. Broman"
+date: "7/27/2019"
+bibliography: research.bib
+output: 
+  bookdown::html_document2:
+    pandoc_args: 
+      - --filter
+      - /usr/local/Cellar/pandoc-crossref/0.3.4.1/bin/pandoc-crossref
+---
+
+
+
+```{r load-broman}
+library(broman)
+library(here)
+```
+
+
+
+
+# Methods
+
+@keller2018genetic identified five expression trait hotspots in their
+study of pancreatic islet gene expression in 378 Diversity Outbred mice. They
+defined a hotspot to be a 4-Mb region that affects at least 100 nonlocal expression
+traits.
+
+For each hotspot, we identified a set of local expression traits and a
+set of nonlocal expression traits. All traits demonstrated LOD peaks that met
+the genome-wide significance threshold, 7.18 [@keller2018genetic].
+The nonlocal expression traits arose from genes
+on other chromosomes, while the local traits reflected expression levels for
+genes on the same chromosome as the hotspot and within 4 Mb of the hotspot
+center. We ignored transcripts for genes on the hotspot chromosome but not within 4 Mb of
+the hotspot center.
+
+
+## Pleiotropy testing
+
+### Two-dimensional, two-QTL scans
+
+For each hotspot, we tested all pairs of traits, regardless of whether the traits were local or nonlocal. We performed a
+two-dimensional, two-QTL scan over a genomic region that included the entirety of the
+hotspot. We fitted bivariate linear mixed effects models at each ordered pair of markers in a two-dimensional grid [@boehm2019testing].
+
+$$
+vec(Y) = X vec(B) + vec(G) + vec(E)
+$$
+
+$$
+G \sim MN_{n x 2}(0, K, V_g)
+$$
+
+$$
+E \sim MN_{n x 2}(0, I_n, V_e)
+$$
+
+and $G$ and $E$ are independent.
+
+$$
+\hat B = (X^T\hat \Sigma^{-1}X)^{-1}X^T\hat\Sigma^{-1}Y
+$$
+
+$$
+\hat \Sigma = \hat V_g \otimes \hat K + \hat V_e \otimes I_n
+$$
+
+
+$$
+l_{10}(\hat B, \hat \Sigma) = - \frac{1}{2}\log_{10}\left((Y - X\hat B)^T\hat \Sigma^{-1}(Y - X\hat B)\right) - n\log_{10}(2\pi) - \log_{10}|\hat \Sigma|
+$$
+
+
+For $n$ mice, $\Sigma$ is a $2n$ by $2n$ covariance matrix, while $V_g$ and $V_e$ are $2$ by $2$ covariance matrices. Estimates $\hat V_g$ and $\hat V_e$ are obtained via an expectation-maximization algorithm [@zhou2014efficient;@gemma2].
+
+
+### Calculating likelihood ratio test statistics}
+From the two-dimensional scans, we calculated pleiotropy likelihood ratio test statistics for each
+pair of traits [@jiang1995multiple;@boehm2019testing;@boehm2019thesis]. Because of the required
+computing time for bootstrap analyses, we didn't obtain p-values for the pleiotropy tests. Instead,
+we worked directly with the test statistic values.
+
+
+
+$$
+LOD = \log_{10} \left(\frac{\max_{\lambda_1, \lambda_2}L(B, \Sigma, \lambda_1, \lambda_2)}{\max_{\lambda}L(B, \Sigma, \lambda, \lambda)} \right)
+$$
+
+$$
+ll(\lambda_1, \lambda_2)
+$$
+
+
+## Mediation analysis
+
+A mediation analysis in systems genetics begins with an identified QTL-expression trait association. In our case, we choose a QTL that affects a nonlocal trait.
+
+For each hotspot and each local trait - nonlocal trait pair, we also performed a
+mediation analysis to assess the extent which the local trait mediates the QTL effect on the nonlocal trait. Each mediation analysis involved fitting four linear models (Equations~\ref{model1}, \ref{model2}, \ref{model3}, \ref{model4}) [@chick2016defining].
+
+$$
+Y = \alpha 1 + WC + E
+\label{model1}
+$$
+
+$$
+Y = XB + WC + E
+\label{model2}
+$$
+
+$$
+Y = \alpha 1 + WC + M\beta + E
+\label{model3}
+$$
+
+$$
+Y = XB + WC + M\beta + E
+\label{model4}
+$$
+
+In all mediation analyses, the nonlocal transcripts are the targets, while the local
+transcripts serve as candidate mediators of the QTL-target relationship.
+In Equations~\ref{model1} through \ref{model4}, $X$ is a matrix of founder allele dosages,
+$B$ is a matrix
+of founder allele effects, $W$ is a matrix of covariates, $C$ is a matrix of covariate
+effects, $M$ is a vector of values for a single candidate mediator, $\beta$ is the effect
+of the mediator on the complex trait, 1 is a vector with all entries set to 1, $\alpha$
+is the mean trait value, and $E$ is a vector of normally distributed random errors. 
+
+## Visualizations
+
+We created scatter plots with the `ggplot2` package [@ggplot2] for the R
+statistical computing environment [@r]. We initially plotted all local-nonlocal pairs for each hotspot. We highlighted in blue those points that correspond to pairs involving the putative mediator per [@keller2018genetic].
+
+We created heatmaps to examine patterns among pleiotropy test results in each hotspot.
+We represented the pleiotropy test statistics as a symmetric matrix, where each row was one expression
+trait and each column was an expression trait. Each cell, then, contained the pleiotropy test statistic
+from the analysis involving the row's expression trait and the column's expression trait.
+To create a heatmap, we first performed two hierarchical clusterings, one on the submatrix involving only
+nonlocal expression traits and a second on the submatrix involving only local expression traits. We
+calculated the Euclidean distances between all trait pairs before clustering. We ordered the rows and
+columns according to optimal leaf ordering. We then combined the
+local and nonlocal traits into a single heatmap. To achieve greater coloring contrasts in the heatmaps, we
+set the color spectrum limits at 0 (dark blue) and 5 (yellow). Test statistics above 5 are represented by
+yellow.
+
+
+
+
+
+
+
+
+# Results
+
+We generated scatter plots of pleiotropy test statistics vs. mediation LOD difference values for each of the five hotspots (Figures).
+Each point represents a pairing of a local trait with a nonlocal trait.
+The mediation LOD difference value is that observed when the local trait is considered
+as a candidate mediator of the QTL-nonlocal trait association.
+
+In all five scatter plots, we observe few
+points in the upper right quadrant of the figure.
+That is, few pairs have high pleiotropy test statistics and
+high mediation LOD difference values.
+
+```{r setup}
+library(qtl2hotspots)
+pleio_threshold <- 4
+ult <- 15 # univariate lod threshold
+```
+
+```{r load_tidyverse}
+library(tidyverse)
+options(tibble.print_max = 50, tibble.print_min = 20)
+```
+
+
+```{r load_heatmaply}
+library(heatmaply)
+```
+
+
+```{r setup_continued-2}
+hot_chr <- 2
+hot_mid <- 165.5
+keller_mediator <- "Hnf4a"
+```
+
+```{r child="hotspot-one-chromosome.Rmd"}
+```
+
+
+
+
+
+
+
+
+
+
+
+# Discussion
+
+Pleiotropy tests complement mediation analyses in the following manner. When considering a
+collection of potential mediators for a nonlocal trait, mediation analyses clearly identify the
+mediator when there is, in fact, a mediator among the candidates. However, when there is no
+mediator, mediation analyses provide little information about the genetics of the complex trait.
+Pleiotropy testing is particularly useful in this setting, since a pleiotropy test always gives
+an answer about the number of underlying QTL. A drawback of pleiotropy testing is that the scientific question that it addresses - do two traits share a single QTL - informs, but doesn't fully resolve, the genetics of the nonlocal complex traits under study.
+
+
+
+
+
+
+
+
+
+# Colophon
+
+This report was generated on ` r Sys.time()` using the following computational environment and dependencies:
+
+```{r colophon, cache = FALSE, echo = TRUE, tidy.opts=list(width.cutoff=50), size = "tiny", results = "markup"}
+# which R packages and versions?
+devtools::session_info()
+```
+
+
+The current Git commit details are:
+
+```{r git2r, cache = FALSE, echo = TRUE}
+# what commit is this file at?
+git2r::repository(here::here())
+```
+
+
+
+
