@@ -3,6 +3,7 @@ title: "Expression QTL hotspot dissection with mediation analysis and pleiotropy
 author: "Frederick J. Boehm, Brian S. Yandell, and Karl W. Broman"
 date: "7/27/2019"
 bibliography: research.bib
+numberSections: true
 output: 
   bookdown::html_document2:
     pandoc_args: 
@@ -102,7 +103,6 @@ mediation analysis to assess the extent which the local trait mediates the QTL e
 
 $$
 Y = \alpha 1 + WC + E
-\label{model1}
 $$
 
 $$

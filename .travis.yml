@@ -23,6 +23,6 @@ deploy:
 
 before_install:
     # create & run container using our dockerfile, i.e. compile pkg and render Rmd to Word doc
-  - travis_wait 60 docker build -t fjboehm/qtl2hotspots:$TRAVIS_COMMIT .
+  - travis_wait 100 docker build -t fjboehm/qtl2hotspots:$TRAVIS_COMMIT .
   - docker tag fjboehm/qtl2hotspots:$TRAVIS_COMMIT fjboehm/qtl2hotspots:travis-$TRAVIS_BUILD_NUMBER
 
