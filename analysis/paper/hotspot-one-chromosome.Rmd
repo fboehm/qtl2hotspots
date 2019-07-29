@@ -68,8 +68,7 @@ nonlocal_annot <- lod_peaks %>%
 
 ```{r}
 local_annot2 <- local_annot %>%
-  filter(middle <= hot_upper + 1, middle >= hot_lower - 1) %>% 
-  # extend only 1 mb beyond hotspot end points (total interval length, for local traits, = 6 Mb)
+  filter(middle <= hot_upper, middle >= hot_lower) %>% 
   arrange(desc(lod))
 ```
 
