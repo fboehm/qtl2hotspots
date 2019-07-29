@@ -1,12 +1,12 @@
 # Introduction
 
 Genetics studies in model organisms like mice can identify
-genomic regions that affect complex traits, such as systolic blood pressure and body weight [@sax1923association;@soller1976power;@lander1989mapping;@broman2009guide;@jansen2007quantitative]. 
+genomic regions that affect complex quantitative traits, such as systolic blood pressure, body weight, and, more recently, biomolecular traits such as gene expression levels and protein concentrations [@sax1923association;@soller1976power;@lander1989mapping;@broman2009guide;@jansen2007quantitative;@chick2016defining]. 
 These genomic regions are called "quantitative trait loci" or "QTL".
 A genome-wide QTL "scan" reveals
 associations between genotypes and phenotypes by considering each position along the genome,
 one at a time, as a candidate QTL for the trait of interest.
-A region with strong evidence of association with a complex trait, then, defines a QTL (for that trait).
+A region with strong evidence of association with a complex quantitative trait, then, defines a QTL (for that trait).
 Because nearby markers have correlated
 genotypes, a QTL in a two-parent cross often spans multiple megabases in length
 and may contain more than a hundred genes.
@@ -14,10 +14,6 @@ Identification of a causal gene (for a given complex trait) from among those gen
 challenging and may require costly and time-consuming experiments.
 The growing need for greater QTL mapping resolution fueled development over the
 last two decades of model organism multiparental populations for high-resolution QTL mapping [@de2017back;@churchill2004collaborative;@svenson2012high;@huang2012multiparent;@shivakumar2018soybean;@huang2011analysis;@kover2009multiparent;@tisne2017identification;@stanley2017genetic].
-With experimentalists now measuring tens of thousands of biomolecular traits
-in multiparental populations, the systems genetics community needs multivariate
-statistical tools to fully examine the large volumes of data [@keller2018genetic;@chick2016defining].
-Identifying loci that affect multiple traits can aid in identifying biomolecular interactions and in clarifying complex trait genetic architecture. A QTL that affects more than one trait is called a "pleiotropic" QTL.
-A test of pleiotropy vs. separate QTL is one multivariate statistical tool that will inform
-complex trait genetics by enabling researchers to identify the number of
-unique QTL in a genomic region of interest.
+
+Recent systems genetics studies have sought to identify QTL for thousands of biomolecular traits [@keller2018genetic;@chick2016defining].
+

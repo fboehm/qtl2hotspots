@@ -303,8 +303,14 @@ webshot::webshot(url = fnhtml,
 
 
 ```{r}
-tibble(symbol = rownames(pm[indic_nonlocal, indic_nonlocal])[ord_nonlocal], index = 1:length(symbol)) %>%
-  left_join(nonlocal_annot, by = "symbol") %>%
-  ggplot() + geom_point(aes(y = pos, x = index))
+bar <- foo %>%
+  filter(local_symbol == keller_mediator)
+
+p <- tibble(nonlocal_symbol = rownames(pm[indic_nonlocal, indic_nonlocal])[ord_nonlocal], index = 1:length(nonlocal_symbol)) %>%
+  inner_join(bar, by = "nonlocal_symbol") %>% 
+  left_join(nonlocal_annot, by = c("nonlocal_symbol" = "symbol")) %>%
+  ggplot() + geom_point(aes(y = pos, x = index, color = lod_diff > 1.5, nonlocal = nonlocal_symbol, lod_diff = lod_diff)) 
+
+ggplotly(p)
 ```
 
