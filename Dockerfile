@@ -30,10 +30,10 @@ RUN install2.r --error \
 # go into the repo directory
 RUN . /etc/environment \
   \
-  # Install linux depedendencies here
-  && sudo apt-get update \
+  # Install linux dependencies here
+  && sudo apt-get -y update \
   && sudo apt-get install libudunits2-dev -y \
-  && sudo apt-get install cabal-install \
+  && sudo apt-get install cabal-install -y \
   && cabal update && cabal install pandoc-crossref \
   # build this compendium package
   && cd /home/rstudio/qtl2hotspots; make
