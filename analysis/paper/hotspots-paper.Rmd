@@ -59,6 +59,25 @@ options(tibble.print_max = 50, tibble.print_min = 20)
 library(heatmaply)
 ```
 
+```{r}
+if (!file.exists(here("analysis", "data", "derived_data", "expr.rds"))){
+  download.file("https://datadryad.org/bitstream/handle/10255/dryad.166774/Attie_DO378_eQTL_viewer_v1.Rdata?sequence=2",
+              destfile = here("analysis", "data", "raw_data", "Attie_DO378_eQTL_viewer_v1.Rdata")
+              )
+  load(here("analysis", "data", "raw_data", "Attie_DO378_eQTL_viewer_v1.Rdata"))
+  saveRDS(dataset.islet.rnaseq$lod.peaks, here("analysis", "data", "derived_data", "lod_peaks.rds"))
+  saveRDS(dataset.islet.rnaseq$annots, here("analysis", "data", "derived_data", "annots.rds"))
+  saveRDS(dataset.islet.rnaseq$expr, here("analysis", "data", "derived_data", "expr.rds"))
+}
+```
+
+```{r}
+lod_peaks <- readRDS(here("analysis", "data", "derived_data", "lod_peaks.rds"))
+annots <- readRDS(here("analysis", "data", "derived_data", "annots.rds"))
+expr <- readRDS(here("analysis", "data", "derived_data", "expr.rds"))
+```
+
+
 
 ```{r setup_continued-2}
 hot_chr <- 2
@@ -71,17 +90,6 @@ keller_mediator <- "Hnf4a"
 
 
 
-```{r, tmem189-scatter, fig.cap="Colors correspond to mediation by Tmem189"}
-bar <- foo %>%
-  filter(local_symbol == "Tmem189")
-
-p <- tibble(nonlocal_symbol = rownames(pm[indic_nonlocal, indic_nonlocal])[ord_nonlocal], index = 1:length(nonlocal_symbol)) %>%
-  inner_join(bar, by = "nonlocal_symbol") %>% 
-  left_join(nonlocal_annot, by = c("nonlocal_symbol" = "symbol")) %>%
-  ggplot() + geom_point(aes(y = pos, x = index, color = lod_diff > 1.5, nonlocal = nonlocal_symbol, lod_diff = lod_diff)) 
-
-ggplotly(p)
-```
 
 
 

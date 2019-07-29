@@ -19,23 +19,6 @@ med_list <- readRDS(here("analysis", "data", "derived_data", paste0("Chr", hot_c
 
 
 
-```{r}
-if (!file.exists(here("analysis", "data", "derived_data", "expr.rds"))){
-  download.file("https://datadryad.org/bitstream/handle/10255/dryad.166774/Attie_DO378_eQTL_viewer_v1.Rdata?sequence=2",
-              destfile = here("analysis", "data", "raw_data", "Attie_DO378_eQTL_viewer_v1.Rdata")
-              )
-  load(here("analysis", "data", "raw_data", "Attie_DO378_eQTL_viewer_v1.Rdata"))
-  saveRDS(dataset.islet.rnaseq$lod.peaks, here("analysis", "data", "derived_data", "lod_peaks.rds"))
-  saveRDS(dataset.islet.rnaseq$annots, here("analysis", "data", "derived_data", "annots.rds"))
-  saveRDS(dataset.islet.rnaseq$expr, here("analysis", "data", "derived_data", "expr.rds"))
-}
-```
-
-```{r}
-lod_peaks <- readRDS(here("analysis", "data", "derived_data", "lod_peaks.rds"))
-annots <- readRDS(here("analysis", "data", "derived_data", "annots.rds"))
-expr <- readRDS(here("analysis", "data", "derived_data", "expr.rds"))
-```
 
 
 
@@ -68,7 +51,7 @@ nonlocal_annot <- lod_peaks %>%
 
 ```{r}
 local_annot2 <- local_annot %>%
-  filter(middle <= hot_upper, middle >= hot_lower) %>% 
+  filter(middle <= hot_upper + 1, middle >= hot_lower - 1) %>% 
   arrange(desc(lod))
 ```
 
