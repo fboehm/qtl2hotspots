@@ -10,7 +10,7 @@ output:
   bookdown::html_document2:
     pandoc_args: 
       - --filter
-      - /usr/local/Cellar/pandoc-crossref/0.3.4.1/bin/pandoc-crossref
+      - pandoc-crossref
 ---
 
 ```{r child="intro.Rmd"}

@@ -31,8 +31,9 @@ RUN install2.r --error \
 RUN . /etc/environment \
   \
   # Install linux depedendencies here
-  # e.g. need this for ggforce::geom_sina
   && sudo apt-get update \
   && sudo apt-get install libudunits2-dev -y \
+  && sudo apt-get install cabal-install \
+  && cabal update && cabal install pandoc-crossref \
   # build this compendium package
   && cd /home/rstudio/qtl2hotspots; make
