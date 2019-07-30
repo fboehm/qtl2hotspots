@@ -54,14 +54,14 @@ ENV PATH /root/.cabal/bin:/root/.local/bin:/opt/cabal/2.4/bin:/opt/ghc/8.6.5/bin
 
 
 # get the newest list of packages
-RUN cabal update &&\
+RUN cabal update
 # install the dependencies of the packages we want
-    cabal install --dependencies-only \
+RUN cabal install --dependencies-only \
                   pandoc \
                   pandoc-citeproc \
-                  pandoc-crossref &&\
+                  pandoc-crossref
 # install the packages we want
-    cabal install pandoc \
+RUN cabal install pandoc \
                   pandoc-citeproc \
                   pandoc-crossref &&\
 
