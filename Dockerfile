@@ -6,23 +6,6 @@ MAINTAINER Frederick J. Boehm <frederick.boehm@gmail.com>
 
 COPY . /home/rstudio/qtl2hotspots
 
-# Install R packages
-RUN install2.r --error \
-    broman \
-    here \
-    heatmaply \
-    dendextend \
-    plotly \
-    svglite \
-    bookdown \
-    webshot \
-    knitr \
-    purrr \
-    dplyr \
-    htmlwidgets \
-    devtools \
-    git2r \
-    tidyverse
 
 
 RUN apt-get clean &&\
