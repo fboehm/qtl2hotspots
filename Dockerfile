@@ -64,11 +64,6 @@ RUN cabal update &&\
     cabal install pandoc \
                   pandoc-citeproc \
                   pandoc-crossref &&\
-# clean up all temporary files
-    apt-get clean &&\
-    apt-get autoclean -y &&\
-    apt-get autoremove -y &&\
-    apt-get clean
 
 # we remember the path to pandoc in a special variable
 ENV PANDOC_DIR=/root/.cabal/bin/
