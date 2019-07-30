@@ -95,6 +95,22 @@ keller_mediator <- "Hnf4a"
 
 ## Chr 2 hotspot results
 
+The scatter plot of pleiotropy test statistics and mediation LOD differences reveals that few local-nonlocal 
+trait pairs have both a high value of the pleiotropy test statistic and a high value of the mediation LOD 
+difference. Many points have low values of both, while some points demonstrate a high value of only mediation 
+LOD difference or pleiotropy test statistic. 
+
+Many points have negative values of mediation LOD difference. These correspond to pairs that, when conditioning 
+on the putative mediator, the LOD for the nonlocal trait increased. 
+
+The points are color-coded to identify those pairs that involve the local trait *Hnf4a*, which 
+@keller2018genetic identified as a key mediator of traits at this hotspot. Blue points involve *Hnf4a*, while 
+red points do not. We see that many blue point have large mediation LOD differences and small pleiotropy test 
+statistics. In fact, most of the points with mediation LOD difference above 15 involve *Hnf4a* and have small 
+pleiotropy test statistics.
+
+
+
 
 
 

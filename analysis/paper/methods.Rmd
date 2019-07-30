@@ -119,17 +119,32 @@ is the mean trait value, and $E$ is a vector of normally distributed random erro
 We created scatter plots with the `ggplot2` package [@ggplot2] for the R
 statistical computing environment [@r]. We initially plotted all local-nonlocal pairs for each hotspot. We highlighted in blue those points that correspond to pairs involving the putative mediator per [@keller2018genetic].
 
+### Heatmaps
+
 We created heatmaps to examine patterns among pleiotropy test results in each hotspot.
 We represented the pleiotropy test statistics as a symmetric matrix, where each row was one expression
-trait and each column was an expression trait. Each cell, then, contained the pleiotropy test statistic
+trait and each column was an expression trait. 
+Excepting the cells on the diagonal, each cell, then, contained the pleiotropy test statistic
 from the analysis involving the row's expression trait and the column's expression trait.
-To create a heatmap, we first performed two hierarchical clusterings, one on the submatrix involving only
-nonlocal expression traits and a second on the submatrix involving only local expression traits. We
-calculated the Euclidean distances between all trait pairs before clustering. We ordered the rows and
-columns according to optimal leaf ordering. We then combined the
-local and nonlocal traits into a single heatmap. To achieve greater coloring contrasts in the heatmaps, we
-set the color spectrum limits at 0 (dark blue) and 5 (yellow). Test statistics above 5 are represented by
-yellow.
+To create a heatmap, we first performed two hierarchical clusterings of rows. 
+One hierarchical clustering involved only the rows and columns containing local traits, while the other contained only 
+rows and columns containing nonlocal traits.
+We calculated the Euclidean distances between all row pairs (in the respective submatrices) before clustering. We ordered the rows according to optimal leaf ordering [@hahsler2008getting;@dendextend]. 
+We then combined the
+local and nonlocal traits into a single heatmap for each hotspot. 
+To achieve coloring contrasts in the heatmaps, we
+set the color spectrum limits at 0 (dark blue) and 5 (yellow). Pleiotropy test statistics above 5, too, are 
+represented by
+yellow. We annotated rows by a collection of columns on the right-hand side of the heatmap. This binary matrix 
+consists of columns that summarize mediation results. Each column represents a local trait. If a row 
+corresponds to a nonlocal trait that is mediated by the local trait, then the cell is colored dark green; 
+otherwise, the cell is light green. The last annotation column and the annotation row above the heatmap both 
+designate local traits with dark blue and nonlocal traits with light blue.
+
+
+
+
+
 
 
 
