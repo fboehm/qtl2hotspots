@@ -3,14 +3,9 @@ title: "Expression QTL hotspot dissection with mediation analysis and pleiotropy
 author: "Frederick J. Boehm, Brian S. Yandell, and Karl W. Broman"
 date: "7/27/2019"
 bibliography: research.bib
-numberSections: true
 linkReferences: true
 link-citations: true
-output: 
-  bookdown::html_document2:
-    pandoc_args: 
-      - --filter
-      - pandoc-crossref
+output: bookdown::html_document2
 ---
 
 ```{r child="intro.Rmd"}
@@ -124,6 +119,9 @@ keller_mediator <- "Pdx1"
 
 ```{r child="hotspot-one-chromosome.Rmd", eval = FALSE}
 ```
+
+## Chr 5 results
+
 
 
 

@@ -78,4 +78,4 @@ RUN echo ${PATH}
 
   # build this compendium package
 
-RUN cd /home/rstudio/qtl2hotspots; make
+RUN cd /home/rstudio/qtl2hotspots; make -f Makefile-docker.makefile
