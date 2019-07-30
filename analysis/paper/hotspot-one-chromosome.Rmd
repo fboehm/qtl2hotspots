@@ -139,7 +139,7 @@ p <- foo %>%
 ) +
   xlab("Pleiotropy LOD") +
   ylab("Mediation LOD difference") +
-  geom_text(aes(x = 1, y = 1, label = local_symbol), inherit.aes=FALSE)
+  geom_text(aes(x = max(foo$pleiotropy_lod), y = 1, label = local_symbol), inherit.aes=FALSE)
 
 fnsvg <- paste0("Chr", hot_chr, "_scatter-panel.svg")
 fnpdf <- paste0("Chr", hot_chr, "_scatter-panel.pdf")
