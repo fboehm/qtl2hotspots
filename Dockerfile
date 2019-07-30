@@ -37,7 +37,6 @@ RUN apt-get clean &&\
 # We also install zlib1g, as we will need it later on.
 # We install librsvg2 in order to make svg -> pdf conversation possible.
     apt-get install -f -y haskell-platform \
-                          cabal-install \
                           libudunits2-dev && \
 # get the newest list of packages
     cabal update &&\
@@ -46,6 +45,7 @@ RUN apt-get clean &&\
                   pandoc \
                   pandoc-citeproc \
                   pandoc-crossref &&\
+
 # install the packages we want
     cabal install pandoc \
                   pandoc-citeproc \
