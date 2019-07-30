@@ -121,7 +121,8 @@ statistical computing environment [@r]. We initially plotted all local-nonlocal 
 
 ### Heatmaps
 
-We created heatmaps to examine patterns among pleiotropy test results in each hotspot.
+We created heatmaps to examine patterns among pleiotropy test results in each hotspot. Our analysis used both 
+local and nonlocal traits.
 We represented the pleiotropy test statistics as a symmetric matrix, where each row was one expression
 trait and each column was an expression trait. 
 Excepting the cells on the diagonal, each cell, then, contained the pleiotropy test statistic
@@ -129,7 +130,12 @@ from the analysis involving the row's expression trait and the column's expressi
 To create a heatmap, we first performed two hierarchical clusterings of rows. 
 One hierarchical clustering involved only the rows and columns containing local traits, while the other contained only 
 rows and columns containing nonlocal traits.
-We calculated the Euclidean distances between all row pairs (in the respective submatrices) before clustering. We ordered the rows according to optimal leaf ordering [@hahsler2008getting;@dendextend]. 
+We calculated the Euclidean distances between all row pairs (in the respective 
+submatrices) before clustering. Hierarchical clustering was performed using the complete 
+linkage method. Initially, each row is assigned to its own cluster. An iterative 
+algorithm then combines the two most similar clusters at each step. Distances between 
+clusters were computed with the Lance-Williams dissimilarity update formula for complete 
+linkage. Lastly, we arranged the rows according to optimal leaf ordering [@hahsler2008getting;@dendextend]. 
 We then combined the
 local and nonlocal traits into a single heatmap for each hotspot. 
 To achieve coloring contrasts in the heatmaps, we
