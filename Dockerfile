@@ -64,13 +64,10 @@ RUN cabal install --dependencies-only \
 RUN cabal install pandoc \
                   pandoc-citeproc \
                   pandoc-crossref \
-
 # we remember the path to pandoc in a special variable
 ENV PANDOC_DIR=/root/.cabal/bin/
-
 # add pandoc to the path
 ENV PATH=${PATH}:${PANDOC_DIR}
-
 # go into the repo directory
 RUN . /etc/environment \
   # Install linux dependencies here
