@@ -66,10 +66,14 @@ RUN cabal install pandoc \
                   pandoc-crossref
 # we remember the path to pandoc in a special variable
 ENV PANDOC_DIR=/root/.cabal/bin/
-# add pandoc to the path
-ENV PATH=${PATH}:${PANDOC_DIR}
+
+
 # go into the repo directory
-RUN . /etc/environment \
-  # Install linux dependencies here
+RUN . /etc/environment
+
+# add pandoc to the path (as the first entry in PATH)
+ENV PATH=${PANDOC_DIR}:${PATH}
+
   # build this compendium package
-  && cd /home/rstudio/qtl2hotspots; make
+
+RUN cd /home/rstudio/qtl2hotspots; make
