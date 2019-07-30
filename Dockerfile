@@ -74,6 +74,8 @@ RUN . /etc/environment
 # add pandoc to the path (as the first entry in PATH)
 ENV PATH=${PANDOC_DIR}:${PATH}
 
+RUN echo ${PATH}
+
   # build this compendium package
 
 RUN cd /home/rstudio/qtl2hotspots; make
