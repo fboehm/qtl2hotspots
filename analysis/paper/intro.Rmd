@@ -1,7 +1,9 @@
 # Introduction
 
 Genetics studies in model organisms like mice can identify
-genomic regions that affect complex quantitative traits, such as systolic blood pressure, body weight, and, more recently, biomolecular traits such as gene expression levels and protein concentrations [@sax1923association;@soller1976power;@lander1989mapping;@broman2009guide;@jansen2007quantitative;@chick2016defining]. 
+genomic regions that affect complex quantitative traits, such as systolic blood pressure, body 
+weight, and, more recently, biomolecular traits such as gene expression levels and protein 
+concentrations [@sax1923association;@soller1976power;@lander1989mapping;@broman2009guide;@jansen2007quantitative;@chick2016defining]. 
 These genomic regions are called "quantitative trait loci" or "QTL".
 A genome-wide QTL "scan" reveals
 associations between genotypes and phenotypes by considering each position along the genome,
@@ -16,4 +18,11 @@ The growing need for greater QTL mapping resolution fueled development over the
 last two decades of model organism multiparental populations for high-resolution QTL mapping [@de2017back;@churchill2004collaborative;@svenson2012high;@huang2012multiparent;@shivakumar2018soybean;@huang2011analysis;@kover2009multiparent;@tisne2017identification;@stanley2017genetic].
 
 Recent systems genetics studies have sought to identify QTL for thousands of biomolecular traits [@keller2018genetic;@chick2016defining].
+
+
+
+## INTRO IDEAS
+
+- why is it useful to study expression hotspots?
+- who else has studied hotspots? And what did they do?
 
