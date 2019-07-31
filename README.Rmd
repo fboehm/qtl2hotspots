@@ -61,6 +61,11 @@ Table: From [Keller et al. 2018 GENETICS](https://www.genetics.org/content/209/1
 
 This is a basic example which shows you how to solve a common problem:
 
+```{r load_tidyverse}
+library(tidyverse)
+```
+
+
 ```{r example}
 map <- readRDS(here::here("analysis", "data", "derived_data", "map.rds"))
 hot_chr <- c(2, 5, 7, 11, 13)
@@ -79,7 +84,8 @@ stop_position <- c(map$`2`[stop_index[1]],
                     map$`11`[stop_index[4]],
                     map$`13`[stop_index[5]]
 )
-tibble::tibble(hot_chr, start_index, scan_length, stop_index, start_position, stop_position)
+tibble::tibble(hot_chr, start_index, scan_length, stop_index, start_position, stop_position) %>%
+  knitr::kable()
 ```
 
 ## Build the manuscript `paper.Rnw`
