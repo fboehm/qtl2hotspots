@@ -6,8 +6,11 @@ bibliography: research.bib
 linkReferences: true
 link-citations: true
 output: 
+  - github_document:
+      html_preview: false
+      toc: true
+      toc_depth: 3
   - bookdown::html_document2  
-  - github_document
 ---
 
 ```{r child="intro.Rmd"}
