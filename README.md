@@ -10,7 +10,7 @@ Status](https://travis-ci.org/fboehm/qtl2hotspots.svg?branch=master)](https://tr
 
 <!-- badges: end -->
 
-The goal of `qtl2hotspots` is to analyze the Keller et al. (2018)
+The goal of `qtl2hotspots` is to analyze the Keller et al. (2018)
 expression trait hotspots with both mediation methods and pleiotropy
 tests.
 
@@ -30,10 +30,9 @@ install.packages("devtools")
 devtools::install_github("fboehm/qtl2hotspots")
 ```
 
-## Keller, et al. (2018)’s hotspots table
+## Keller, et al. (2018)’s hotspots table
 
-Here is Keller’s Table S1 (from the Supplemental
-Documents).
+Here is Keller’s Table S1 (from the Supplemental Documents).
 
 | Chr | position (Mb) | number of transcripts | candidate mediator | number of genes with LOD difference \> 1.5 |
 | --- | ------------- | --------------------- | ------------------ | ------------------------------------------ |
@@ -52,8 +51,32 @@ table 1](https://figshare.com/articles/Supplemental_Material_for_Attie_et_al_201
 This is a basic example which shows you how to solve a common problem:
 
 ``` r
-#library(qtl2hotspots)
-## basic example code
+map <- readRDS(here::here("analysis", "data", "derived_data", "map.rds"))
+hot_chr <- c(2, 5, 7, 11, 13)
+start_index <- c(3742, 3498, 927, 1868, 2814) # from s1 values in condor submit files
+scan_length <- c(247, 269, 242, 217, 226) # in number of markers, from condor submit files
+stop_index <- start_index + scan_length - 1 # index of the last marker in the interval
+start_position <- c(map$`2`[start_index[1]], 
+                    map$`5`[start_index[2]], 
+                    map$`7`[start_index[3]],
+                    map$`11`[start_index[4]],
+                    map$`13`[start_index[5]]
+)
+stop_position <- c(map$`2`[stop_index[1]], 
+                    map$`5`[stop_index[2]], 
+                    map$`7`[stop_index[3]],
+                    map$`11`[stop_index[4]],
+                    map$`13`[stop_index[5]]
+)
+tibble::tibble(hot_chr, start_index, scan_length, stop_index, start_position, stop_position)
+#> # A tibble: 5 x 6
+#>   hot_chr start_index scan_length stop_index start_position stop_position
+#>     <dbl>       <dbl>       <dbl>      <dbl>          <dbl>         <dbl>
+#> 1       2        3742         247       3988          163.          168. 
+#> 2       5        3498         269       3766          142.          149. 
+#> 3       7         927         242       1168           40.8          50.3
+#> 4      11        1868         217       2084           67.6          76.7
+#> 5      13        2814         226       3039          110.          116.
 ```
 
 ## Build the manuscript `paper.Rnw`
