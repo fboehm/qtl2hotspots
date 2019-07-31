@@ -63,6 +63,10 @@ if (!file.exists(here("analysis", "data", "derived_data", "expr.rds"))){
   saveRDS(dataset.islet.rnaseq$lod.peaks, here("analysis", "data", "derived_data", "lod_peaks.rds"))
   saveRDS(dataset.islet.rnaseq$annots, here("analysis", "data", "derived_data", "annots.rds"))
   saveRDS(dataset.islet.rnaseq$expr, here("analysis", "data", "derived_data", "expr.rds"))
+  saveRDS(K, here("analysis", "data", "derived_data", "kinship.rds"))
+  saveRDS(map, here("analysis", "data", "derived_data", "map.rds"))
+  saveRDS(genoprobs, here("analysis", "data", "derived_data", "genoprobs.rds"))
+  saveRDS(dataset.islet.rnaseq$covar, here("analysis", "data", "derived_data", "covar.rds"))
 }
 ```
 
@@ -102,13 +106,50 @@ The points are color-coded to identify those pairs that involve the local trait 
 @keller2018genetic identified as a key mediator of traits at this hotspot. Blue points involve *Hnf4a*, while 
 red points do not. We see that many blue point have large mediation LOD differences and small pleiotropy test 
 statistics. In fact, most of the points with mediation LOD difference above 15 involve *Hnf4a* and have small 
-pleiotropy test statistics.
+pleiotropy test statistics. 
+
+An unanticipated observation is that some points have mediation LOD differences of nearly 10 
+and pleiotropy test statistics of nearly 10. With such large pleiotropy test statistics, one 
+has reasonable evidence each point representing two separate QTL. It seems biologically 
+unlikely that a nonlocal trait and a mediating local trait would not share a pleiotropic QTL. 
+
+In looking closer at these six points, we find that five of the six have *Tmem189* as the 
+local trait. This raises questions about the *Tmem189* trait. One known issue with the pleiotropy test is its sensitivity to start and end points for the two-dimensional scan. If the scan interval is too small, the test can return misleading results. If *Tmem189* were to have a very broad univariate peak, such that the peak extended beyond the scan interval, then we might observe misleading results in tests involving *Tmem189*.
 
 
-
-
-
-
+```{r scan1}
+# read oddball points from interactive plot
+tr <- c("Tmem189",
+        "Myo15b",
+        "Sephs2",
+        "Bcmo1",
+        "Tmprss4",
+        "Cacnb3",
+        "Gm12929",
+        "Eya2"
+        )
+tr_tib <- hot_annot %>%
+  filter(symbol %in% tr) %>%
+  arrange(annot.id)
+K <- readRDS(here("analysis", "data", "derived_data", "kinship.rds"))
+map <- readRDS(here("analysis", "data", "derived_data", "map.rds"))
+covar <- readRDS(here("analysis", "data", "derived_data", "covar.rds"))
+aprobs <- readRDS(here("analysis", "data", "derived_data", "genoprobs.rds"))
+expr_sm <- expr[ , colnames(expr) %in% tr_tib$annot.id, drop = FALSE]
+s1 <- qtl2::scan1(genoprobs = aprobs,
+            pheno = expr_sm,
+            kinship = K,
+            addcovar = covar, 
+            cores = 0
+)
+# zoom in on Chr2 after 150 Mb
+# get length of map$`1`
+purrr::map(.x = 1:8, .f = function(x) qtl2::plot_scan1(s1, map, lodcolumn = x, chr = 2, main = paste0(tr_tib[x, ])))
+qtl2::find_peaks(scan1_output = s1, map = map, threshold = 7) %>% 
+  as_tibble() %>%
+  filter(chr == 2) %>%
+  left_join(hot_annot, by = c("lodcolumn" = "annot.id"))
+```
 
 
 ```{r setup_continued-5}
