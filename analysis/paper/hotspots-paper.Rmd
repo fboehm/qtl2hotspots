@@ -160,7 +160,7 @@ hot_mid <- 146
 keller_mediator <- "Pdx1"
 ```
 
-```{r child="hotspot-one-chromosome.Rmd", eval = FALSE}
+```{r child="hotspot-one-chromosome.Rmd"}
 ```
 
 ## Chr 5 results
@@ -176,7 +176,7 @@ hot_mid <- 46
 keller_mediator <- "Fam83e"
 ```
 
-```{r child="hotspot-one-chromosome.Rmd", eval = FALSE}
+```{r child="hotspot-one-chromosome.Rmd"}
 ```
 
 
