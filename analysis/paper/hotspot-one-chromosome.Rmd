@@ -51,7 +51,7 @@ nonlocal_annot <- lod_peaks %>%
 
 ```{r}
 local_annot2 <- local_annot %>%
-  filter(middle <= hot_upper + 1, middle >= hot_lower - 1) %>% 
+  filter(middle <= hot_upper, middle >= hot_lower) %>% 
   arrange(desc(lod))
 ```
 
