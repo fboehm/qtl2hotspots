@@ -5,7 +5,9 @@ date: "7/27/2019"
 bibliography: research.bib
 linkReferences: true
 link-citations: true
-output: bookdown::html_document2
+output: 
+  - bookdown::html_document2  
+  - github_document
 ---
 
 ```{r child="intro.Rmd"}
