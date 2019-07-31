@@ -117,7 +117,7 @@ In looking closer at these six points, we find that five of the six have *Tmem18
 local trait. This raises questions about the *Tmem189* trait. One known issue with the pleiotropy test is its sensitivity to start and end points for the two-dimensional scan. If the scan interval is too small, the test can return misleading results. If *Tmem189* were to have a very broad univariate peak, such that the peak extended beyond the scan interval, then we might observe misleading results in tests involving *Tmem189*.
 
 
-```{r scan1}
+```{r scan1-Chr2, eval = FALSE}
 # read oddball points from interactive plot
 tr <- c("Tmem189",
         "Myo15b",
