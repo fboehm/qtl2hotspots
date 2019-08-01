@@ -12,7 +12,8 @@ A region with strong evidence of association with a complex quantitative trait, 
 Because nearby markers have correlated
 genotypes, a QTL in a two-parent cross often spans multiple megabases in length
 and may contain more than a hundred genes.
-Identification of a causal gene (for a given complex trait) from among those genes near the QTL is
+Identification of a causal gene (for a given complex trait) from 
+among those genes near the QTL is
 challenging and may require costly and time-consuming experiments.
 The growing need for greater QTL mapping resolution fueled development over the
 last two decades of model organism multiparental populations for high-resolution QTL mapping [@de2017back;@churchill2004collaborative;@svenson2012high;@huang2012multiparent;@shivakumar2018soybean;@huang2011analysis;@kover2009multiparent;@tisne2017identification;@stanley2017genetic].
