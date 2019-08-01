@@ -6,11 +6,8 @@ bibliography: research.bib
 linkReferences: true
 link-citations: true
 output: 
-  - github_document:
-      html_preview: false
-      toc: true
-      toc_depth: 3
-  - bookdown::html_document2  
+  bookdown::html_document2:
+  code_folding: hide  
 ---
 
 ```{r child="intro.Rmd"}
@@ -37,7 +34,7 @@ Simple hotspots: Chr 2, Chr 13
 
 Complex hotspots: Chr 5
 
-Undetermined: Chr 7, Chr 11
+Undetermined (right now): Chr 7, Chr 11
 
 
 
