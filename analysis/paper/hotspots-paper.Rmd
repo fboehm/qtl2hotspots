@@ -168,6 +168,19 @@ keller_mediator <- "Pdx1"
 
 ## Chr 5 results
 
+The Chr 5 scatter plot of mediation LOD difference values against pleiotropy test statistics 
+reveals a block-diagonal pattern of blue coloring among the nonlocal traits. We observe the 
+set of nonlocal traits clustered into two blocks. Within each block, any two traits share a 
+QTL, ie, are pleiotropic. Yet, the off-diagonal cells, ie, those nonlocal trait pairs that 
+include one trait from each of the two blocks, tend to have greater pleiotropy test 
+statistics. Still, not all off-diagonal blocks have large pleiotropy test statistics. The 
+mostly dark blue matrix on the diagonal (from column 22 to 99) features no cells with pleiotropy test statistics above 3.2. While we didn't determine p-values for these analyses, prior analyses suggest that pleiotropy test statistics below 3.2 are consistent with p-values above 0.05, and, thus, are consistent with a single pleiotropic QTL.
+
+Columns 100 to 119 (and rows 100 to 119) are a second (symmetric) block with only small 
+pleiotropy test statistics. Columns 120 to 202 contains cells for the third (symmetric) block. Column 203, the last column, contains a trait *Gm* that, based on pleiotropy test statistics, doesn't cluster near other traits.
+
+
+
 
 
 
@@ -190,7 +203,7 @@ hot_mid <- 71
 keller_mediator <- "Sat2"
 ```
 
-```{r child="hotspot-one-chromosome.Rmd", eval = FALSE}
+```{r child="hotspot-one-chromosome.Rmd"}
 ```
 
 
@@ -201,8 +214,22 @@ hot_mid <- 112.5
 keller_mediator <- "Il6st"
 ```
 
-```{r child="hotspot-one-chromosome.Rmd", eval = FALSE}
+```{r child="hotspot-one-chromosome.Rmd"}
 ```
+
+Our analysis of the Chromosome 13 hotspot presents results much like those for the Chromosome 2 
+hotspot, with the Chromosome 13 local transcript *Il6st* playing a role like that of *Hnf4a* in the 
+Chr 2 hotspot. In examining the scatter plot (Figure ) of mediation LOD differences against 
+pleiotropy test statistics for all local-nonlocal pairs, we see, as in Figure for the Chr 2 
+hotspot, a single local trait *Il6st* has strong mediation effects on a collection of nonlocal traits. *Il6st*, first identified by @keller2018genetic, accounts for most of the nonlocal traits that are affected by the hotspot. 
+
+The heatmap for pleiotropy statistics for pairwise tests involving nonlocal traits resembles the 
+heatmap for the Chr2 hotspot. Nearly all nonlocal traits have small test statistics when paired 
+with each other. This is visualized as a dark blue, symmetric square along the heatmap's diagonal 
+with only a few outlier nonlocal traits that demonstrate distinct patterns in pleiotropy test 
+statistics.
+
+
 
 
 
@@ -223,6 +250,11 @@ mediator, mediation analyses provide little information about the genetics of th
 Pleiotropy testing is particularly useful in this setting, since a pleiotropy test always gives
 an answer about the number of underlying QTL. A drawback of pleiotropy testing is that the scientific question that it addresses - do two traits share a single QTL - informs, but doesn't fully resolve, the genetics of the nonlocal complex traits under study.
 
+- lod difference threshold for declaration of "mediation". 
+  - esp with regards to Chr 5 hotspot, where the keller mediator has a lot of traits with lod differences under 3, but above the 1.5 threshold.
+  
+  
+- look at outputs of `lod_int()`, ie, the support intervals for all traits in a hotspot. Could plot interval against cluster order, for example.
 
 
 

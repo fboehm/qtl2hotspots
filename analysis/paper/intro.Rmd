@@ -23,6 +23,7 @@ Recent systems genetics studies have sought to identify QTL for thousands of bio
 
 ## INTRO IDEAS
 
-- why is it useful to study expression hotspots?
+- why is it useful to study expression hotspots? 
+- why are these two methods - pleiotropy tests and mediation analyses useful for studying hotspots? 
 - who else has studied hotspots? And what did they do?
 
