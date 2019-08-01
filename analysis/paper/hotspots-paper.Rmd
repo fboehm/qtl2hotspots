@@ -33,6 +33,14 @@ library(here)
 
 # Results
 
+Simple hotspots: Chr 2, Chr 13
+
+Complex hotspots: Chr 5
+
+Undetermined: Chr 7, Chr 11
+
+
+
 We generated scatter plots of pleiotropy test statistics vs. mediation LOD difference values for each of the five hotspots (Figures).
 Each point represents a pairing of a local trait with a nonlocal trait.
 The mediation LOD difference value is that observed when the local trait is considered
@@ -59,7 +67,7 @@ options(tibble.print_max = 50, tibble.print_min = 20)
 library(heatmaply)
 ```
 
-```{r}
+```{r saveRDS}
 if (!file.exists(here("analysis", "data", "derived_data", "expr.rds"))){
   download.file("https://datadryad.org/bitstream/handle/10255/dryad.166774/Attie_DO378_eQTL_viewer_v1.Rdata?sequence=2",
               destfile = here("analysis", "data", "raw_data", "Attie_DO378_eQTL_viewer_v1.Rdata")
@@ -75,7 +83,7 @@ if (!file.exists(here("analysis", "data", "derived_data", "expr.rds"))){
 }
 ```
 
-```{r}
+```{r readRDS}
 lod_peaks <- readRDS(here("analysis", "data", "derived_data", "lod_peaks.rds"))
 annots <- readRDS(here("analysis", "data", "derived_data", "annots.rds"))
 expr <- readRDS(here("analysis", "data", "derived_data", "expr.rds"))
@@ -99,6 +107,9 @@ keller_mediator <- "Hnf4a"
 
 ## Chr 2 hotspot results
 
+
+### Chr 2 scatter plots
+ 
 The scatter plot of pleiotropy test statistics and mediation LOD differences reveals that few local-nonlocal 
 trait pairs have both a high value of the pleiotropy test statistic and a high value of the mediation LOD 
 difference. Many points have low values of both, while some points demonstrate a high value of only mediation 
@@ -113,48 +124,19 @@ red points do not. We see that many blue point have large mediation LOD differen
 statistics. In fact, most of the points with mediation LOD difference above 15 involve *Hnf4a* and have small 
 pleiotropy test statistics. 
 
-An unanticipated observation is that some points have mediation LOD differences of nearly 10 
-and pleiotropy test statistics of nearly 10. With such large pleiotropy test statistics, one 
-has reasonable evidence each point representing two separate QTL. It seems biologically 
-unlikely that a nonlocal trait and a mediating local trait would not share a pleiotropic QTL. 
-
-In looking closer at these six points, we find that five of the six have *Tmem189* as the 
-local trait. This raises questions about the *Tmem189* trait. One known issue with the pleiotropy test is its sensitivity to start and end points for the two-dimensional scan. If the scan interval is too small, the test can return misleading results. If *Tmem189* were to have a very broad univariate peak, such that the peak extended beyond the scan interval, then we might observe misleading results in tests involving *Tmem189*.
+An unanticipated observation is that some points have mediation LOD differences of 
 
 
-```{r scan1-Chr2, eval = FALSE}
-# read oddball points from interactive plot
-tr <- c("Tmem189",
-        "Myo15b",
-        "Sephs2",
-        "Bcmo1",
-        "Tmprss4",
-        "Cacnb3",
-        "Gm12929",
-        "Eya2"
-        )
-tr_tib <- hot_annot %>%
-  filter(symbol %in% tr) %>%
-  arrange(annot.id)
-K <- readRDS(here("analysis", "data", "derived_data", "kinship.rds"))
-map <- readRDS(here("analysis", "data", "derived_data", "map.rds"))
-covar <- readRDS(here("analysis", "data", "derived_data", "covar.rds"))
-aprobs <- readRDS(here("analysis", "data", "derived_data", "genoprobs.rds"))
-expr_sm <- expr[ , colnames(expr) %in% tr_tib$annot.id, drop = FALSE]
-s1 <- qtl2::scan1(genoprobs = aprobs,
-            pheno = expr_sm,
-            kinship = K,
-            addcovar = covar, 
-            cores = 0
-)
-# zoom in on Chr2 after 150 Mb
-# get length of map$`1`
-purrr::map(.x = 1:8, .f = function(x) qtl2::plot_scan1(s1, map, lodcolumn = x, chr = 2, main = paste0(tr_tib[x, ])))
-qtl2::find_peaks(scan1_output = s1, map = map, threshold = 7) %>% 
-  as_tibble() %>%
-  filter(chr == 2) %>%
-  left_join(hot_annot, by = c("lodcolumn" = "annot.id"))
-```
+### Chr 2 heatmap
+
+
+
+
+### Chr 2 index v position plot
+
+
+
+
 
 
 ```{r setup_continued-5}
@@ -168,7 +150,13 @@ keller_mediator <- "Pdx1"
 
 ## Chr 5 results
 
-The Chr 5 scatter plot of mediation LOD difference values against pleiotropy test statistics 
+
+### Chr 5 scatter plots
+
+
+### Chr 5 heatmap
+
+The Chr 5 heatmap of pleiotropy test statistics 
 reveals a block-diagonal pattern of blue coloring among the nonlocal traits. We observe the 
 set of nonlocal traits clustered into two blocks. Within each block, any two traits share a 
 QTL, ie, are pleiotropic. Yet, the off-diagonal cells, ie, those nonlocal trait pairs that 
@@ -180,7 +168,7 @@ Columns 100 to 119 (and rows 100 to 119) are a second (symmetric) block with onl
 pleiotropy test statistics. Columns 120 to 202 contains cells for the third (symmetric) block. Column 203, the last column, contains a trait *Gm* that, based on pleiotropy test statistics, doesn't cluster near other traits.
 
 
-
+### Chr 5 index v position plot
 
 
 
@@ -195,6 +183,17 @@ keller_mediator <- "Fam83e"
 ```{r child="hotspot-one-chromosome.Rmd"}
 ```
 
+## Chr 7 results
+
+### Chr 7 scatter plots
+
+
+### Chr 7 heatmap
+
+
+### Chr 7 index v position plot
+
+
 
 
 ```{r setup_continued-11}
@@ -206,6 +205,16 @@ keller_mediator <- "Sat2"
 ```{r child="hotspot-one-chromosome.Rmd"}
 ```
 
+## Chr 11 results
+
+### Chr 11 scatter plots
+
+
+### Chr 11 heatmap
+
+
+### Chr 11 index v position plot
+
 
 
 ```{r setup_continued-13}
@@ -216,6 +225,17 @@ keller_mediator <- "Il6st"
 
 ```{r child="hotspot-one-chromosome.Rmd"}
 ```
+
+## Chr 13 results
+
+### Chr 13 scatter plots
+
+
+### Chr 13 heatmap
+
+
+### Chr 13 index v position plot
+
 
 Our analysis of the Chromosome 13 hotspot presents results much like those for the Chromosome 2 
 hotspot, with the Chromosome 13 local transcript *Il6st* playing a role like that of *Hnf4a* in the 
