@@ -6,19 +6,19 @@ bibliography: research.bib
 linkReferences: true
 link-citations: true 
 output: 
-  bookdown::html_document2: 
-    code_folding: hide
   bookdown::pdf_document2:
     fig_caption: true
+  bookdown::html_document2: 
+    code_folding: hide
 ---
 
-```{r child = "abstract.Rmd"}
+```{r child = "abstract.Rmd", eval = TRUE}
 ```
 
 
 
 
-```{r child="intro.Rmd"}
+```{r child="intro.Rmd", eval = TRUE}
 ```
 
 ```{r presetup}
@@ -33,7 +33,7 @@ library(here)
 ```
 
 
-```{r child="methods.Rmd"}
+```{r child="methods.Rmd", eval = TRUE}
 ```
 
 
@@ -113,16 +113,6 @@ out <- pmap_dfc(inputs, .f = function(hot_chr, hot_mid, keller_mediator) knitr::
 
 
 
-
-
-### Chr 5 index v position plot
-
-
-
-
-
-
-
 ### Chr 7 results
 
 
@@ -145,13 +135,13 @@ out <- pmap_dfc(inputs, .f = function(hot_chr, hot_mid, keller_mediator) knitr::
 
 
 
-```{r read_discussion, child = "results.Rmd"}
+```{r read_results, child = "results.Rmd", eval = TRUE}
 ```
 
 
 
 
-```{r read_discussion, child = "discussion.Rmd"}
+```{r read_discussion, child = "discussion.Rmd", eval = TRUE}
 ```
 
 
