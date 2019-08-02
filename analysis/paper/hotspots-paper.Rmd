@@ -24,8 +24,6 @@ library(here)
 ```
 
 
-```{r child="methods.Rmd"}
-```
 
 
 
