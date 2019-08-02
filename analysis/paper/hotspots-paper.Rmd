@@ -6,8 +6,10 @@ bibliography: research.bib
 linkReferences: true
 link-citations: true 
 output: 
-  bookdown::html_document2:
+  bookdown::html_document2: 
     code_folding: hide
+  bookdown::pdf_document2:
+    code_folding: none
 ---
 
 ```{r child="intro.Rmd"}

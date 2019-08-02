@@ -20,6 +20,15 @@ last two decades of model organism multiparental populations for high-resolution
 
 Recent systems genetics studies have sought to identify QTL for thousands of biomolecular traits [@keller2018genetic;@chick2016defining]. 
 
+@boehm2019thesis argued for complementary roles for mediation analysis and pleiotropy testing in hotspot 
+dissection. Here, we clarify this argument by presenting a study of five expression trait 
+hotspots in a publicly available data set. We consider each hotspot one at a time. At each hotspot, we identify 
+a set of local traits that have QTL within the hotspot. We also identify a set of nonlocal traits with QTL 
+arising from the hotspot. We perform pleiotropy tests and mediation analyses for all local-nonlocal trait pairs. 
+Graphical summaries of our results enable us to conclude that at least one of the five hotspots is due to multiple QTL, 
+while the evidence at the four other hotspots is consistent with a single local trait affecting most or all of the 
+nonlocal associated traits. The Chr 5 hotspot 
+
 
 
 
