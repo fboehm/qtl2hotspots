@@ -20,39 +20,44 @@ the hotspot center.
 ### Two-dimensional, two-QTL scans
 
 
-$$
+\begin{equation}
 vec(Y) = X vec(B) + vec(G) + vec(E)
-$${#eq:mvlmm}
+(\#eq:mvlmm)
+\end{equation}
 
 For each hotspot, we tested all pairs of traits, regardless of whether the traits were local or nonlocal. We performed a
 two-dimensional, two-QTL scan over a genomic region that included the entirety of the
-hotspot. We fitted bivariate linear mixed effects models (Equations [-@eq:mvlmm;-@eq:g;-@eq:e]) at each ordered pair of markers in a two-dimensional grid [@boehm2019testing].
+hotspot. We fitted bivariate linear mixed effects models (Equations \@ref(), \@ref(), and \@ref()) at each ordered pair of markers in a two-dimensional grid [@boehm2019testing].
 
 
 
 
-$$
+\begin{equation}
 G \sim MN_{n x 2}(0, K, V_g)
-$${#eq:g}
+(\#eq:g)
+\end{equation}
 
-$$
+\begin{equation}
 E \sim MN_{n x 2}(0, I_n, V_e)
-$${#eq:e}
+(\#eq:e)
+\end{equation}
 
 and $G$ and $E$ are independent.
 
-$$
+\begin{equation}
 \hat B = (X^T\hat \Sigma^{-1}X)^{-1}X^T\hat\Sigma^{-1}Y
-$$
+(\#eq:Bhat)
+\end{equation}
 
-$$
+\begin{equation}
 \hat \Sigma = \hat V_g \otimes \hat K + \hat V_e \otimes I_n
-$$
+(\#eq:Sigmahat)
+\end{equation}
 
-
-$$
+\begin{equation}
 l_{10}(\hat B, \hat \Sigma) = - \frac{1}{2}\log_{10}\left((Y - X\hat B)^T\hat \Sigma^{-1}(Y - X\hat B)\right) - n\log_{10}(2\pi) - \log_{10}|\hat \Sigma|
-$$
+(\#eq:loglik)
+\end{equation}
 
 
 For $n$ mice, $\Sigma$ is a $2n$ by $2n$ covariance matrix, while $V_g$ and $V_e$ are $2$ by $2$ covariance matrices. Estimates $\hat V_g$ and $\hat V_e$ are obtained via an expectation-maximization algorithm [@zhou2014efficient;@gemma2].
@@ -67,14 +72,14 @@ we worked directly with the test statistic values.
 
 
 
-$$
+\begin{equation}
 LOD = \log_{10} \left(\frac{\max_{\lambda_1, \lambda_2}L(B, \Sigma, \lambda_1, \lambda_2)}{\max_{\lambda}L(B, \Sigma, \lambda, \lambda)} \right)
-$${#eq:lod}
+\end{equation}{#eq:lod}
 
 
-$$
+\begin{equation}
 ll(\lambda_1, \lambda_2)
-$$
+\end{equation}
 
 
 ## Mediation analysis
@@ -82,28 +87,27 @@ $$
 A mediation analysis in systems genetics begins with an identified QTL-expression trait association. In our case, we choose a QTL that affects a nonlocal trait.
 
 For each hotspot and each local trait - nonlocal trait pair, we also performed a
-mediation analysis to assess the extent which the local trait mediates the QTL effect on the nonlocal trait. Each mediation analysis involved fitting four linear models (Equations~\ref{model1}, \ref{model2}, \ref{model3}, \ref{model4}) [@chick2016defining].
+mediation analysis to assess the extent which the local trait mediates the QTL effect on the nonlocal trait. Each mediation analysis involved fitting four linear models (Equations \@ref(eq:model1), \@ref(eq:model2), \@ref(eq:model3), \@ref(eq:model4)) [@chick2016defining].
 
-$$
+\begin{equation}
 Y = \alpha 1 + WC + E
-$${#eq:model1}
+(\#eq:model1)
+\end{equation}
 
-$$
+\begin{equation}
 Y = XB + WC + E
-$${#eq:model2}
+(\#eq:model2)
+\end{equation}
 
-
-
-
-
-
-$$
+\begin{equation}
 Y = \alpha 1 + WC + M\beta + E
-$${#eq:model3}
+(\#eq:model3)
+\end{equation}
 
-$$
+\begin{equation}
 Y = XB + WC + M\beta + E
-$${#eq:model4}
+(\#eq:model4)
+\end{equation}
 
 In all of our mediation analyses, the nonlocal transcripts are the targets, while the local
 transcripts serve as candidate mediators of the QTL-target relationship. We only considered as potential mediators those local traits with strong univariate LODs.
