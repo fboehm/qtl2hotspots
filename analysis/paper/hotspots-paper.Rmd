@@ -146,6 +146,9 @@ An unanticipated observation is that some points have mediation LOD differences 
 
 ### Chr 5 scatter plots
 
+`r knitr::knit(text = out[[2]])`
+
+
 
 ### Chr 5 heatmap
 
@@ -173,6 +176,9 @@ pleiotropy test statistics. Columns 120 to 202 contains cells for the third (sym
 
 ### Chr 7 scatter plots
 
+`r knitr::knit(text = out[[3]])`
+
+
 
 ### Chr 7 heatmap
 
@@ -185,6 +191,9 @@ pleiotropy test statistics. Columns 120 to 202 contains cells for the third (sym
 
 ### Chr 11 scatter plots
 
+`r knitr::knit(text = out[[4]])`
+
+
 
 ### Chr 11 heatmap
 
@@ -196,6 +205,8 @@ pleiotropy test statistics. Columns 120 to 202 contains cells for the third (sym
 ## Chr 13 results
 
 ### Chr 13 scatter plots
+
+`r knitr::knit(text = out[[5]])`
 
 
 ### Chr 13 heatmap
