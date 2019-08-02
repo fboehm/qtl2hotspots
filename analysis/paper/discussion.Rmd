@@ -4,3 +4,18 @@ We sought to answer the question of whether a single local trait is primarily re
 five hotspots in pancreatic islets from Diversity Outbred mice. Our primary tools for probing this 
 question are linear regression-based mediation analysis and pleiotropy testing. 
 We 
+
+
+Pleiotropy tests complement mediation analyses in the following manner. When considering a
+collection of potential mediators for a nonlocal trait, mediation analyses clearly identify the
+mediator when there is, in fact, a mediator among the candidates. However, when there is no
+mediator, mediation analyses provide little information about the genetics of the complex trait.
+Pleiotropy testing is particularly useful in this setting, since a pleiotropy test always gives
+an answer about the number of underlying QTL. A drawback of pleiotropy testing is that the scientific question that it addresses - do two traits share a single QTL - informs, but doesn't fully resolve, the genetics of the nonlocal complex traits under study.
+
+- lod difference threshold for declaration of "mediation". 
+  - esp with regards to Chr 5 hotspot, where the keller mediator has a lot of traits with lod differences under 3, but above the 1.5 threshold.
+  
+  
+- look at outputs of `lod_int()`, ie, the support intervals for all traits in a hotspot. Could plot interval against cluster order, for example.
+
