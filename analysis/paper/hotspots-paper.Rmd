@@ -6,8 +6,10 @@ bibliography: research.bib
 linkReferences: true
 link-citations: true
 output: 
-  bookdown::html_document2:
-  code_folding: hide  
+  - bookdown::html_document2:
+    code_folding: hide
+  - bookdown::pdf_document2:
+    code_folding: hide  
 ---
 
 ```{r child="intro.Rmd"}
@@ -24,6 +26,8 @@ library(here)
 ```
 
 
+```{r child="methods.Rmd"}
+```
 
 
 
@@ -94,7 +98,8 @@ hot_mid <- 165.5
 keller_mediator <- "Hnf4a"
 ```
 
-```{r child="hotspot-one-chromosome.Rmd"}
+```{r}
+knitr::knit_expand(file = here::here("analysis", "paper", "hotspot-one-chromosome.Rmd"))
 ```
 
 
