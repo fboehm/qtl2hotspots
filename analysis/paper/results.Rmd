@@ -15,5 +15,10 @@ Some hotspot scatter plots show points with both high pleiotropy test statistics
 LOD differences. Closer investigation of these points reveals that, for a given hotspot, they 
 include a single local trait. For example, multiple pairs with local trait *Tmem130* have high 
 mediation LOD differences and high pleiotropy test statistics. This may indicate that our QTL scan 
-region was too narrow to encompass the entirety of the *Tmem130* peak.
+region was too narrow to encompass the entirety of the *Tmem130* peak. 
+
+The heatmaps reveal one of two patterns among the nonlocal traits. The first possible pattern is a 
+single, mostly blue, square along the diagonal that includes most of the nonlocal traits. The second 
+possible pattern involves more than one dark blue square. Chr 5 hotspot is an example of this second 
+pattern. Its block-diagonal structure contains off-diagonal blocks that are a mixture of colors. 
 
