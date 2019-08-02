@@ -1,18 +1,21 @@
 # Methods
 
+We used the publicly available data from @keller2018genetic to demonstrate our strategy. @keller2018genetic
+measured genome-wide gene expression levels with RNA sequencing of pancreatic islets in 378 Diversity Outbred mice. From the RNA sequencing counts, they obtained normalized gene expression levels for 21,771 transcripts, which they shared publicly via DataDryad (). 
+
 @keller2018genetic identified five expression trait hotspots in their
 study of pancreatic islet gene expression in 378 Diversity Outbred mice. They
 defined a hotspot to be a 4-Mb region that affects at least 100 nonlocal expression
 traits.
 
 For each hotspot, we identified a set of local expression traits and a
-set of nonlocal expression traits. All traits demonstrated LOD peaks that met
-the genome-wide significance threshold, 7.18 [@keller2018genetic].
-The nonlocal expression traits arose from genes
+set of nonlocal expression traits. We focused on those local 
+traits that strongly associated with QTL within the hotspot. We set the univariate LOD threshold for local traits at 15. We limited consideration to those local traits for which the middle of the gene lay within the hotspot interval. 
+All nonlocal traits demonstrated univariate LOD peaks that met
+the genome-wide significance threshold, 7.18 [@keller2018genetic]. The nonlocal expression traits arose from genes
 on other chromosomes, while the local traits reflected expression levels for
-genes on the same chromosome as the hotspot and within 4 Mb of the hotspot
-center. We ignored transcripts for genes on the hotspot chromosome but not within 4 Mb of
-the hotspot center.
+genes on the same chromosome as the hotspot . We ignored transcripts for genes on the hotspot chromosome but outside the hotspot interval. 
+
 
 
 ## Pleiotropy testing
@@ -84,10 +87,11 @@ ll(\lambda_1, \lambda_2)
 
 ## Mediation analysis
 
-A mediation analysis in systems genetics begins with an identified QTL-expression trait association. In our case, we choose a QTL that affects a nonlocal trait.
+A mediation analysis in systems genetics begins with an identified QTL-expression trait 
+association [@chick2016defining]. In our case, we choose a QTL that affects a nonlocal trait, then ask if any of 
+the nearby local traits lie in the causal pathway from QTL to nonlocal trait. 
 
-For each hotspot and each local trait - nonlocal trait pair, we also performed a
-mediation analysis to assess the extent which the local trait mediates the QTL effect on the nonlocal trait. Each mediation analysis involved fitting four linear models (Equations \@ref(eq:model1), \@ref(eq:model2), \@ref(eq:model3), \@ref(eq:model4)) [@chick2016defining].
+involved fitting four linear models (Equations \@ref(eq:model1), \@ref(eq:model2), \@ref(eq:model3), \@ref(eq:model4)) [@chick2016defining].
 
 \begin{equation}
 Y = \alpha 1 + WC + E
