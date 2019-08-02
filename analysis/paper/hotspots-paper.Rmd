@@ -1,7 +1,7 @@
 ---
 title: "Expression QTL hotspot dissection with mediation analysis and pleiotropy testing"
 author: "Frederick J. Boehm, Brian S. Yandell, and Karl W. Broman"
-date: "7/27/2019"
+date: "August 1, 2019"
 bibliography: research.bib
 linkReferences: true
 link-citations: true 
@@ -97,7 +97,8 @@ library(purrr)
 hot_chr <- c(2, 5, 7, 11, 13)
 hot_mid <- c(165.5, 146, 46, 71, 112.5)
 keller_mediator <- c("Hnf4a", "Pdx1", "Fam83e", "Sat2", "Il6st")
-out <- pmap(tibble(hot_chr, hot_mid, keller_mediator), function(hot_chr, hot_mid, keller_mediator) knitr::knit_expand(text = readLines(here::here("analysis", "paper", "hotspot-one-chromosome.Rmd"))))
+out <- pmap(tibble(hot_chr, hot_mid, keller_mediator), .f = function(hot_chr, hot_mid, keller_mediator) knitr::knit_expand(text = readLines(here::here("analysis", "paper", "hotspot-one-chromosome.Rmd"))))
+# note that ... argument must be a list, ie, it must be a single argument, not multiple args
 ```
 
 
@@ -106,7 +107,7 @@ out <- pmap(tibble(hot_chr, hot_mid, keller_mediator), function(hot_chr, hot_mid
 
 ## Chr 2 hotspot results
 
-`r knitr::knit(out[[1]])`
+`r knitr::knit(text = out[[1]])`
 
 
 ### Chr 2 scatter plots
@@ -140,14 +141,6 @@ An unanticipated observation is that some points have mediation LOD differences 
 
 
 
-```{r setup_continued-5}
-hot_chr <- 5
-hot_mid <- 146
-keller_mediator <- "Pdx1"
-out <- knitr::knit_expand(file = "hotspot-one-chromosome.Rmd")
-```
-
-
 
 ## Chr 5 results
 
@@ -175,14 +168,6 @@ pleiotropy test statistics. Columns 120 to 202 contains cells for the third (sym
 
 
 
-```{r setup_continued-7}
-hot_chr <- 7
-hot_mid <- 46
-keller_mediator <- "Fam83e"
-out <- knitr::knit_expand(file = here::here("analysis", "paper", "hotspot-one-chromosome.Rmd"))
-```
-
-`r knit(text = out)`
 
 
 ## Chr 7 results
@@ -197,17 +182,6 @@ out <- knitr::knit_expand(file = here::here("analysis", "paper", "hotspot-one-ch
 
 
 
-
-```{r setup_continued-11}
-hot_chr <- 11
-hot_mid <- 71
-keller_mediator <- "Sat2"
-out <- knitr::knit_expand(file = here::here("analysis", "paper", "hotspot-one-chromosome.Rmd"))
-```
-
-`r knit(text = out)`
-
-
 ## Chr 11 results
 
 ### Chr 11 scatter plots
@@ -218,16 +192,6 @@ out <- knitr::knit_expand(file = here::here("analysis", "paper", "hotspot-one-ch
 
 ### Chr 11 index v position plot
 
-
-
-```{r setup_continued-13}
-hot_chr <- 13
-hot_mid <- 112.5
-keller_mediator <- "Il6st"
-out <- knitr::knit_expand(file = here::here("analysis", "paper", "hotspot-one-chromosome.Rmd"))
-```
-
-`r knit(text = out)`
 
 
 ## Chr 13 results
