@@ -10,3 +10,10 @@ Examinating the ranges of pleiotropy test statistics within a hotspot also infor
 Some hotspots have maximum pleiotropy test statistics under 6 (Figure \@ref(fig:scatter-7)), while 
 other hotspots have local-nonlocal pairs with pleiotropy test statistics over 15 (Figure 
 \@ref(fig:scatter-2)). 
+
+Some hotspot scatter plots show points with both high pleiotropy test statistics and high mediation 
+LOD differences. Closer investigation of these points reveals that, for a given hotspot, they 
+include a single local trait. For example, multiple pairs with local trait *Tmem130* have high 
+mediation LOD differences and high pleiotropy test statistics. This may indicate that our QTL scan 
+region was too narrow to encompass the entirety of the *Tmem130* peak.
+

@@ -18,7 +18,9 @@ challenging and may require costly and time-consuming experiments.
 The growing need for greater QTL mapping resolution fueled development over the
 last two decades of model organism multiparental populations for high-resolution QTL mapping [@de2017back;@churchill2004collaborative;@svenson2012high;@huang2012multiparent;@shivakumar2018soybean;@huang2011analysis;@kover2009multiparent;@tisne2017identification;@stanley2017genetic].
 
-Recent systems genetics studies have sought to identify QTL for thousands of biomolecular traits [@keller2018genetic;@chick2016defining].
+Recent systems genetics studies have sought to identify QTL for thousands of biomolecular traits [@keller2018genetic;@chick2016defining]. 
+
+
 
 
 

@@ -1,2 +1,6 @@
 ## Discussion
 
+We sought to answer the question of whether a single local trait is primarily responsible for each of 
+five hotspots in pancreatic islets from Diversity Outbred mice. Our primary tools for probing this 
+question are linear regression-based mediation analysis and pleiotropy testing. 
+We 
