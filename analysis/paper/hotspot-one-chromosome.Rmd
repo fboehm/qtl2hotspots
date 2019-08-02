@@ -108,7 +108,7 @@ p <- pleio_mixed_list %>%
   rename(pleiotropy_lod = lod) %>%
   inner_join(med_tib, by = c("local_gene_id", "nonlocal_gene_id")) %>%
   dplyr::select(local_symbol, nonlocal_symbol, pleiotropy_lod, lod_diff, lod_diff_proportion, lod_without_med, lod_with_med, filename, nonlocal_gene_id, local_gene_id) %>%
-  ggplot() + geom_point(mapping = aes(x = pleiotropy_lod, y = lod_diff, colour = local_symbol == {{keller_mediator}}, nonlocal = nonlocal_symbol, local = local_symbol), size = 0.05) + theme(legend.position = "none") + xlab("Pleiotropy LOD") + ylab("Mediation LOD difference")
+  ggplot() + geom_point(mapping = aes(x = pleiotropy_lod, y = lod_diff, colour = local_symbol == "{{keller_mediator}}", nonlocal = nonlocal_symbol, local = local_symbol), size = 0.05) + theme(legend.position = "none") + xlab("Pleiotropy LOD") + ylab("Mediation LOD difference")
 fnsvg <- paste0("Chr", {{hot_chr}}, "_scatter.svg")
 fnpdf <- paste0("Chr", {{hot_chr}}, "_scatter.pdf")
 ggsave(plot = p, filename = here("analysis", "figures", fnsvg))
@@ -184,7 +184,7 @@ for (i in 1:n_figs){
 
 ```{r, scols-{{hot_chr}}}
 scols1 <- 1L + (rownames(pm) %in% local_annot2$symbol)
-scols2 <- rownames(pm) %in% (med_tib %>% filter(local_symbol == {{keller_mediator}}, lod_diff > 1.5))$nonlocal_symbol
+scols2 <- rownames(pm) %in% (med_tib %>% filter(local_symbol == "{{keller_mediator}}", lod_diff > 1.5))$nonlocal_symbol
 ```
 
 
@@ -286,7 +286,7 @@ webshot::webshot(url = fnhtml,
 
 ```{r, index_v_position-{{hot_chr}}}
 bar <- foo %>%
-  filter(local_symbol == {{keller_mediator}})
+  filter(local_symbol == "{{keller_mediator}}")
 
 p <- tibble(nonlocal_symbol = rownames(pm[indic_nonlocal, indic_nonlocal])[ord_nonlocal], index = 1:length(nonlocal_symbol)) %>%
   inner_join(bar, by = "nonlocal_symbol") %>% 

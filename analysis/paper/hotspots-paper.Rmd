@@ -97,7 +97,8 @@ library(purrr)
 hot_chr <- c(2, 5, 7, 11, 13)
 hot_mid <- c(165.5, 146, 46, 71, 112.5)
 keller_mediator <- c("Hnf4a", "Pdx1", "Fam83e", "Sat2", "Il6st")
-out <- pmap(tibble(hot_chr, hot_mid, keller_mediator), .f = function(hot_chr, hot_mid, keller_mediator) knitr::knit_expand(text = readLines(here::here("analysis", "paper", "hotspot-one-chromosome.Rmd"))))
+inputs <- tibble(hot_chr, hot_mid, keller_mediator)
+out <- pmap_dfc(inputs, .f = function(hot_chr, hot_mid, keller_mediator) knitr::knit_expand(text = readLines(here::here("analysis", "paper", "hotspot-one-chromosome.Rmd"))))
 # note that ... argument must be a list, ie, it must be a single argument, not multiple args
 ```
 
