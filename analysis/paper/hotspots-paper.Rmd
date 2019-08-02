@@ -4,12 +4,10 @@ author: "Frederick J. Boehm, Brian S. Yandell, and Karl W. Broman"
 date: "7/27/2019"
 bibliography: research.bib
 linkReferences: true
-link-citations: true
+link-citations: true 
 output: 
-  - bookdown::html_document2:
+  bookdown::html_document2:
     code_folding: hide
-  - bookdown::pdf_document2:
-    code_folding: hide  
 ---
 
 ```{r child="intro.Rmd"}
@@ -53,6 +51,7 @@ That is, few pairs have high pleiotropy test statistics and
 high mediation LOD difference values.
 
 ```{r setup}
+library(knitr)
 library(qtl2hotspots)
 pleio_threshold <- 4
 ult <- 15 # univariate lod threshold
@@ -90,21 +89,24 @@ annots <- readRDS(here("analysis", "data", "derived_data", "annots.rds"))
 expr <- readRDS(here("analysis", "data", "derived_data", "expr.rds"))
 ```
 
-
-
-```{r setup_continued-2}
-hot_chr <- 2
-hot_mid <- 165.5
-keller_mediator <- "Hnf4a"
-out <- knitr::knit_expand(file = here::here("analysis", "paper", "hotspot-one-chromosome.Rmd"))
+```{r, load_purrr}
+library(purrr)
 ```
 
-`r knit(text = out)`
+```{r setup_continued}
+hot_chr <- c(2, 5, 7, 11, 13)
+hot_mid <- c(165.5, 146, 46, 71, 112.5)
+keller_mediator <- c("Hnf4a", "Pdx1", "Fam83e", "Sat2", "Il6st")
+out <- pmap(tibble(hot_chr, hot_mid, keller_mediator), function(hot_chr, hot_mid, keller_mediator) knitr::knit_expand(text = readLines(here::here("analysis", "paper", "hotspot-one-chromosome.Rmd"))))
+```
+
 
 
 
 
 ## Chr 2 hotspot results
+
+`r knitr::knit(out[[1]])`
 
 
 ### Chr 2 scatter plots
@@ -142,10 +144,9 @@ An unanticipated observation is that some points have mediation LOD differences 
 hot_chr <- 5
 hot_mid <- 146
 keller_mediator <- "Pdx1"
-out <- knitr::knit_expand(file = here::here("analysis", "paper", "hotspot-one-chromosome.Rmd"))
+out <- knitr::knit_expand(file = "hotspot-one-chromosome.Rmd")
 ```
 
-`r knit(text = out)`
 
 
 ## Chr 5 results
