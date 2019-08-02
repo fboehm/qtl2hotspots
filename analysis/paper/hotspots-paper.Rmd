@@ -96,13 +96,10 @@ expr <- readRDS(here("analysis", "data", "derived_data", "expr.rds"))
 hot_chr <- 2
 hot_mid <- 165.5
 keller_mediator <- "Hnf4a"
+out <- knitr::knit_expand(file = here::here("analysis", "paper", "hotspot-one-chromosome.Rmd"))
 ```
 
-```{r}
-knitr::knit_expand(file = here::here("analysis", "paper", "hotspot-one-chromosome.Rmd"))
-```
-
-
+`r knit(text = out)`
 
 
 
@@ -145,10 +142,11 @@ An unanticipated observation is that some points have mediation LOD differences 
 hot_chr <- 5
 hot_mid <- 146
 keller_mediator <- "Pdx1"
+out <- knitr::knit_expand(file = here::here("analysis", "paper", "hotspot-one-chromosome.Rmd"))
 ```
 
-```{r child="hotspot-one-chromosome.Rmd"}
-```
+`r knit(text = out)`
+
 
 ## Chr 5 results
 
@@ -180,10 +178,11 @@ pleiotropy test statistics. Columns 120 to 202 contains cells for the third (sym
 hot_chr <- 7
 hot_mid <- 46
 keller_mediator <- "Fam83e"
+out <- knitr::knit_expand(file = here::here("analysis", "paper", "hotspot-one-chromosome.Rmd"))
 ```
 
-```{r child="hotspot-one-chromosome.Rmd"}
-```
+`r knit(text = out)`
+
 
 ## Chr 7 results
 
@@ -202,10 +201,11 @@ keller_mediator <- "Fam83e"
 hot_chr <- 11
 hot_mid <- 71
 keller_mediator <- "Sat2"
+out <- knitr::knit_expand(file = here::here("analysis", "paper", "hotspot-one-chromosome.Rmd"))
 ```
 
-```{r child="hotspot-one-chromosome.Rmd"}
-```
+`r knit(text = out)`
+
 
 ## Chr 11 results
 
@@ -223,10 +223,11 @@ keller_mediator <- "Sat2"
 hot_chr <- 13
 hot_mid <- 112.5
 keller_mediator <- "Il6st"
+out <- knitr::knit_expand(file = here::here("analysis", "paper", "hotspot-one-chromosome.Rmd"))
 ```
 
-```{r child="hotspot-one-chromosome.Rmd"}
-```
+`r knit(text = out)`
+
 
 ## Chr 13 results
 

@@ -2,8 +2,8 @@
 
 
 ```{r, def-{{hot_chr}}}
-hot_lower <- hot_mid - 2
-hot_upper <- hot_mid + 2
+hot_lower <- {{hot_mid}} - 2
+hot_upper <- {{hot_mid}} + 2
 fp <- paste0("Chr", hot_chr, "-")
 knitr::opts_chunk$set(fig.path = here("analysis", "figures", fp))
 ```
@@ -36,7 +36,7 @@ local_annot <- lod_peaks %>%
 ```
 
 
-```{r}
+```{r, define_nonlocal_annot-{{hot_chr}}}
 nonlocal_annot <- lod_peaks %>%
   filter(chrom == hot_chr, pos <= hot_upper, pos >= hot_lower) %>%
   inner_join(y = annots, by = c("annot.id" = "gene_id")) %>%
@@ -49,14 +49,14 @@ nonlocal_annot <- lod_peaks %>%
 
 
 
-```{r}
+```{r, local_annot2-{{hot_chr}}}
 local_annot2 <- local_annot %>%
   filter(middle <= hot_upper, middle >= hot_lower) %>% 
   arrange(desc(lod))
 ```
 
 
-```{r}
+```{r hot_expr-{{hot_chr}}}
 hot_local <- expr[, colnames(expr) %in% local_annot2$annot.id]
 hot_nonlocal <- expr[, colnames(expr) %in% nonlocal_annot$annot.id]
 nnonlocal <- nrow(nonlocal_annot)
@@ -64,7 +64,7 @@ nlocal <- nrow(local_annot2)
 ```
 
 
-```{r, message=FALSE, warning = FALSE}
+```{r, med_tib-{{hot_chr}}, message=FALSE, warning = FALSE}
 med_tib <- med_list %>%
   purrr::map(bind_rows) %>%
   bind_rows() %>%
@@ -79,7 +79,7 @@ med_tib <- med_list %>%
 ```
 
 
-```{r}
+```{r, hot_annot-{{hot_chr}}}
 hot_annot <- local_annot2 %>%
   bind_rows(nonlocal_annot) %>%
   dplyr::select(annot.id, symbol)
@@ -96,7 +96,7 @@ pleio_tib <- pleio_mixed_list %>%
 ```
 
 
-```{r}
+```{r pm-{{hot_chr}}}
 pm <- pleio_tib %>%
   tibble_to_matrix(symmetric = TRUE)
 ```
@@ -108,7 +108,7 @@ p <- pleio_mixed_list %>%
   rename(pleiotropy_lod = lod) %>%
   inner_join(med_tib, by = c("local_gene_id", "nonlocal_gene_id")) %>%
   dplyr::select(local_symbol, nonlocal_symbol, pleiotropy_lod, lod_diff, lod_diff_proportion, lod_without_med, lod_with_med, filename, nonlocal_gene_id, local_gene_id) %>%
-  ggplot() + geom_point(mapping = aes(x = pleiotropy_lod, y = lod_diff, colour = local_symbol == keller_mediator, nonlocal = nonlocal_symbol, local = local_symbol), size = 0.05) + theme(legend.position = "none") + xlab("Pleiotropy LOD") + ylab("Mediation LOD difference")
+  ggplot() + geom_point(mapping = aes(x = pleiotropy_lod, y = lod_diff, colour = local_symbol == {{keller_mediator}}, nonlocal = nonlocal_symbol, local = local_symbol), size = 0.05) + theme(legend.position = "none") + xlab("Pleiotropy LOD") + ylab("Mediation LOD difference")
 fnsvg <- paste0("Chr", hot_chr, "_scatter.svg")
 fnpdf <- paste0("Chr", hot_chr, "_scatter.pdf")
 ggsave(plot = p, filename = here("analysis", "figures", fnsvg))
@@ -121,7 +121,7 @@ plotly::ggplotly(p)
 
 
 
-```{r, fig.height = ceiling(nlocal / 2)}
+```{r, scatter_by_local-{{hot_chr}}, fig.height = ceiling(nlocal / 2)}
 foo <- pleio_mixed_list %>%
   bind_rows() %>%
   rename(pleiotropy_lod = lod) %>%
@@ -182,13 +182,13 @@ for (i in 1:n_figs){
 
 
 
-```{r}
+```{r, scols-{{hot_chr}}}
 scols1 <- 1L + (rownames(pm) %in% local_annot2$symbol)
-scols2 <- rownames(pm) %in% (med_tib %>% filter(local_symbol == keller_mediator, lod_diff > 1.5))$nonlocal_symbol
+scols2 <- rownames(pm) %in% (med_tib %>% filter(local_symbol == {{keller_mediator}}, lod_diff > 1.5))$nonlocal_symbol
 ```
 
 
-```{r}
+```{r, ordering-{{hot_chr}}}
 # order the nonlocal traits first
 ## indicator for being a nonlocal trait
 indic_nonlocal <- rownames(pm) %in% nonlocal_annot$symbol
@@ -212,7 +212,7 @@ rn <- c(rn_nonlocal, rn_local)
 ```
 
 
-```{r}
+```{r, scols_extra-{{hot_chr}}}
 scols_extra <- purrr::map(.x = local_annot2$symbol,
                           .f = function(x) {rownames(pm) %in% (med_tib %>% filter(local_symbol == x, lod_diff > 1.5))$nonlocal_symbol}
 ) %>%
@@ -222,7 +222,7 @@ scols_extra <- purrr::map(.x = local_annot2$symbol,
 ```
 
 
-```{r}
+```{r, n_med-{{hot_chr}}}
 n_med_tr <- 4 # arbitrary threshold for number of mediated traits per local
 # only those local traits with n_med_tr or more mediated nonlocal traits 
 # appear as annotation columns in the heatmap
@@ -252,7 +252,7 @@ fnhtml <- here("analysis", "figures", paste0("Chr", hot_chr, "hm.html"))
 
 
 
-```{r}
+```{r, heat-{{hot_chr}}}
 ord <- match(rn, rownames(pm))
 
 (p <- pm[ord, ord] %>%
@@ -274,7 +274,7 @@ htmlwidgets::saveWidget(widget = p,
                         )
 ```
 
-```{r eval = FALSE}
+```{r, webshot-{{hot_chr}}, eval = FALSE}
 webshot::webshot(url = fnhtml,
                  file = fnpdf,
                  cliprect = "viewport"
@@ -284,9 +284,9 @@ webshot::webshot(url = fnhtml,
 
 
 
-```{r}
+```{r, index_v_position-{{hot_chr}}}
 bar <- foo %>%
-  filter(local_symbol == keller_mediator)
+  filter(local_symbol == {{keller_mediator}})
 
 p <- tibble(nonlocal_symbol = rownames(pm[indic_nonlocal, indic_nonlocal])[ord_nonlocal], index = 1:length(nonlocal_symbol)) %>%
   inner_join(bar, by = "nonlocal_symbol") %>% 
