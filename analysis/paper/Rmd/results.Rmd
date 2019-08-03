@@ -7,7 +7,7 @@ right quadrant. This tells us that local-nonlocal trait pairs may have either hi
 statistics or high mediation LOD differences, but not both.
 
 
-Complex hotspots: Chr 5; Simple hotspots: Chr 2, Chr 13, Chr 7
+Complex hotspots: Chr 5; Simple hotspots: Chr 2 (Hnf4a), Chr 13 (), Chr 7
 
 
 Undetermined (right now): Chr 11

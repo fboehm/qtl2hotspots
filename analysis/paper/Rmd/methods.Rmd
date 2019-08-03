@@ -153,8 +153,11 @@ set the color spectrum limits at 0 (dark blue) and 5 (yellow). Pleiotropy test s
 represented by
 yellow. We annotated rows by a collection of columns on the right-hand side of the heatmap. This binary matrix 
 consists of columns that summarize mediation results. Each column represents a local trait. If a row 
-corresponds to a nonlocal trait that is mediated by the local trait (*i.e.*, with mediation LOD difference greater than 1.5), then the cell is colored dark green; 
-otherwise, the cell is light green. We didn't examine the possibility that a local trait might mediate the relationship between a QTL and another local trait; thus, all local trait rows are colored light green. The last annotation column and the annotation row above the heatmap both 
+corresponds to a nonlocal trait that is mediated by the local trait (*i.e.*, with mediation LOD 
+difference greater than 1.5), then the cell is colored dark green; 
+otherwise, the cell is light green. We didn't examine the possibility that a local trait might 
+mediate the relationship between a QTL and another local trait; thus, all local trait rows are 
+colored light green. The last annotation column and the annotation row above the heatmap both 
 designate local traits with dark blue and nonlocal traits with light blue.
 
 
