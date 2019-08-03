@@ -1,15 +1,17 @@
 ---
 title: "Expression QTL hotspot dissection with mediation analysis and pleiotropy testing"
 author: "Frederick J. Boehm, Brian S. Yandell, and Karl W. Broman"
-date: "August 1, 2019"
+date: "August 3, 2019"
 bibliography: research.bib
 linkReferences: true
 link-citations: true 
 output: 
   bookdown::pdf_document2:
     fig_caption: true
+    keep_tex: true
   bookdown::html_document2: 
     code_folding: hide
+    self_contained: no
 ---
 
 ```{r child = "abstract.Rmd", eval = TRUE}
