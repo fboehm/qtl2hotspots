@@ -1,7 +1,7 @@
 # Methods
 
 We used the publicly available data from @keller2018genetic to demonstrate our strategy. @keller2018genetic
-measured genome-wide gene expression levels with RNA sequencing of pancreatic islets in 378 Diversity Outbred mice. From the RNA sequencing counts, they obtained normalized gene expression levels for 21,771 transcripts, which they shared publicly via DataDryad (). 
+measured genome-wide gene expression levels with RNA sequencing of pancreatic islets in 378 Diversity Outbred mice. From the RNA sequencing counts, they obtained normalized gene expression levels for 21,771 transcripts, which they shared publicly via DataDryad [@dryad]. @keller2018genetic also included founder allele probabilities at 69,005 markers across the genome, covariates, and leave-one-chromosome-out estimated kinship matrices. @keller2018genetic calculated leave-one-chromosome-out kinship matrices for every chromosome [@broman2019rqtl2; @yang2014advantages].
 
 @keller2018genetic identified five expression trait hotspots in their
 study of pancreatic islet gene expression in 378 Diversity Outbred mice. They
