@@ -22,8 +22,8 @@ output:
 ```
 
 ```{r presetup}
-eval_code <- FALSE
-knitr::opts_chunk$set(comment=NA, fig.width=6, fig.height=6, eval = eval_code)
+eval_code <- TRUE
+knitr::opts_chunk$set(comment=NA, fig.width=6, fig.height=6, eval = eval_code, results = "hide")
 ```
 
 
@@ -41,7 +41,6 @@ library(here)
 
 
 
-# Results
 
 
 

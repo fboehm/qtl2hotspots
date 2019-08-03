@@ -1,3 +1,5 @@
-## Abstract
+# Abstract
 
-We present our analysis of five expression trait hotspots. Data  
+We present our analysis of five expression trait hotspots in pancreatic islets from 378
+Diversity Outbred mice.
+

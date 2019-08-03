@@ -68,7 +68,7 @@ For $n$ mice, $\Sigma$ is a $2n$ by $2n$ covariance matrix, while $V_g$ and $V_e
 
 ### Calculating likelihood ratio test statistics
 
-From the two-dimensional scans, we calculated pleiotropy likelihood ratio test statistics for each
+From the two-dimensional scans, we calculated pleiotropy likelihood ratio test (LOD) statistics for each
 pair of traits [@jiang1995multiple;@boehm2019testing;@boehm2019thesis]. Because of the required
 computing time for bootstrap analyses, we didn't obtain p-values for the pleiotropy tests. Instead,
 we worked directly with the test statistic values.
@@ -77,21 +77,19 @@ we worked directly with the test statistic values.
 
 \begin{equation}
 LOD = \log_{10} \left(\frac{\max_{\lambda_1, \lambda_2}L(B, \Sigma, \lambda_1, \lambda_2)}{\max_{\lambda}L(B, \Sigma, \lambda, \lambda)} \right)
-\end{equation}{#eq:lod}
-
-
-\begin{equation}
-ll(\lambda_1, \lambda_2)
+(\#eq:lod)
 \end{equation}
+
+
 
 
 ## Mediation analysis
 
 A mediation analysis in systems genetics begins with an identified QTL-expression trait 
-association [@chick2016defining]. In our case, we choose a QTL that affects a nonlocal trait, then ask if any of 
-the nearby local traits lie in the causal pathway from QTL to nonlocal trait. 
+association [@chick2016defining]. In our case, we choose a QTL that affects a nonlocal expression trait, then ask if any of 
+the nearby local expression traits lie in the causal pathway from QTL to nonlocal trait. 
 
-involved fitting four linear models (Equations \@ref(eq:model1), \@ref(eq:model2), \@ref(eq:model3), \@ref(eq:model4)) [@chick2016defining].
+A single mediation analysis involving one nonlocal trait and one local trait requires fitting four linear models (Equations \@ref(eq:model1), \@ref(eq:model2), \@ref(eq:model3), \@ref(eq:model4)) [@chick2016defining].
 
 \begin{equation}
 Y = \alpha 1 + WC + E
@@ -114,20 +112,24 @@ Y = XB + WC + M\beta + E
 \end{equation}
 
 In all of our mediation analyses, the nonlocal transcripts are the targets, while the local
-transcripts serve as candidate mediators of the QTL-target relationship. We only considered as potential mediators those local traits with strong univariate LODs.
+transcripts serve as candidate mediators of the QTL-target relationship. 
+We only considered as potential mediators those local traits with strong univariate LODs.
 In Equations~\ref{model1} through \ref{model4}, $X$ is a matrix of founder allele dosages,
 $B$ is a matrix
 of founder allele effects, $W$ is a matrix of covariates, $C$ is a matrix of covariate
-effects, $M$ is a vector of values for a single candidate mediator, $\beta$ is the effect
-of the mediator on the complex trait, 1 is a vector with all entries set to 1, $\alpha$
-is the mean trait value, and $E$ is a vector of normally distributed random errors. 
+effects, $M$ is a vector of values for a single candidate mediator (a local expression trait, in our case), $\beta$ is the effect
+of the mediator on the complex trait (after adjusting for other covariates in the model), 1 is a vector with all entries set to 1, $\alpha$
+is a parameter that corresponds to the mean trait value (after adjusting for other covariates in the model), and $E$ is a vector of normally distributed random errors. 
+
+We included four covariates in our models: three wave indicators and sex. The wave indicators are binary vectors to account for wave membership. @keller2018genetic phenotyped the mice in four waves of nearly 100 mice per wave. 
+
 
 ## Visualizations
 
 We created scatter plots with the `ggplot2` package [@ggplot2] for the R
 statistical computing environment [@r]. We initially plotted all local-nonlocal pairs for each hotspot. We highlighted in blue those points that correspond to pairs involving the putative mediator per [@keller2018genetic].
 
-### Heatmaps
+
 
 We created heatmaps to examine patterns among pleiotropy test results in each hotspot. Our analysis used both 
 local and nonlocal traits.

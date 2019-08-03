@@ -1,4 +1,4 @@
-## Results
+# Results
 
 We studied five expression trait hotspots in pancreatic islets from 378 Diversity Outbred mice [@keller2018genetic]. Scatter plots of 
 pleiotropy test statistic against mediation LOD difference for local - nonlocal trait pairs reveal 
@@ -7,10 +7,10 @@ right quadrant. This tells us that local-nonlocal trait pairs may have either hi
 statistics or high mediation LOD differences, but not both.
 
 
-Complex hotspots: Chr 5; Simple hotspots: Chr 2, Chr 13
+Complex hotspots: Chr 5; Simple hotspots: Chr 2, Chr 13, Chr 7
 
 
-Undetermined (right now): Chr 7, Chr 11
+Undetermined (right now): Chr 11
 
 
 
@@ -25,7 +25,7 @@ That is, few pairs have high pleiotropy test statistics and
 high mediation LOD difference values.
 
 
-Examinating the ranges of pleiotropy test statistics within a hotspot also informs our conclusions. 
+Examining the ranges of pleiotropy test statistics within a hotspot also informs our conclusions. 
 Some hotspots have maximum pleiotropy test statistics under 6 (Figure \@ref(fig:scatter-7)), while 
 other hotspots have local-nonlocal pairs with pleiotropy test statistics over 15 (Figure 
 \@ref(fig:scatter-2)). 
