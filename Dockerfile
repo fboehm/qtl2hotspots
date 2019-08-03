@@ -21,4 +21,4 @@ RUN install2.r --error \
 
 
 # build this compendium package
-RUN cd /home/rstudio/qtl2hotspots; make
+RUN cd /home/rstudio/qtl2hotspots/analysis/paper/Rmd; make
