@@ -1,5 +1,5 @@
 
-PAPER_DIR=analysis/paper
+PAPER_DIR=analysis/paper/Rmd
 
 
 # Rules
