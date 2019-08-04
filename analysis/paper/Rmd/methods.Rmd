@@ -3,18 +3,23 @@
 We used the publicly available data from @keller2018genetic to demonstrate our strategy. @keller2018genetic
 measured genome-wide gene expression levels with RNA sequencing of pancreatic islets in 378 Diversity Outbred mice. From the RNA sequencing counts, they obtained normalized gene expression levels for 21,771 transcripts, which they shared publicly via DataDryad [@dryad]. @keller2018genetic also included founder allele probabilities at 69,005 markers across the genome, covariates, and leave-one-chromosome-out estimated kinship matrices. @keller2018genetic calculated leave-one-chromosome-out kinship matrices for every chromosome [@broman2019rqtl2; @yang2014advantages].
 
-@keller2018genetic identified five expression trait hotspots in their
+@keller2018genetic performed univariate QTL mapping for all expression traits. 
+They identified five expression trait hotspots in their
 study of pancreatic islet gene expression in 378 Diversity Outbred mice. They
 defined a hotspot to be a 4-Mb region that affects at least 100 nonlocal expression
 traits.
 
 For each hotspot, we identified a set of local expression traits and a
 set of nonlocal expression traits. We focused on those local 
-traits that strongly associated with QTL within the hotspot. We set the univariate LOD threshold for local traits at 15. We limited consideration to those local traits for which the middle of the gene lay within the hotspot interval. 
+traits that strongly associated with QTL within the hotspot. We set the univariate LOD threshold for 
+local traits at 15. We limited consideration to those local traits for which the middle of the gene lay 
+within the hotspot interval. 
 All nonlocal traits demonstrated univariate LOD peaks that met
-the genome-wide significance threshold, 7.18 [@keller2018genetic]. The nonlocal expression traits arose from genes
+the genome-wide significance threshold, 7.18 [@keller2018genetic]. The nonlocal expression traits arose 
+from genes
 on other chromosomes, while the local traits reflected expression levels for
-genes on the same chromosome as the hotspot . We ignored transcripts for genes on the hotspot chromosome but outside the hotspot interval. 
+genes on the same chromosome as the hotspot . We ignored transcripts for genes on the hotspot chromosome 
+but outside the hotspot interval. 
 
 
 
@@ -28,7 +33,8 @@ vec(Y) = X vec(B) + vec(G) + vec(E)
 (\#eq:mvlmm)
 \end{equation}
 
-For each hotspot, we tested all pairs of traits, regardless of whether the traits were local or nonlocal. We performed a
+For each hotspot, we tested all pairs of traits, regardless of whether the traits were local or nonlocal. 
+We performed a
 two-dimensional, two-QTL scan over a genomic region that included the entirety of the
 hotspot. We fitted bivariate linear mixed effects models (Equations \@ref(), \@ref(), and \@ref()) at each ordered pair of markers in a two-dimensional grid [@boehm2019testing].
 
@@ -114,7 +120,7 @@ Y = XB + WC + M\beta + E
 In all of our mediation analyses, the nonlocal transcripts are the targets, while the local
 transcripts serve as candidate mediators of the QTL-target relationship. 
 We only considered as potential mediators those local traits with strong univariate LODs.
-In Equations~\ref{model1} through \ref{model4}, $X$ is a matrix of founder allele dosages,
+In Equations~\ref{eq:model1} through \ref{eq:model4}, $X$ is a matrix of founder allele dosages,
 $B$ is a matrix
 of founder allele effects, $W$ is a matrix of covariates, $C$ is a matrix of covariate
 effects, $M$ is a vector of values for a single candidate mediator (a local expression trait, in our case), $\beta$ is the effect
