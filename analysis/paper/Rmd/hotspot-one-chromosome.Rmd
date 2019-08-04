@@ -102,7 +102,7 @@ pm <- pleio_tib %>%
 ```
 
 
-```{r, scatter-{{hot_chr}}}
+```{r, scatter-{{hot_chr}}, fig.cap="Pleiotropy test statistic vs. mediation LOD difference for Chr {{hot_chr}} hotspot."}
 p <- pleio_mixed_list %>%
   bind_rows() %>%
   rename(pleiotropy_lod = lod) %>%
@@ -121,7 +121,7 @@ plotly::ggplotly(p)
 
 
 
-```{r, scatter_by_local-{{hot_chr}}, fig.height = ceiling(nlocal / 2)}
+```{r, scatter_by_local-{{hot_chr}}, fig.height = ceiling(nlocal / 2), fig.cap="Pleiotropy test statistic vs. mediation LOD difference by local expression trait for Chr {{hot_chr}} hotspot."}
 foo <- pleio_mixed_list %>%
   bind_rows() %>%
   rename(pleiotropy_lod = lod) %>%
@@ -252,7 +252,7 @@ fnhtml <- here("analysis", "figures", paste0("Chr", {{hot_chr}}, "hm.html"))
 
 
 
-```{r, heat-{{hot_chr}}}
+```{r, heat-{{hot_chr}}, fig.cap="Heatmap for pleiotropy test statsitics for Chr {{hot_chr}}."}
 ord <- match(rn, rownames(pm))
 
 (p <- pm[ord, ord] %>%
@@ -284,7 +284,7 @@ webshot::webshot(url = fnhtml,
 
 
 
-```{r, index_v_position-{{hot_chr}}}
+```{r, index-v-position-{{hot_chr}}, fig.cap="QTL peak position vs. dendrogram index for Chr {{hot_chr}}."}
 bar <- foo %>%
   filter(local_symbol == "{{keller_mediator}}")
 
