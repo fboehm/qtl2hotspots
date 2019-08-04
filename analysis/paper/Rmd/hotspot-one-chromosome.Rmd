@@ -121,7 +121,7 @@ plotly::ggplotly(p)
 
 
 
-```{r, scatter_by_local-{{hot_chr}}, fig.height = ceiling(nlocal / 2), fig.cap="Pleiotropy test statistic vs. mediation LOD difference by local expression trait for Chr {{hot_chr}} hotspot."}
+```{r, scatter-by-local-{{hot_chr}}, fig.height = ceiling(nlocal / 2), fig.cap="Pleiotropy test statistic vs. mediation LOD difference by local expression trait for Chr {{hot_chr}} hotspot."}
 foo <- pleio_mixed_list %>%
   bind_rows() %>%
   rename(pleiotropy_lod = lod) %>%

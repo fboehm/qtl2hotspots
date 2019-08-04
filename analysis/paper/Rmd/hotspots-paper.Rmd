@@ -6,12 +6,12 @@ bibliography: research.bib
 linkReferences: true
 link-citations: true 
 output: 
-  bookdown::pdf_document2:
-    fig_caption: true
-    keep_tex: true
   bookdown::html_document2: 
     code_folding: hide
     self_contained: no
+  bookdown::pdf_document2:
+    fig_caption: true
+    keep_tex: true
 ---
 
 ```{r child = "abstract.Rmd", eval = TRUE}
@@ -25,7 +25,7 @@ output:
 
 ```{r presetup}
 eval_code <- TRUE
-knitr::opts_chunk$set(comment=NA, fig.width=6, fig.height=6, eval = eval_code, results = "hide")
+knitr::opts_chunk$set(comment=NA, fig.width=6, fig.height=6, eval = eval_code)
 ```
 
 
