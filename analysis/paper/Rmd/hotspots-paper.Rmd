@@ -9,6 +9,7 @@ output:
   bookdown::html_document2: 
     code_folding: hide
     self_contained: no
+    keep_md: true
   bookdown::pdf_document2:
     fig_caption: true
     keep_tex: true
