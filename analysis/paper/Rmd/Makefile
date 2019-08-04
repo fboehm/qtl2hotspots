@@ -1,6 +1,6 @@
 
 PAPER_DIR=.
-
+FIGURE_DIR=../../figures
 
 # Rules
 
@@ -16,3 +16,8 @@ $(PAPER_DIR)/hotspots-paper.html: $(PAPER_DIR)/hotspots-paper.Rmd $(PAPER_DIR)/m
 
 clean:
 	rm -f $(PAPER_DIR)/hotspots-paper.html
+	rm -f $(PAPER_DIR)/hotspots-paper.md
+	rm -f $(PAPER_DIR)/hotspots-paper.tex
+
+cleanfigures:
+	rm -fr $(FIGURE_DIR)/*.*
