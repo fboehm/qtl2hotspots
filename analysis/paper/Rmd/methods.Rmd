@@ -25,7 +25,6 @@ but outside the hotspot interval.
 
 ## Pleiotropy testing
 
-### Two-dimensional, two-QTL scans
 
 
 \begin{equation}
@@ -36,7 +35,7 @@ vec(Y) = X vec(B) + vec(G) + vec(E)
 For each hotspot, we tested all pairs of traits, regardless of whether the traits were local or nonlocal. 
 We performed a
 two-dimensional, two-QTL scan over a genomic region that included the entirety of the
-hotspot. We fitted bivariate linear mixed effects models (Equations \@ref(), \@ref(), and \@ref()) at each ordered pair of markers in a two-dimensional grid [@boehm2019testing].
+hotspot. We fitted bivariate linear mixed effects models (Equations \@ref(eq:mvlmm), \@ref(eq:g), and \@ref(eq:e)) at each ordered pair of markers in a two-dimensional grid [@boehm2019testing].
 
 
 
@@ -71,8 +70,6 @@ l_{10}(\hat B, \hat \Sigma) = - \frac{1}{2}\log_{10}\left((Y - X\hat B)^T\hat \S
 
 For $n$ mice, $\Sigma$ is a $2n$ by $2n$ covariance matrix, while $V_g$ and $V_e$ are $2$ by $2$ covariance matrices. Estimates $\hat V_g$ and $\hat V_e$ are obtained via an expectation-maximization algorithm [@zhou2014efficient;@gemma2].
 
-
-### Calculating likelihood ratio test statistics
 
 From the two-dimensional scans, we calculated pleiotropy likelihood ratio test (LOD) statistics for each
 pair of traits [@jiang1995multiple;@boehm2019testing;@boehm2019thesis]. Because of the required
@@ -133,7 +130,7 @@ We included four covariates in our models: three wave indicators and sex. The wa
 ## Visualizations
 
 We created scatter plots with the `ggplot2` package [@ggplot2] for the R
-statistical computing environment [@r]. We initially plotted all local-nonlocal pairs for each hotspot. We highlighted in blue those points that correspond to pairs involving the putative mediator per [@keller2018genetic].
+statistical computing environment [@r]. We plotted all local-nonlocal pairs for each hotspot. We highlighted in blue those points that correspond to pairs involving the putative mediator that @keller2018genetic identified.
 
 
 

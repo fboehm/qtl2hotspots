@@ -1,19 +1,24 @@
-# Chr {{hot_chr}}
+# Chr 
 
+```{r definitions}
+hot_chr <- 2
+keller_mediator <- "Hnf4a"
+hot_mid <- 165.5
+```
 
-```{r, def-{{hot_chr}}}
-hot_lower <- {{hot_mid}} - 2
-hot_upper <- {{hot_mid}} + 2
-fp <- paste0("Chr", {{hot_chr}}, "-")
+```{r, def-hot_chr}
+hot_lower <- hot_mid - 2
+hot_upper <- hot_mid + 2
+fp <- paste0("Chr", hot_chr, "-")
 knitr::opts_chunk$set(fig.path = here("analysis", "figures", fp))
 ```
 
 
-```{r, readRDS-{{hot_chr}}}
-pleio_mixed_list <- readRDS(here("analysis", "data", "derived_data", paste0("Chr", {{hot_chr}}, "_pleio.rds")))
-pleio_local_list <- readRDS(here("analysis", "data", "derived_data", paste0("Chr", {{hot_chr}}, "_pleio_local.rds")))
-pleio_nonlocal_list <- readRDS(here("analysis", "data", "derived_data", paste0("Chr", {{hot_chr}}, "_pleio_nonlocal.rds")))
-med_list <- readRDS(here("analysis", "data", "derived_data", paste0("Chr", {{hot_chr}}, "_mediations.rds")))
+```{r, readRDS-hot_chr}
+pleio_mixed_list <- readRDS(here("analysis", "data", "derived_data", paste0("Chr", hot_chr, "_pleio.rds")))
+pleio_local_list <- readRDS(here("analysis", "data", "derived_data", paste0("Chr", hot_chr, "_pleio_local.rds")))
+pleio_nonlocal_list <- readRDS(here("analysis", "data", "derived_data", paste0("Chr", hot_chr, "_pleio_nonlocal.rds")))
+med_list <- readRDS(here("analysis", "data", "derived_data", paste0("Chr", hot_chr, "_mediations.rds")))
 ```
 
 
@@ -25,38 +30,38 @@ med_list <- readRDS(here("analysis", "data", "derived_data", paste0("Chr", {{hot
 
 
 
-```{r, define_local_annot-{{hot_chr}}}
+```{r, define_local_annot-hot_chr}
 local_annot <- lod_peaks %>%
-  filter(chrom == {{hot_chr}}, pos <= hot_upper, pos >= hot_lower) %>%
+  filter(chrom == hot_chr, pos <= hot_upper, pos >= hot_lower) %>%
   left_join(y = annots, by = c("annot.id" = "gene_id")) %>%
   filter(!duplicated(annot.id)) %>%
   filter(lod >= ult) %>%
-  mutate(local_tx = chr == {{hot_chr}}) %>%
+  mutate(local_tx = chr == hot_chr) %>%
   filter(local_tx)
 ```
 
 
-```{r, define_nonlocal_annot-{{hot_chr}}}
+```{r, define_nonlocal_annot-hot_chr}
 nonlocal_annot <- lod_peaks %>%
-  filter(chrom == {{hot_chr}}, pos <= hot_upper, pos >= hot_lower) %>%
+  filter(chrom == hot_chr, pos <= hot_upper, pos >= hot_lower) %>%
   inner_join(y = annots, by = c("annot.id" = "gene_id")) %>%
   filter(!duplicated(annot.id)) %>%
   filter(lod >= 7.18) %>%
-  mutate(local_tx = chr == {{hot_chr}}) %>%
+  mutate(local_tx = chr == hot_chr) %>%
   filter(!local_tx) %>%
   filter(!is.na(hotspot))
 ```
 
 
 
-```{r, local_annot2-{{hot_chr}}}
+```{r, local_annot2-hot_chr}
 local_annot2 <- local_annot %>%
   filter(middle <= hot_upper, middle >= hot_lower) %>% 
   arrange(desc(lod))
 ```
 
 
-```{r hot_expr-{{hot_chr}}}
+```{r hot_expr-hot_chr}
 hot_local <- expr[, colnames(expr) %in% local_annot2$annot.id]
 hot_nonlocal <- expr[, colnames(expr) %in% nonlocal_annot$annot.id]
 nnonlocal <- nrow(nonlocal_annot)
@@ -64,7 +69,7 @@ nlocal <- nrow(local_annot2)
 ```
 
 
-```{r, med_tib-{{hot_chr}}, message=FALSE, warning = FALSE}
+```{r, med_tib-hot_chr, message=FALSE, warning = FALSE}
 med_tib <- med_list %>%
   purrr::map(bind_rows) %>%
   bind_rows() %>%
@@ -79,7 +84,7 @@ med_tib <- med_list %>%
 ```
 
 
-```{r, hot_annot-{{hot_chr}}}
+```{r, hot_annot-hot_chr}
 hot_annot <- local_annot2 %>%
   bind_rows(nonlocal_annot) %>%
   dplyr::select(annot.id, symbol)
@@ -96,21 +101,21 @@ pleio_tib <- pleio_mixed_list %>%
 ```
 
 
-```{r pm-{{hot_chr}}}
+```{r pm-hot_chr}
 pm <- pleio_tib %>%
   tibble_to_matrix(symmetric = TRUE)
 ```
 
 
-```{r, scatter-{{hot_chr}}, fig.cap="Pleiotropy test statistic vs. mediation LOD difference for Chr {{hot_chr}} hotspot."}
+```{r, scatter-hot_chr, fig.cap="Pleiotropy test statistic vs. mediation LOD difference for Chr hot_chr hotspot."}
 p <- pleio_mixed_list %>%
   bind_rows() %>%
   rename(pleiotropy_lod = lod) %>%
   inner_join(med_tib, by = c("local_gene_id", "nonlocal_gene_id")) %>%
   dplyr::select(local_symbol, nonlocal_symbol, pleiotropy_lod, lod_diff, lod_diff_proportion, lod_without_med, lod_with_med, filename, nonlocal_gene_id, local_gene_id) %>%
-  ggplot() + geom_point(mapping = aes(x = pleiotropy_lod, y = lod_diff, colour = local_symbol == "{{keller_mediator}}", nonlocal = nonlocal_symbol, local = local_symbol), size = 0.05) + theme(legend.position = "none") + xlab("Pleiotropy LOD") + ylab("Mediation LOD difference")
-fnsvg <- paste0("Chr", {{hot_chr}}, "_scatter.svg")
-fnpdf <- paste0("Chr", {{hot_chr}}, "_scatter.pdf")
+  ggplot() + geom_point(mapping = aes(x = pleiotropy_lod, y = lod_diff, colour = local_symbol == "keller_mediator", nonlocal = nonlocal_symbol, local = local_symbol), size = 0.05) + theme(legend.position = "none") + xlab("Pleiotropy LOD") + ylab("Mediation LOD difference")
+fnsvg <- paste0("Chr", hot_chr, "_scatter.svg")
+fnpdf <- paste0("Chr", hot_chr, "_scatter.pdf")
 ggsave(plot = p, filename = here("analysis", "figures", fnsvg))
 ggsave(plot = p, filename = here("analysis", "figures", fnpdf))
 plotly::ggplotly(p)
@@ -121,7 +126,7 @@ plotly::ggplotly(p)
 
 
 
-```{r, scatter-by-local-{{hot_chr}}, fig.height = ceiling(nlocal / 2), fig.cap="Pleiotropy test statistic vs. mediation LOD difference by local expression trait for Chr {{hot_chr}} hotspot."}
+```{r, scatter-by-local-hot_chr, fig.height = ceiling(nlocal / 2), fig.cap="Pleiotropy test statistic vs. mediation LOD difference by local expression trait for Chr hot_chr hotspot."}
 foo <- pleio_mixed_list %>%
   bind_rows() %>%
   rename(pleiotropy_lod = lod) %>%
@@ -141,78 +146,27 @@ p <- foo %>%
   ylab("Mediation LOD difference") +
   geom_text(aes(x = max(foo$pleiotropy_lod), y = 1, label = local_symbol), inherit.aes=FALSE)
 
-fnsvg <- paste0("Chr", {{hot_chr}}, "_scatter-panel.svg")
-fnpdf <- paste0("Chr", {{hot_chr}}, "_scatter-panel.pdf")
+fnsvg <- paste0("Chr", hot_chr, "_scatter-panel.svg")
+fnpdf <- paste0("Chr", hot_chr, "_scatter-panel.pdf")
 ggsave(p, filename = here("analysis", "figures", fnsvg), height = ceiling(nlocal / 2))
 ggsave(p, filename = here("analysis", "figures", fnpdf), height = ceiling(nlocal / 2))
 plotly::ggplotly(p)
 ```
 
-```{r, eval = FALSE}
-# put in multiple figures, if there are many local traits
-n_figs <- 1 + nlocal %/% 18 # 18 is the number of panels per page in pdf
-n_last <- nlocal %% 18 # number of panels on last figure
-max_pleio_lod <- max(foo$pleiotropy_lod)
-max_med_lod_difference <- max(foo$lod_diff)
-min_med_lod_difference <- min(foo$lod_diff)
-
-for (i in 1:n_figs){
-  n_panels <- 18 * (i < n_figs) + n_last * (i == n_figs)
-  foo %>%
-    filter(local_symbol %in% local_annot2$symbol[((i - 1) * 18 + 1): (18 * i)]) %>%
-    ggplot() +
-      geom_point(mapping = aes(x = pleiotropy_lod, y = lod_diff, colour = nonlocal_symbol), size = 0.1) +
-      facet_wrap(. ~ local_symbol, nrow = ceiling(n_panels / 2), ncol = 2) +
-      broman::karl_theme() +
-      theme(legend.position = "none") +
-      theme(
-        strip.background = element_blank(),
-        strip.text.x = element_blank()
-    ) +
-      xlab("Pleiotropy LOD") + xlim(c(0, max_pleio_lod)) + ylim(c(min_med_lod_difference, max_med_lod_difference)) +
-      ylab("Mediation LOD difference") +
-      geom_text(size = 2, aes(x = max_pleio_lod / 2, y = 2 * max_med_lod_difference / 3, label = local_symbol), inherit.aes=FALSE)
-  fnsvg <- paste0("Chr", {{hot_chr}}, "_scatter-panel", i, ".svg")
-  fnpdf <- paste0("Chr", {{hot_chr}}, "_scatter-panel", i, ".pdf")
-  ggsave(filename = here("analysis", "figures", fnsvg), height = ceiling(n_panels / 2))
-  ggsave(filename = here("analysis", "figures", fnpdf), height = ceiling(n_panels / 2))
-}
-```
 
 
 
-
-```{r, scols-{{hot_chr}}}
+```{r, scols-hot_chr}
 scols1 <- 1L + (rownames(pm) %in% local_annot2$symbol)
-scols2 <- rownames(pm) %in% (med_tib %>% filter(local_symbol == "{{keller_mediator}}", lod_diff > 1.5))$nonlocal_symbol
+scols2 <- rownames(pm) %in% (med_tib %>% filter(local_symbol == "keller_mediator", lod_diff > 1.5))$nonlocal_symbol
 ```
 
 
-```{r, ordering-{{hot_chr}}}
-# order the nonlocal traits first
-## indicator for being a nonlocal trait
-indic_nonlocal <- rownames(pm) %in% nonlocal_annot$symbol
-# define ord_nonlocal
-ord_nonlocal <- pm[indic_nonlocal, ] %>%
-  dist() %>%
-  hclust() %>%
-  as.dendrogram() %>%
-  dendextend::seriate_dendrogram(dist(pm[indic_nonlocal, ])) %>%
-  order.dendrogram()
-rn_nonlocal <- rownames(pm[indic_nonlocal, ][ord_nonlocal, ])
-# define ord_local
-ord_local<- pm[!indic_nonlocal, ] %>%
-  dist() %>%
-  hclust() %>%
-  as.dendrogram() %>%
-  dendextend::seriate_dendrogram(dist(pm[!indic_nonlocal, ])) %>%
-  order.dendrogram()
-rn_local <- rownames(pm[!indic_nonlocal, ][ord_local, ])
-rn <- c(rn_nonlocal, rn_local)
+```{r, ordering-hot_chr}
 ```
 
 
-```{r, scols_extra-{{hot_chr}}}
+```{r, scols_extra-hot_chr}
 scols_extra <- purrr::map(.x = local_annot2$symbol,
                           .f = function(x) {rownames(pm) %in% (med_tib %>% filter(local_symbol == x, lod_diff > 1.5))$nonlocal_symbol}
 ) %>%
@@ -222,8 +176,8 @@ scols_extra <- purrr::map(.x = local_annot2$symbol,
 ```
 
 
-```{r, n-med-{{hot_chr}}}
-n_med_tr <- 10 # arbitrary threshold for number of mediated traits per local
+```{r, n_med-hot_chr}
+n_med_tr <- 4 # arbitrary threshold for number of mediated traits per local
 # only those local traits with n_med_tr or more mediated nonlocal traits 
 # appear as annotation columns in the heatmap
 n_med_per_local <- med_tib %>%
@@ -233,7 +187,7 @@ n_med_per_local <- med_tib %>%
   filter(n >= n_med_tr)
 n_med_per_local %>%
   arrange(desc(n)) %>%
-  knitr::kable(caption = "Number of mediated traits per local trait for Chr {{hot_chr}} hotspot.")
+  knitr::kable()
 
 scols_pre <- scols_extra %>%
   dplyr::select(n_med_per_local$local_symbol)
@@ -247,15 +201,15 @@ col_order <- scols_pre %>%
   order.dendrogram()
 scols <- scols_pre[ , col_order] %>%
   mutate(local = scols1)
-fnhtml <- here("analysis", "figures", paste0("Chr", {{hot_chr}}, "hm.html"))
+fnhtml <- here("analysis", "figures", paste0("Chr", hot_chr, "hm.html"))
 ```
 
 
 
-```{r, heat-{{hot_chr}}, fig.cap="Heatmap for pleiotropy test statistics for Chr {{hot_chr}}."}
+```{r, heat-hot_chr, fig.cap="Heatmap for pleiotropy test statsitics for Chr hot_chr."}
 ord <- match(rn, rownames(pm))
 
-(p <- pm[ord, ord] %>% # order both cols and rows by 'ord'
+(p <- pm[ord, ord] %>%
   apply(FUN = trunc2, MARGIN = 2, threshold = 5) %>%
   heatmaply(Rowv = FALSE,
             Colv = FALSE,
@@ -268,16 +222,25 @@ ord <- match(rn, rownames(pm))
             ) %>%
   hide_guides()
 )
+fnpdf <- here("analysis", "figures", paste0("Chr", hot_chr, "hm.pdf"))
 htmlwidgets::saveWidget(widget = p, 
                         file = fnhtml
                         )
 ```
 
+```{r, webshot-hot_chr, eval = FALSE}
+webshot::webshot(url = fnhtml,
+                 file = fnpdf,
+                 cliprect = "viewport"
+                 )
+```
 
 
-```{r, index-v-position-{{hot_chr}}, fig.cap="QTL peak position vs. dendrogram index for Chr {{hot_chr}}."}
+
+
+```{r, index-v-position-hot_chr, fig.cap="QTL peak position vs. dendrogram index for Chr hot_chr."}
 bar <- foo %>%
-  filter(local_symbol == "{{keller_mediator}}")
+  filter(local_symbol == keller_mediator)
 
 p <- tibble(nonlocal_symbol = rownames(pm[indic_nonlocal, ])[ord_nonlocal], index = 1:length(nonlocal_symbol)) %>%
   inner_join(bar, by = "nonlocal_symbol") %>% 
