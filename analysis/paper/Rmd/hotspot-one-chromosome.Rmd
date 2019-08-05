@@ -109,10 +109,6 @@ p <- pleio_mixed_list %>%
   inner_join(med_tib, by = c("local_gene_id", "nonlocal_gene_id")) %>%
   dplyr::select(local_symbol, nonlocal_symbol, pleiotropy_lod, lod_diff, lod_diff_proportion, lod_without_med, lod_with_med, filename, nonlocal_gene_id, local_gene_id) %>%
   ggplot() + geom_point(mapping = aes(x = pleiotropy_lod, y = lod_diff, colour = local_symbol == "{{keller_mediator}}", nonlocal = nonlocal_symbol, local = local_symbol), size = 0.05) + theme(legend.position = "none") + xlab("Pleiotropy LOD") + ylab("Mediation LOD difference")
-fnsvg <- paste0("Chr", {{hot_chr}}, "_scatter.svg")
-fnpdf <- paste0("Chr", {{hot_chr}}, "_scatter.pdf")
-ggsave(plot = p, filename = here("analysis", "figures", fnsvg))
-ggsave(plot = p, filename = here("analysis", "figures", fnpdf))
 plotly::ggplotly(p)
 ```
 
@@ -140,46 +136,8 @@ p <- foo %>%
   xlab("Pleiotropy LOD") +
   ylab("Mediation LOD difference") +
   geom_text(aes(x = max(foo$pleiotropy_lod), y = 1, label = local_symbol), inherit.aes=FALSE)
-
-fnsvg <- paste0("Chr", {{hot_chr}}, "_scatter-panel.svg")
-fnpdf <- paste0("Chr", {{hot_chr}}, "_scatter-panel.pdf")
-ggsave(p, filename = here("analysis", "figures", fnsvg), height = ceiling(nlocal / 2))
-ggsave(p, filename = here("analysis", "figures", fnpdf), height = ceiling(nlocal / 2))
 plotly::ggplotly(p)
 ```
-
-```{r, eval = FALSE}
-# put in multiple figures, if there are many local traits
-n_figs <- 1 + nlocal %/% 18 # 18 is the number of panels per page in pdf
-n_last <- nlocal %% 18 # number of panels on last figure
-max_pleio_lod <- max(foo$pleiotropy_lod)
-max_med_lod_difference <- max(foo$lod_diff)
-min_med_lod_difference <- min(foo$lod_diff)
-
-for (i in 1:n_figs){
-  n_panels <- 18 * (i < n_figs) + n_last * (i == n_figs)
-  foo %>%
-    filter(local_symbol %in% local_annot2$symbol[((i - 1) * 18 + 1): (18 * i)]) %>%
-    ggplot() +
-      geom_point(mapping = aes(x = pleiotropy_lod, y = lod_diff, colour = nonlocal_symbol), size = 0.1) +
-      facet_wrap(. ~ local_symbol, nrow = ceiling(n_panels / 2), ncol = 2) +
-      broman::karl_theme() +
-      theme(legend.position = "none") +
-      theme(
-        strip.background = element_blank(),
-        strip.text.x = element_blank()
-    ) +
-      xlab("Pleiotropy LOD") + xlim(c(0, max_pleio_lod)) + ylim(c(min_med_lod_difference, max_med_lod_difference)) +
-      ylab("Mediation LOD difference") +
-      geom_text(size = 2, aes(x = max_pleio_lod / 2, y = 2 * max_med_lod_difference / 3, label = local_symbol), inherit.aes=FALSE)
-  fnsvg <- paste0("Chr", {{hot_chr}}, "_scatter-panel", i, ".svg")
-  fnpdf <- paste0("Chr", {{hot_chr}}, "_scatter-panel", i, ".pdf")
-  ggsave(filename = here("analysis", "figures", fnsvg), height = ceiling(n_panels / 2))
-  ggsave(filename = here("analysis", "figures", fnpdf), height = ceiling(n_panels / 2))
-}
-```
-
-
 
 
 ```{r, scols-{{hot_chr}}}
@@ -247,7 +205,6 @@ col_order <- scols_pre %>%
   order.dendrogram()
 scols <- scols_pre[ , col_order] %>%
   mutate(local = scols1)
-fnhtml <- here("analysis", "figures", paste0("Chr", {{hot_chr}}, "hm.html"))
 ```
 
 
@@ -268,9 +225,6 @@ ord <- match(rn, rownames(pm))
             ) %>%
   hide_guides()
 )
-htmlwidgets::saveWidget(widget = p, 
-                        file = fnhtml
-                        )
 ```
 
 

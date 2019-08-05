@@ -13,9 +13,6 @@ RUN install2.r --error \
     heatmaply \
     dendextend \
     plotly \
-    svglite \
-    webshot \
-    htmlwidgets \
     git2r \
     bookdown
 
