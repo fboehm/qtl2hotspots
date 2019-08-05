@@ -50,7 +50,6 @@ library(here)
 ```{r setup}
 library(knitr)
 library(qtl2hotspots)
-pleio_threshold <- 4
 ult <- 15 # univariate lod threshold
 ```
 
