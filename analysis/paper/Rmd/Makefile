@@ -20,4 +20,7 @@ clean:
 	rm -f $(PAPER_DIR)/hotspots-paper.tex
 
 cleanfigures:
-	rm -fr $(FIGURE_DIR)/*.*
+	rm -f $(FIGURE_DIR)/*.pdf $(FIGURE_DIR)/*.html $(FIGURE_DIR)/*.svg; rm -rf $(FIGURE_DIR)/*_files
+
+cleanall: clean cleanfigures
+
