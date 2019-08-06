@@ -1,11 +1,9 @@
-# Chr {{hot_chr}}
+## Chr {{hot_chr}}
 
 
 ```{r, def-{{hot_chr}}}
 hot_lower <- {{hot_mid}} - 2
 hot_upper <- {{hot_mid}} + 2
-fp <- paste0("Chr", {{hot_chr}}, "-")
-knitr::opts_chunk$set(fig.path = here("analysis", "figures", fp))
 ```
 
 

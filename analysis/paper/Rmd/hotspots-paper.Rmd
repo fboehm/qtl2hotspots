@@ -102,33 +102,20 @@ out <- pmap_dfc(inputs, .f = function(hot_chr, hot_mid, keller_mediator) knitr::
 
 
 
-### Chr 2 hotspot results
+
+
 
 `r if (eval_code) knitr::knit(text = out[[1]])`
 
 
-### Chr 5 hotspot results
-
 `r if (eval_code) knitr::knit(text = out[[2]])`
-
-
-
-
-### Chr 7 results
 
 
 `r if (eval_code) knitr::knit(text = out[[3]])`
 
 
-
-### Chr 11 results
-
-
 `r if (eval_code) knitr::knit(text = out[[4]])`
 
-
-
-### Chr 13 results
 
 `r if (eval_code) knitr::knit(text = out[[5]])`
 
