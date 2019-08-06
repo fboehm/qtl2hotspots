@@ -1,2 +1,6 @@
 hotspots-paper_files
+*.log
 hotspots-paper.md
+hotspots-paper.html
+hotspots-paper.pdf
+hotspots-paper.tex
