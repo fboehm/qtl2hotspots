@@ -8,11 +8,6 @@ link-citations: true
 output: 
   bookdown::html_document2: 
     code_folding: hide
-    self_contained: no
-    keep_md: true
-  bookdown::pdf_document2:
-    fig_caption: true
-    keep_tex: true
 ---
 
 ```{r child = "abstract.Rmd", eval = TRUE}
@@ -84,10 +79,6 @@ lod_peaks <- readRDS(here("analysis", "data", "derived_data", "lod_peaks.rds"))
 annots <- readRDS(here("analysis", "data", "derived_data", "annots.rds"))
 expr <- readRDS(here("analysis", "data", "derived_data", "expr.rds"))
 probs <- readRDS(here("analysis", "data", "derived_data", "genoprobs.rds"))
-K <- readRDS(here("analysis", "data", "derived_data", "kinship.rds"))
-covar <- readRDS(here("analysis", "data", "derived_data", "covar.rds"))
-map <-   readRDS(here("analysis", "data", "derived_data", "map.rds"))
-
 ```
 
 ```{r, load_purrr}
@@ -111,20 +102,6 @@ out <- pmap_dfc(inputs, .f = function(hot_chr, hot_mid, keller_mediator) knitr::
 
 
 `r if (eval_code) knitr::knit(text = out[[1]])`
-
-
-`r if (eval_code) knitr::knit(text = out[[2]])`
-
-
-`r if (eval_code) knitr::knit(text = out[[3]])`
-
-
-`r if (eval_code) knitr::knit(text = out[[4]])`
-
-
-`r if (eval_code) knitr::knit(text = out[[5]])`
-
-
 
 
 

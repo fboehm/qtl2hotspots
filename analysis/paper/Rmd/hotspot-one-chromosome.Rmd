@@ -139,8 +139,11 @@ plotly::ggplotly(p)
 
 
 ```{r, scols-{{hot_chr}}}
-scols1 <- 1L + (rownames(pm) %in% local_annot2$symbol)
-scols2 <- rownames(pm) %in% (med_tib %>% filter(local_symbol == "{{keller_mediator}}", lod_diff > 1.5))$nonlocal_symbol
+scols1 <- tibble(local = 1L + (rownames(pm) %in% local_annot2$symbol), 
+                 symbol = rownames(pm), 
+                 mediated_by_keller_mediator = rownames(pm) %in% (med_tib %>% filter(local_symbol == "{{keller_mediator}}", lod_diff > 1.5))$nonlocal_symbol
+                 )
+
 ```
 
 
@@ -169,13 +172,78 @@ rn <- c(rn_nonlocal, rn_local)
 
 
 ```{r, scols_extra-{{hot_chr}}}
-scols_extra <- purrr::map(.x = local_annot2$symbol,
-                          .f = function(x) {rownames(pm) %in% (med_tib %>% filter(local_symbol == x, lod_diff > 1.5))$nonlocal_symbol}
+scols_extra <- local_annot2$symbol %>%
+  as.list() %>%
+  (function(x) {names(x) <- unlist(x); x}) %>%
+  purrr::map(.f = function(x) {rownames(pm) %in% (med_tib %>% filter(local_symbol == x, lod_diff > 1.5))$nonlocal_symbol}
 ) %>%
   bind_cols() %>%
-  (function(x){colnames(x) <- local_annot2$symbol; x}) %>%
-  mutate(local = scols1)
+  mutate(symbol = rownames(pm)) %>%
+left_join(scols1, by = "symbol")
 ```
+
+```{r, scols-peak-position-{{hot_chr}}}
+annot_all <- local_annot2 %>%
+  bind_rows(nonlocal_annot)
+  
+binning <- annot_all %>%
+  dplyr::select(symbol, pos, lod) %>%
+  mutate(bin = unlist(pos) %>%
+           map(.f = function(x) {x %>% 
+               bin_peak_position(breaks = hot_lower + (1:9) * 0.4) %>%
+               binarize_bin_number(total_number_of_bins = 10L)
+             })
+  )
+```
+
+```{r, scan1-{{hot_chr}}}
+fn <- here::here("analysis", "data", "derived_data", "Chr{{hot_chr}}_scan1_out.rds")
+if (file.exists(fn)) {
+  s1out <- readRDS(fn)
+} else {
+  s1out <- qtl2::scan1(genoprobs = probs, 
+                       pheno = cbind(hot_local, hot_nonlocal), 
+                       kinship = K[["{{hot_chr}}"]], 
+                       addcovar = covar, 
+                       reml = TRUE
+                       )
+  saveRDS(s1out, fn)
+}
+```
+
+
+
+```{r allele-effects-{{hot_chr}}}
+fn <- here::here("analysis", "data", "derived_data", "Chr{{hot_chr}}_scan1coef_out.rds")
+if (file.exists(fn)) {
+  s1coef_out <- readRDS(fn)
+} else {
+s1coef_out <- purrr::map(.x = tibble(cbind(hot_local, hot_nonlocal)), 
+           .f = function(pheno) {
+             qtl2::scan1coef(genoprobs = probs[["{{hot_chr}}"]], 
+                             pheno = pheno, 
+                             kinship = K[["{{hot_chr}}"]], 
+                             addcovar = covar, 
+                             reml = TRUE, 
+                             )
+           }
+                )
+saveRDS(s1coef_out, fn)
+}
+```
+
+```{r, get-allele-effects-{{hot_chr}}}
+# add index values for peak position
+local_annot2 %>%
+  mutate(peak_index = match(table = names(map[["{{hot_chr}}"]]), x = marker.id)) %>%
+  mutate(peak_effects = qtl2pleio::get_effects(peak_index, allele_effects_matrix = s1coef_out, map = map[["{{hot_chr}}"]]))
+  
+nonlocal_annot %>%
+  mutate(peak_index = match(table = names(map[["{{hot_chr}}"]]), x = marker.id))
+
+
+```
+
 
 
 ```{r, n-med-{{hot_chr}}}
@@ -190,7 +258,9 @@ n_med_per_local <- med_tib %>%
 n_med_per_local %>%
   arrange(desc(n)) %>%
   knitr::kable(caption = "Number of mediated traits per local trait for Chr {{hot_chr}} hotspot.")
+```
 
+```{r define-scols-pre-{{hot_chr}}}
 scols_pre <- scols_extra %>%
   dplyr::select(n_med_per_local$local_symbol)
 # get ordering for columns of scols_pre
@@ -212,13 +282,17 @@ ord <- match(rn, rownames(pm))
 
 (p <- pm[ord, ord] %>% # order both cols and rows by 'ord'
   apply(FUN = trunc2, MARGIN = 2, threshold = 5) %>%
-  heatmaply(Rowv = FALSE,
+  heatmaply::heatmapr(Rowv = FALSE,
             Colv = FALSE,
-            cexRow = 0.2,
-            cexCol = 0.2,
+            plot_method = "plotly"
+            ) %>%
+    heatmaply::heatmaply_heatmapr2(
+            fontsize_col = 2,
+            fontsize_row = 2,
             symm = TRUE,
-            row_side_colors = scols[ord, ],
-            col_side_colors = tibble(local = scols1[ord]),
+            row_side_colors = list(scols[ord, ], tibble(scols1$local[ord])),
+            row_side_palette = list(heatmaply::cool_warm, heatmaply::Blues), 
+            col_side_colors = tibble(local = scols1$local[ord]),
             limits = c(0, 5)
             ) %>%
   hide_guides()
