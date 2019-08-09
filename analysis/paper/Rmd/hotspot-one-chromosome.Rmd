@@ -96,6 +96,7 @@ pleio_tib <- pleio_mixed_list %>%
 
 ```{r pm-{{hot_chr}}}
 pm <- pleio_tib %>%
+  arrange(gene1_symbol, gene2_symbol) %>%
   tibble_to_matrix(symmetric = TRUE)
 ```
 
@@ -143,7 +144,6 @@ scols1 <- tibble(local = 1L + (rownames(pm) %in% local_annot2$symbol),
                  symbol = rownames(pm), 
                  mediated_by_keller_mediator = rownames(pm) %in% (med_tib %>% filter(local_symbol == "{{keller_mediator}}", lod_diff > 1.5))$nonlocal_symbol
                  )
-
 ```
 
 
@@ -167,7 +167,7 @@ ord_local<- pm[!indic_nonlocal, ] %>%
   dendextend::seriate_dendrogram(dist(pm[!indic_nonlocal, ])) %>%
   order.dendrogram()
 rn_local <- rownames(pm[!indic_nonlocal, ][ord_local, ])
-rn <- c(rn_nonlocal, rn_local)
+rn <- c(rn_nonlocal, rn_local) # order for dendrogram
 ```
 
 
@@ -183,18 +183,19 @@ left_join(scols1, by = "symbol")
 ```
 
 ```{r, scols-peak-position-{{hot_chr}}}
-annot_all <- local_annot2 %>%
-  bind_rows(nonlocal_annot)
-  
-binning <- annot_all %>%
+
+binning <- local_nonlocal_annot %>%
   dplyr::select(symbol, pos, lod) %>%
   mutate(bin = unlist(pos) %>%
            map(.f = function(x) {x %>% 
                bin_peak_position(breaks = hot_lower + (1:9) * 0.4) %>%
                binarize_bin_number(total_number_of_bins = 10L)
              })
-  )
+  ) %>%
+  listcol_to_cols(list_column = quo(bin), another_column = quo(symbol))
 ```
+
+
 
 ```{r, scan1-{{hot_chr}}}
 fn <- here::here("analysis", "data", "derived_data", "Chr{{hot_chr}}_scan1_out.rds")
@@ -205,7 +206,8 @@ if (file.exists(fn)) {
                        pheno = cbind(hot_local, hot_nonlocal), 
                        kinship = K[["{{hot_chr}}"]], 
                        addcovar = covar, 
-                       reml = TRUE
+                       reml = TRUE, 
+                       cores = 7
                        )
   saveRDS(s1out, fn)
 }
@@ -218,13 +220,16 @@ fn <- here::here("analysis", "data", "derived_data", "Chr{{hot_chr}}_scan1coef_o
 if (file.exists(fn)) {
   s1coef_out <- readRDS(fn)
 } else {
-s1coef_out <- purrr::map(.x = tibble(cbind(hot_local, hot_nonlocal)), 
+s1coef_out <- purrr::map(.x = as_tibble(cbind(hot_local, hot_nonlocal)), 
            .f = function(pheno) {
-             qtl2::scan1coef(genoprobs = probs[["{{hot_chr}}"]], 
-                             pheno = pheno, 
+             ph <- as.matrix(pheno)
+             rownames(ph) <- rownames(expr)
+             qtl2::scan1coef(genoprobs = list(probs[["{{hot_chr}}"]]), 
+                             pheno = ph, 
                              kinship = K[["{{hot_chr}}"]], 
                              addcovar = covar, 
                              reml = TRUE, 
+                             cores = 7
                              )
            }
                 )
@@ -234,14 +239,10 @@ saveRDS(s1coef_out, fn)
 
 ```{r, get-allele-effects-{{hot_chr}}}
 # add index values for peak position
-local_annot2 %>%
+local_nonlocal_annot <- dplyr::bind_rows(local_annot2, nonlocal_annot) %>%
   mutate(peak_index = match(table = names(map[["{{hot_chr}}"]]), x = marker.id)) %>%
-  mutate(peak_effects = qtl2pleio::get_effects(peak_index, allele_effects_matrix = s1coef_out, map = map[["{{hot_chr}}"]]))
-  
-nonlocal_annot %>%
-  mutate(peak_index = match(table = names(map[["{{hot_chr}}"]]), x = marker.id))
-
-
+  mutate(peak_effects = purrr::map2(.f = qtl2pleio::get_effects, .x = peak_index, .y = s1coef_out, map = map[["{{hot_chr}}"]])) %>%
+  listcol_to_cols(list_column = quo(peak_effects), another_column = quo(symbol))
 ```
 
 
@@ -272,15 +273,59 @@ col_order <- scols_pre %>%
   dendextend::seriate_dendrogram(dist(t(scols_pre))) %>%
   order.dendrogram()
 scols <- scols_pre[ , col_order] %>%
-  mutate(local = scols1)
+  mutate(local = scols1$local)
 ```
 
 
+```{r, prepare-annotations-{{hot_chr}}}
+# need 5 annotation object: 1. local v nonlocal, 2. mediation LOD difference for all local traits, 3. mediation LOD difference proportion for all local traits, 4. 8 allele effects per trait, 5. peak position per trait, encoded as binned position
+# 2,3,4 are numeric; 1 & 5 are binary
+## local_nonlocal_annot already has the allele effect and local v nonlocal; binning has the peak position. Need to join these two on symbol
+### med_tib has lod diff & lod diff proportion for all local - nonlocal pairs
+fake_tibble_mediation <- tidyr::crossing(symbol = local_annot2$symbol, 
+                                         symbol2 = local_annot2$symbol) %>%
+  mutate(dat = NA) %>%
+  spread(key = symbol, value = dat) %>%
+  rename(symbol = symbol2)
+  
+
+lod_diffs_tibble <- med_tib %>%
+  select( - c(lod_without_med, 
+              lod_with_med, 
+              lod_diff_proportion, 
+              local_gene_id, 
+              nonlocal_gene_id)
+          ) %>%
+  tidyr::spread(key = local_symbol, 
+                value = lod_diff) %>% 
+  dplyr::rename(symbol = nonlocal_symbol) %>%
+  dplyr::bind_rows(fake_tibble_mediation)
+lod_diff_proportions_tibble <- med_tib %>%
+  select( - c(lod_without_med, 
+              lod_with_med, 
+              lod_diff, 
+              local_gene_id, 
+              nonlocal_gene_id)
+          ) %>%
+  tidyr::spread(key = local_symbol, 
+                value = lod_diff_proportion) %>% # 147 rows by 32 columns
+  rename(symbol = nonlocal_symbol) %>%
+  bind_rows(fake_tibble_mediation)
+allele_effects_tibble <- local_nonlocal_annot %>%
+  dplyr::select(symbol, 18:25)
+peak_positions <- binning %>%
+  select(symbol, pos)
+local_tibble <- local_nonlocal_annot %>%
+  select(symbol, local_tx) %>% 
+  ungroup()
+
+```
+
 
 ```{r, heat-{{hot_chr}}, fig.cap="Heatmap for pleiotropy test statistics for Chr {{hot_chr}}."}
-ord <- match(rn, rownames(pm))
+ord <- match(x = rn, table = rownames(pm))
 
-(p <- pm[ord, ord] %>% # order both cols and rows by 'ord'
+pm[ord, ord] %>% # order both cols and rows by 'ord'
   apply(FUN = trunc2, MARGIN = 2, threshold = 5) %>%
   heatmaply::heatmapr(Rowv = FALSE,
             Colv = FALSE,
@@ -296,7 +341,6 @@ ord <- match(rn, rownames(pm))
             limits = c(0, 5)
             ) %>%
   hide_guides()
-)
 ```
 
 

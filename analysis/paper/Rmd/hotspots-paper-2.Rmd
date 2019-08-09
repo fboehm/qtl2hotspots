@@ -74,12 +74,14 @@ if (!file.exists(here("analysis", "data", "derived_data", "expr.rds"))){
 }
 ```
 
+
 ```{r readRDS}
 lod_peaks <- readRDS(here("analysis", "data", "derived_data", "lod_peaks.rds"))
 annots <- readRDS(here("analysis", "data", "derived_data", "annots.rds"))
 expr <- readRDS(here("analysis", "data", "derived_data", "expr.rds"))
 probs <- readRDS(here("analysis", "data", "derived_data", "genoprobs.rds"))
 ```
+
 
 ```{r, load_purrr}
 library(purrr)
