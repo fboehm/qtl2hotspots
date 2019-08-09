@@ -3,6 +3,7 @@
 export(bin_peak_position)
 export(binarize_bin_number)
 export(cluster_pleio_stats)
+export(listcol_to_cols)
 export(make_adjacency_matrix)
 export(tibble_to_matrix)
 export(trunc2)
