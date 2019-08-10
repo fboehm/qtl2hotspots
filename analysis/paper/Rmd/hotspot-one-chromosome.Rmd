@@ -327,15 +327,11 @@ ord <- match(x = rn, table = rownames(pm))
 
 pm[ord, ord] %>% # order both cols and rows by 'ord'
   apply(FUN = trunc2, MARGIN = 2, threshold = 5) %>%
-  heatmaply:::heatmaply(Rowv = FALSE,
-            Colv = FALSE,
-            plot_method = "plotly",
-            symm = TRUE,
-            row_side_colors = as.matrix(annots_ord[[3]][, 2:3]),
-            fontsize_col = 2,
-            fontsize_row = 2,
-            ) %>%
-  hide_guides()
+  pheatmap::pheatmap(cluster_rows = FALSE,
+                     cluster_cols = FALSE,
+                     fontsize = 2,
+                     annotation_row = as.data.frame(annfoo)
+                     )
 ```
 
 
