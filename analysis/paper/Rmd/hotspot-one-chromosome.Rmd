@@ -171,16 +171,6 @@ rn <- c(rn_nonlocal, rn_local) # order for dendrogram
 ```
 
 
-```{r, scols_extra-{{hot_chr}}}
-scols_extra <- local_annot2$symbol %>%
-  as.list() %>%
-  (function(x) {names(x) <- unlist(x); x}) %>%
-  purrr::map(.f = function(x) {rownames(pm) %in% (med_tib %>% filter(local_symbol == x, lod_diff > 1.5))$nonlocal_symbol}
-) %>%
-  bind_cols() %>%
-  mutate(symbol = rownames(pm)) %>%
-left_join(scols1, by = "symbol")
-```
 
 ```{r, scols-peak-position-{{hot_chr}}}
 
@@ -247,7 +237,7 @@ local_nonlocal_annot <- dplyr::bind_rows(local_annot2, nonlocal_annot) %>%
 
 
 
-```{r, n-med-{{hot_chr}}}
+```{r, n-med-{{hot_chr}}, eval = FALSE}
 n_med_tr <- 10 # arbitrary threshold for number of mediated traits per local
 # only those local traits with n_med_tr or more mediated nonlocal traits 
 # appear as annotation columns in the heatmap
@@ -261,20 +251,6 @@ n_med_per_local %>%
   knitr::kable(caption = "Number of mediated traits per local trait for Chr {{hot_chr}} hotspot.")
 ```
 
-```{r define-scols-pre-{{hot_chr}}}
-scols_pre <- scols_extra %>%
-  dplyr::select(n_med_per_local$local_symbol)
-# get ordering for columns of scols_pre
-col_order <- scols_pre %>%
-  t() %>%
-  dist() %>%
-  hclust() %>%
-  as.dendrogram() %>%
-  dendextend::seriate_dendrogram(dist(t(scols_pre))) %>%
-  order.dendrogram()
-scols <- scols_pre[ , col_order] %>%
-  mutate(local = scols1$local)
-```
 
 
 ```{r, prepare-annotations-{{hot_chr}}}
@@ -287,8 +263,9 @@ fake_tibble_mediation <- tidyr::crossing(symbol = local_annot2$symbol,
   mutate(dat = NA) %>%
   spread(key = symbol, value = dat) %>%
   rename(symbol = symbol2)
-  
+# to add to mediation tibbles  
 
+# first med tibble
 lod_diffs_tibble <- med_tib %>%
   select( - c(lod_without_med, 
               lod_with_med, 
@@ -300,6 +277,7 @@ lod_diffs_tibble <- med_tib %>%
                 value = lod_diff) %>% 
   dplyr::rename(symbol = nonlocal_symbol) %>%
   dplyr::bind_rows(fake_tibble_mediation)
+# second med tibble
 lod_diff_proportions_tibble <- med_tib %>%
   select( - c(lod_without_med, 
               lod_with_med, 
@@ -311,14 +289,36 @@ lod_diff_proportions_tibble <- med_tib %>%
                 value = lod_diff_proportion) %>% # 147 rows by 32 columns
   rename(symbol = nonlocal_symbol) %>%
   bind_rows(fake_tibble_mediation)
+# effects tibble
 allele_effects_tibble <- local_nonlocal_annot %>%
   dplyr::select(symbol, 18:25)
+# peak positions tibble
 peak_positions <- binning %>%
   select(symbol, pos)
+# local indicator
 local_tibble <- local_nonlocal_annot %>%
   select(symbol, local_tx) %>% 
   ungroup()
+# univariate lods
+lod_tibble <- local_nonlocal_annot %>%
+  select(symbol, lod) %>%
+  ungroup()
+```
 
+```{r, order-annotations-{{hot_chr}}}
+# all annots 
+annots_ord <- list(lod_diffs_tibble, 
+                   lod_diff_proportions_tibble, 
+                   allele_effects_tibble,
+                   peak_positions, 
+                   local_tibble,
+                   lod_tibble
+                    ) %>% 
+  purrr::map(.f = function(df, rn){
+    out <- df[match(x = rn, table = df$symbol), ]
+    return(out)
+  }, 
+  rn = rn)
 ```
 
 
@@ -327,18 +327,13 @@ ord <- match(x = rn, table = rownames(pm))
 
 pm[ord, ord] %>% # order both cols and rows by 'ord'
   apply(FUN = trunc2, MARGIN = 2, threshold = 5) %>%
-  heatmaply::heatmapr(Rowv = FALSE,
+  heatmaply:::heatmaply(Rowv = FALSE,
             Colv = FALSE,
-            plot_method = "plotly"
-            ) %>%
-    heatmaply::heatmaply_heatmapr2(
+            plot_method = "plotly",
+            symm = TRUE,
+            row_side_colors = as.matrix(annots_ord[[3]][, 2:3]),
             fontsize_col = 2,
             fontsize_row = 2,
-            symm = TRUE,
-            row_side_colors = list(scols[ord, ], tibble(scols1$local[ord])),
-            row_side_palette = list(heatmaply::cool_warm, heatmaply::Blues), 
-            col_side_colors = tibble(local = scols1$local[ord]),
-            limits = c(0, 5)
             ) %>%
   hide_guides()
 ```
