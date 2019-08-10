@@ -1,0 +1,103 @@
+---
+title: "Comparing heatmap functions in R"
+author: "Frederick Boehm"
+date: "8/10/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+The goal here is to compare heatmaps that are produced by R functions. I'm particularly excited by interactive heatmaps, like those using D3 javascript.
+
+```{r presetup}
+eval_code <- TRUE
+knitr::opts_chunk$set(comment=NA, fig.width=6, fig.height=6, eval = eval_code)
+```
+
+
+```{r load-broman}
+library(broman)
+library(here)
+```
+
+
+```{r child="methods.Rmd", eval = TRUE}
+```
+
+
+
+
+
+
+
+
+
+```{r setup}
+library(knitr)
+library(qtl2hotspots)
+ult <- 15 # univariate lod threshold
+```
+
+```{r load_tidyverse}
+library(tidyverse)
+options(tibble.print_max = 50, tibble.print_min = 20)
+```
+
+
+```{r load_heatmaply}
+library(heatmaply)
+```
+
+```{r saveRDS}
+if (!file.exists(here("analysis", "data", "derived_data", "expr.rds"))){
+  download.file("https://datadryad.org/bitstream/handle/10255/dryad.166774/Attie_DO378_eQTL_viewer_v1.Rdata?sequence=2",
+              destfile = here("analysis", "data", "raw_data", "Attie_DO378_eQTL_viewer_v1.Rdata")
+              )
+  load(here("analysis", "data", "raw_data", "Attie_DO378_eQTL_viewer_v1.Rdata"))
+  saveRDS(dataset.islet.rnaseq$lod.peaks, here("analysis", "data", "derived_data", "lod_peaks.rds"))
+  saveRDS(dataset.islet.rnaseq$annots, here("analysis", "data", "derived_data", "annots.rds"))
+  saveRDS(dataset.islet.rnaseq$expr, here("analysis", "data", "derived_data", "expr.rds"))
+  saveRDS(K, here("analysis", "data", "derived_data", "kinship.rds"))
+  saveRDS(map, here("analysis", "data", "derived_data", "map.rds"))
+  saveRDS(genoprobs, here("analysis", "data", "derived_data", "genoprobs.rds"))
+  saveRDS(dataset.islet.rnaseq$covar, here("analysis", "data", "derived_data", "covar.rds"))
+}
+```
+
+```{r readRDS}
+lod_peaks <- readRDS(here("analysis", "data", "derived_data", "lod_peaks.rds"))
+annots <- readRDS(here("analysis", "data", "derived_data", "annots.rds"))
+expr <- readRDS(here("analysis", "data", "derived_data", "expr.rds"))
+probs <- readRDS(here("analysis", "data", "derived_data", "genoprobs.rds"))
+K <- readRDS(here("analysis", "data", "derived_data", "kinship.rds"))
+covar <- readRDS(here("analysis", "data", "derived_data", "covar.rds"))
+map <- readRDS(here("analysis", "data", "derived_data", "map.rds"))
+```
+
+
+```{r setup_continued}
+hot_chr <- c(2, 5, 7, 11, 13)
+hot_mid <- c(165.5, 146, 46, 71, 112.5)
+keller_mediator <- c("Hnf4a", "Pdx1", "Fam83e", "Sat2", "Il6st")
+inputs <- tibble(hot_chr, hot_mid, keller_mediator)
+out <- pmap_dfc(inputs, .f = function(hot_chr, hot_mid, keller_mediator) knitr::knit_expand(text = readLines(here::here("analysis", "paper", "Rmd", "hotspot-one-chromosome.Rmd"))))
+# note that ... argument must be a list, ie, it must be a single argument, not multiple args
+```
+
+
+
+
+
+
+
+
+`r if (eval_code) knitr::knit(text = out[[1]])`
+
+### `iheatmapr` R package
+
+I installed the `iheatmapr` package from Github: `ropensci/iheatmapr`.
+
+
+
