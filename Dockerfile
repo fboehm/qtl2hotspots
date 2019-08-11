@@ -6,6 +6,32 @@ MAINTAINER Frederick J. Boehm <frederick.boehm@gmail.com>
 
 COPY . /home/rstudio/qtl2hotspots
 
+RUN DEBIAN_FRONTEND=noninteractive apt-get update -qq && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -yqq \
+    libssl-dev \
+    libssh2-1-dev \
+    libffi-dev \
+    zlib1g-dev \
+    build-essential \
+    cmake \
+    gcc \
+    pkg-config \
+    git \
+    libhttp-parser-dev \
+    python-setuptools \
+    wget
+
+RUN wget https://github.com/libgit2/libgit2/archive/v0.25.0.tar.gz && \
+tar xzf v0.25.0.tar.gz && \
+cd libgit2-0.25.0/ && \
+cmake . && \
+make && \
+make install
+
+RUN ldconfig
+
+
+
 # Install R packages
 RUN install2.r --error \
     broman \
