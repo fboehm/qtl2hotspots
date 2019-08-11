@@ -170,23 +170,6 @@ rn_local <- rownames(pm[!indic_nonlocal, ][ord_local, ])
 rn <- c(rn_nonlocal, rn_local) # order for dendrogram
 ```
 
-
-
-```{r, scols-peak-position-{{hot_chr}}}
-
-binning <- local_nonlocal_annot %>%
-  dplyr::select(symbol, pos, lod) %>%
-  mutate(bin = unlist(pos) %>%
-           map(.f = function(x) {x %>% 
-               bin_peak_position(breaks = hot_lower + (1:9) * 0.4) %>%
-               binarize_bin_number(total_number_of_bins = 10L)
-             })
-  ) %>%
-  listcol_to_cols(list_column = quo(bin), another_column = quo(symbol))
-```
-
-
-
 ```{r, scan1-{{hot_chr}}}
 fn <- here::here("analysis", "data", "derived_data", "Chr{{hot_chr}}_scan1_out.rds")
 if (file.exists(fn)) {
@@ -227,17 +210,38 @@ saveRDS(s1coef_out, fn)
 }
 ```
 
+
+
+
 ```{r, get-allele-effects-{{hot_chr}}}
 # add index values for peak position
 local_nonlocal_annot <- dplyr::bind_rows(local_annot2, nonlocal_annot) %>%
   mutate(peak_index = match(table = names(map[["{{hot_chr}}"]]), x = marker.id)) %>%
   mutate(peak_effects = purrr::map2(.f = qtl2pleio::get_effects, .x = peak_index, .y = s1coef_out, map = map[["{{hot_chr}}"]])) %>%
-  listcol_to_cols(list_column = quo(peak_effects), another_column = quo(symbol))
+  qtl2hotspots::listcol_to_cols(list_column = quo(peak_effects), another_column = quo(symbol))
+```
+
+
+```{r, scols-peak-position-{{hot_chr}}}
+
+binning <- local_nonlocal_annot %>%
+  dplyr::select(symbol, pos, lod) %>%
+  mutate(bin = unlist(pos) %>%
+           map(.f = function(x) {x %>% 
+               bin_peak_position(breaks = hot_lower + (1:9) * 0.4) %>%
+               binarize_bin_number(total_number_of_bins = 10L)
+             })
+  ) %>%
+  listcol_to_cols(list_column = quo(bin), another_column = quo(symbol))
 ```
 
 
 
-```{r, n-med-{{hot_chr}}, eval = FALSE}
+
+
+
+
+```{r, n-med-{{hot_chr}}}
 n_med_tr <- 10 # arbitrary threshold for number of mediated traits per local
 # only those local traits with n_med_tr or more mediated nonlocal traits 
 # appear as annotation columns in the heatmap
@@ -329,8 +333,7 @@ pm[ord, ord] %>% # order both cols and rows by 'ord'
   apply(FUN = trunc2, MARGIN = 2, threshold = 5) %>%
   pheatmap::pheatmap(cluster_rows = FALSE,
                      cluster_cols = FALSE,
-                     fontsize = 2,
-                     annotation_row = as.data.frame(annfoo)
+                     fontsize = 2
                      )
 ```
 
@@ -345,6 +348,48 @@ p <- tibble(nonlocal_symbol = rownames(pm[indic_nonlocal, ])[ord_nonlocal], inde
   left_join(nonlocal_annot, by = c("nonlocal_symbol" = "symbol")) %>%
   ggplot() + geom_point(aes(y = pos, x = index, color = lod_diff > 1.5, nonlocal = nonlocal_symbol, lod_diff = lod_diff)) 
 
-ggplotly(p)
+plotly::ggplotly(p)
 ```
 
+```{r iheatmapr-{{hot_chr}}}
+ann3 <- annots_ord[[3]] %>%
+  ungroup() %>%
+  select(- symbol) %>%
+  as.matrix() %>%
+  (function(x){rownames(x) <- annots_ord[[3]]$symbol; return(x)})
+colnames(ann3) <- LETTERS[1:8]
+ann2 <- annots_ord[[2]] %>%
+  select(-symbol) %>%
+  as.matrix() %>%
+  (function(x){rownames(x) <- annots_ord[[2]]$symbol; return(x)})
+ann1 <- annots_ord[[1]] %>%
+  select(-symbol) %>%
+  as.matrix() %>%
+  (function(x){rownames(x) <- annots_ord[[1]]$symbol; return(x)})
+ann5 <- annots_ord[[5]] %>%
+  select(-symbol) %>%
+  as.matrix() %>%
+  (function(x){rownames(x) <- annots_ord[[5]]$symbol; return(x)})
+ann6 <- annots_ord[[6]] %>%
+  select(-symbol) %>%
+  as.matrix() %>%
+  (function(x){rownames(x) <- annots_ord[[6]]$symbol; return(x)})
+ann4 <- annots_ord[[4]] %>%
+  ungroup() %>%
+  select(-symbol) %>%
+  as.matrix() %>%
+  (function(x){rownames(x) <- annots_ord[[4]]$symbol; return(x)})
+mymat <- pm[ord, ord] %>% # order both cols and rows by 'ord'
+  apply(FUN = trunc2, MARGIN = 2, threshold = 5)
+iheatmapr::main_heatmap(mymat, show_colorbar = FALSE, layout = list(font = list(size = 2))) %>%
+  iheatmapr::add_col_labels() %>%
+  iheatmapr::add_row_labels() %>%
+  iheatmapr::add_col_annotation(ann5) %>%
+  iheatmapr::add_main_heatmap(ann3, name = "signal3", size = 0.2, show_colorbar = FALSE) %>%
+  iheatmapr::add_main_heatmap(ann2, name = "signal2", size = 0.5, show_colorbar = FALSE) %>%
+  iheatmapr::add_main_heatmap(ann1, name = "signal1", size = 0.5, show_colorbar = FALSE) %>%
+  iheatmapr::add_row_annotation(ann4) %>%
+  iheatmapr::add_row_annotation(ann5, side = "left") %>%
+  iheatmapr::add_row_annotation(ann6, side = "left")
+
+```

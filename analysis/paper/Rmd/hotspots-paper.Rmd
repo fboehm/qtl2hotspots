@@ -59,9 +59,6 @@ options(tibble.print_max = 50, tibble.print_min = 20)
 ```
 
 
-```{r load_heatmaply}
-library(heatmaply)
-```
 
 ```{r saveRDS}
 if (!file.exists(here("analysis", "data", "derived_data", "expr.rds"))){

@@ -9,7 +9,13 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+# Goals
+
 The goal here is to compare heatmaps that are produced by R functions. I'm particularly excited by interactive heatmaps, like those using D3 javascript.
+
+It's particularly important that I be able to easily annotate, with multiple objects, the rows (and/or columns).
+
+
 
 ```{r presetup}
 eval_code <- TRUE
@@ -21,15 +27,6 @@ knitr::opts_chunk$set(comment=NA, fig.width=6, fig.height=6, eval = eval_code)
 library(broman)
 library(here)
 ```
-
-
-```{r child="methods.Rmd", eval = TRUE}
-```
-
-
-
-
-
 
 
 
@@ -45,26 +42,6 @@ library(tidyverse)
 options(tibble.print_max = 50, tibble.print_min = 20)
 ```
 
-
-```{r load_heatmaply}
-library(heatmaply)
-```
-
-```{r saveRDS}
-if (!file.exists(here("analysis", "data", "derived_data", "expr.rds"))){
-  download.file("https://datadryad.org/bitstream/handle/10255/dryad.166774/Attie_DO378_eQTL_viewer_v1.Rdata?sequence=2",
-              destfile = here("analysis", "data", "raw_data", "Attie_DO378_eQTL_viewer_v1.Rdata")
-              )
-  load(here("analysis", "data", "raw_data", "Attie_DO378_eQTL_viewer_v1.Rdata"))
-  saveRDS(dataset.islet.rnaseq$lod.peaks, here("analysis", "data", "derived_data", "lod_peaks.rds"))
-  saveRDS(dataset.islet.rnaseq$annots, here("analysis", "data", "derived_data", "annots.rds"))
-  saveRDS(dataset.islet.rnaseq$expr, here("analysis", "data", "derived_data", "expr.rds"))
-  saveRDS(K, here("analysis", "data", "derived_data", "kinship.rds"))
-  saveRDS(map, here("analysis", "data", "derived_data", "map.rds"))
-  saveRDS(genoprobs, here("analysis", "data", "derived_data", "genoprobs.rds"))
-  saveRDS(dataset.islet.rnaseq$covar, here("analysis", "data", "derived_data", "covar.rds"))
-}
-```
 
 ```{r readRDS}
 lod_peaks <- readRDS(here("analysis", "data", "derived_data", "lod_peaks.rds"))
@@ -93,11 +70,63 @@ out <- pmap_dfc(inputs, .f = function(hot_chr, hot_mid, keller_mediator) knitr::
 
 
 
-`r if (eval_code) knitr::knit(text = out[[1]])`
+`r knitr::knit(text = out[[1]])`
 
 ### `iheatmapr` R package
 
 I installed the `iheatmapr` package from Github: `ropensci/iheatmapr`.
 
+```{r, eval = FALSE}
+devtools::install_github("ropensci/iheatmapr")
+```
+
+```{r iheatmapr-{{hot_chr}}}
+ann3 <- annots_ord[[3]] %>%
+  ungroup() %>%
+  select(- symbol) %>%
+  as.matrix() %>%
+  (function(x){rownames(x) <- annots_ord[[3]]$symbol; return(x)})
+colnames(ann3) <- LETTERS[1:8]
+ann2 <- annots_ord[[2]] %>%
+  select(-symbol) %>%
+  as.matrix() %>%
+  (function(x){rownames(x) <- annots_ord[[2]]$symbol; return(x)})
+ann1 <- annots_ord[[1]] %>%
+  select(-symbol) %>%
+  as.matrix() %>%
+  (function(x){rownames(x) <- annots_ord[[1]]$symbol; return(x)})
+ann5 <- annots_ord[[5]] %>%
+  select(-symbol) %>%
+  as.matrix() %>%
+  (function(x){rownames(x) <- annots_ord[[5]]$symbol; return(x)})
+ann6 <- annots_ord[[6]] %>%
+  select(-symbol) %>%
+  as.matrix() %>%
+  (function(x){rownames(x) <- annots_ord[[6]]$symbol; return(x)})
+ann4 <- annots_ord[[4]] %>%
+  ungroup() %>%
+  select(-symbol) %>%
+  as.matrix() %>%
+  (function(x){rownames(x) <- annots_ord[[4]]$symbol; return(x)})
+mymat <- pm[ord, ord] %>% # order both cols and rows by 'ord'
+  apply(FUN = trunc2, MARGIN = 2, threshold = 5)
+iheatmapr::main_heatmap(mymat, show_colorbar = FALSE, layout = list(font = list(size = 2))) %>%
+  iheatmapr::add_col_labels() %>%
+  iheatmapr::add_row_labels() %>%
+  iheatmapr::add_col_annotation(ann5) %>%
+  iheatmapr::add_main_heatmap(ann3, name = "signal3", size = 0.2, show_colorbar = FALSE) %>%
+  iheatmapr::add_main_heatmap(ann2, name = "signal2", size = 0.5, show_colorbar = FALSE) %>%
+  iheatmapr::add_main_heatmap(ann1, name = "signal1", size = 0.5, show_colorbar = FALSE) %>%
+  iheatmapr::add_row_annotation(ann4) %>%
+  iheatmapr::add_row_annotation(ann5, side = "left") %>%
+  iheatmapr::add_row_annotation(ann6, side = "left")
+
+```
+
+By using distinct `name` values in the calls to `main_heatmap`, I can get the two heatmaps together and with different color schemes.
 
 
+
+```{r sess_info}
+devtools::session_info()
+```
