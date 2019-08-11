@@ -8,6 +8,11 @@ link-citations: true
 output: 
   bookdown::html_document2: 
     code_folding: hide
+    self_contained: no
+    keep_md: true
+  bookdown::pdf_document2:
+    fig_caption: true
+    keep_tex: true
 ---
 
 ```{r child = "abstract.Rmd", eval = TRUE}
@@ -54,9 +59,6 @@ options(tibble.print_max = 50, tibble.print_min = 20)
 ```
 
 
-```{r load_heatmaply}
-library(heatmaply)
-```
 
 ```{r saveRDS}
 if (!file.exists(here("analysis", "data", "derived_data", "expr.rds"))){
@@ -74,18 +76,16 @@ if (!file.exists(here("analysis", "data", "derived_data", "expr.rds"))){
 }
 ```
 
-
 ```{r readRDS}
 lod_peaks <- readRDS(here("analysis", "data", "derived_data", "lod_peaks.rds"))
 annots <- readRDS(here("analysis", "data", "derived_data", "annots.rds"))
 expr <- readRDS(here("analysis", "data", "derived_data", "expr.rds"))
 probs <- readRDS(here("analysis", "data", "derived_data", "genoprobs.rds"))
+K <- readRDS(here("analysis", "data", "derived_data", "kinship.rds"))
+covar <- readRDS(here("analysis", "data", "derived_data", "covar.rds"))
+map <- readRDS(here("analysis", "data", "derived_data", "map.rds"))
 ```
 
-
-```{r, load_purrr}
-library(purrr)
-```
 
 ```{r setup_continued}
 hot_chr <- c(2, 5, 7, 11, 13)
@@ -107,6 +107,11 @@ out <- pmap_dfc(inputs, .f = function(hot_chr, hot_mid, keller_mediator) knitr::
 
 
 
+
+
+
+
+
 ```{r read_results, child = "results.Rmd", eval = TRUE}
 ```
 
@@ -116,7 +121,7 @@ out <- pmap_dfc(inputs, .f = function(hot_chr, hot_mid, keller_mediator) knitr::
 ```{r read_discussion, child = "discussion.Rmd", eval = TRUE}
 ```
 
-
+  
 
 
 
