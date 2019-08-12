@@ -20,5 +20,4 @@ Suggests:
     plotly,
     iheatmapr,
     pheatmap
-
 RoxygenNote: 6.1.1
