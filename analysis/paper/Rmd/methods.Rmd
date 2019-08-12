@@ -14,7 +14,8 @@ expression traits.
 They identified five expression trait hotspots in their
 study of pancreatic islet gene expression in 378 Diversity Outbred mice. 
 
-In analyzing the data from @keller2018genetic, we first established criteria for identifying local and nonlocal transcripts at each of the five hotspots. We focused on those local 
+In analyzing the data from @keller2018genetic, we first established criteria for identifying local and 
+nonlocal transcripts at each of the five hotspots. We focused on those local 
 traits that strongly associated with QTL within the hotspot. We set the univariate LOD threshold for 
 local traits at 15. We limited consideration to those local traits for which the middle of the gene lay 
 within the hotspot interval. 

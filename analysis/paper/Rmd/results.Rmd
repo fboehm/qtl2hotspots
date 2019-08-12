@@ -1,6 +1,7 @@
 # Results
 
-We studied five expression trait hotspots in pancreatic islets from 378 Diversity Outbred mice [@keller2018genetic]. Scatter plots of 
+We studied five expression trait hotspots in pancreatic islets from 378 Diversity Outbred mice 
+[@keller2018genetic]. Scatter plots of 
 pleiotropy test statistic against mediation LOD difference for local - nonlocal trait pairs reveal 
 some similarities for the five hotspots. All five scatter plots have few, if any, points in the upper 
 right quadrant. This tells us that local-nonlocal trait pairs may have either high pleiotropy test 

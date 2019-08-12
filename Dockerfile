@@ -36,11 +36,12 @@ RUN ldconfig
 RUN install2.r --error \
     broman \
     here \
-    heatmaply \
     dendextend \
     plotly \
     git2r \
-    bookdown
+    bookdown \
+    iheatmapr \
+    pheatmap
 
 
 # build this compendium package

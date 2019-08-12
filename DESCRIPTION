@@ -11,12 +11,13 @@ LazyData: true
 Imports: 
     broman,
     here,
-    heatmaply,
     purrr,
     dplyr,
     dendextend,
     plotly,
-    svglite
+    iheatmapr,
+    pheatmap
+    
 Suggests: 
     testthat (>= 2.1.0)
 RoxygenNote: 6.1.1
