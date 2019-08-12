@@ -21,9 +21,9 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update -qq && \
     python-setuptools \
     wget
 
-RUN wget https://github.com/libgit2/libgit2/archive/v0.25.0.tar.gz && \
-tar xzf v0.25.0.tar.gz && \
-cd libgit2-0.25.0/ && \
+RUN wget https://github.com/libgit2/libgit2/archive/v0.28.0.tar.gz && \
+tar xzf v0.28.0.tar.gz && \
+cd libgit2-0.28.0/ && \
 cmake . && \
 make && \
 make install
