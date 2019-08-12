@@ -9,6 +9,9 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Imports: 
+    tidyverse
+Suggests: 
+    testthat (>= 2.1.0),
     broman,
     here,
     purrr,
@@ -17,7 +20,5 @@ Imports:
     plotly,
     iheatmapr,
     pheatmap
-    
-Suggests: 
-    testthat (>= 2.1.0)
+
 RoxygenNote: 6.1.1
