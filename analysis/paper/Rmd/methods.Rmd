@@ -12,7 +12,7 @@ genome, covariates, and leave-one-chromosome-out estimated kinship matrices [@br
 defined an expression trait hotspot to be a 4-Mb region that affects at least 100 nonlocal 
 expression traits.
 They identified five expression trait hotspots in their
-study of pancreatic islet gene expression in 378 Diversity Outbred mice . 
+study of pancreatic islet gene expression in 378 Diversity Outbred mice. 
 
 In analyzing the data from @keller2018genetic, we first established criteria for identifying local and nonlocal transcripts at each of the five hotspots. We focused on those local 
 traits that strongly associated with QTL within the hotspot. We set the univariate LOD threshold for 
@@ -138,8 +138,10 @@ We included four covariates in our models: three wave indicators and sex. The wa
 ## Visualizations
 
 We created scatter plots with the `ggplot2` package [@ggplot2] for the R
-statistical computing environment [@r]. We plotted all local-nonlocal pairs for each hotspot. We highlighted in blue those points that correspond to pairs involving the putative mediator that @keller2018genetic identified.
-
+statistical computing environment [@r]. We plotted pleiotropy test statistics against 
+mediation LOD differences for all local-nonlocal pairs at each hotspot. We highlighted in blue 
+those points that correspond to pairs involving the putative mediator that @keller2018genetic 
+identified. We used the same results in plots of pleiotropy test statistics against mediation LOD difference for analyses involving a single local trait. 
 
 
 We created heatmaps to examine patterns among pleiotropy test results in each hotspot. Our analysis used both 
@@ -149,27 +151,25 @@ trait and each column was an expression trait.
 Excepting the cells on the diagonal, each cell, then, contained the pleiotropy test statistic
 from the analysis involving the row's expression trait and the column's expression trait.
 To create a heatmap, we first performed two hierarchical clusterings of rows. 
-One hierarchical clustering involved only the rows and columns containing local traits, while the other contained only 
-rows and columns containing nonlocal traits.
+One hierarchical clustering involved only the rows containing local traits, while the other contained only 
+rows corresponding to nonlocal traits.
 We calculated the Euclidean distances between all row pairs (in the respective 
-submatrices) before clustering. Hierarchical clustering was performed using the complete 
-linkage method. Initially, each row is assigned to its own cluster. An iterative 
+submatrices) before clustering. Hierarchical clustering was performed using the iterative complete 
+linkage method. Initially, each row is assigned to its own cluster. The iterative 
 algorithm then combines the two most similar clusters at each step. Distances between 
 clusters were computed with the Lance-Williams dissimilarity update formula for complete 
 linkage [@lance1967general]. Lastly, we arranged the rows according to optimal leaf ordering [@hahsler2008getting;@dendextend]. 
 We then combined the
 local and nonlocal traits into a single heatmap for each hotspot. 
 To achieve coloring contrasts in the heatmaps, we
-set the color spectrum limits at 0 (dark blue) and 5 (yellow). Pleiotropy test statistics above 5, too, are 
-represented by
-yellow. We annotated rows by a collection of columns on the right-hand side of the heatmap. This binary matrix 
-consists of columns that summarize mediation results. Each column represents a local trait. If a row 
-corresponds to a nonlocal trait that is mediated by the local trait (*i.e.*, with mediation LOD 
-difference greater than 1.5), then the cell is colored dark green; 
-otherwise, the cell is light green. We didn't examine the possibility that a local trait might 
-mediate the relationship between a QTL and another local trait; thus, all local trait rows are 
-colored light green. The last annotation column and the annotation row above the heatmap both 
-designate local traits with dark blue and nonlocal traits with light blue.
+set the color spectrum limits at 0 and 5. 
+We annotated rows with six pieces of information: 1. mediation LOD differences, 2. mediation 
+LOD difference proportions, 3. univariate QTL peak positions, 4. estimated allele effects 
+vector at the univariate peak position, 5. univariate LOD score, and 6. whether the row 
+corresponds to a local trait. For clarity of presentation, we also indicated those columns that  
+correspond to a local traits. We didn't examine the possibility that a local trait might 
+mediate the relationship between a QTL and another local trait.
+
 
 
 
