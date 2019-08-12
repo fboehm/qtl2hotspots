@@ -61,7 +61,7 @@ options(tibble.print_max = 50, tibble.print_min = 20)
 
 
 ```{r saveRDS}
-if (!file.exists(here("analysis", "data", "derived_data", "expr.rds"))){
+if (!file.exists(here("analysis", "data", "derived_data", "genoprobs.rds"))){
   download.file("https://datadryad.org/bitstream/handle/10255/dryad.166774/Attie_DO378_eQTL_viewer_v1.Rdata?sequence=2",
               destfile = here("analysis", "data", "raw_data", "Attie_DO378_eQTL_viewer_v1.Rdata")
               )

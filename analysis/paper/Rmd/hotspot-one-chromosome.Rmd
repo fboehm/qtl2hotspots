@@ -351,7 +351,7 @@ p <- tibble(nonlocal_symbol = rownames(pm[indic_nonlocal, ])[ord_nonlocal], inde
 plotly::ggplotly(p)
 ```
 
-```{r iheatmapr-{{hot_chr}}, out.width="20in"}
+```{r iheatmapr-{{hot_chr}}, out.width="25in", out.height = "10in"}
 ann3 <- annots_ord[[3]] %>%
   ungroup() %>%
   select(- symbol) %>%
