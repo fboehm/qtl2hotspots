@@ -39,7 +39,6 @@ RUN install2.r --error \
     dendextend \
     plotly \
     git2r \
-    bookdown \
     iheatmapr \
     pheatmap
 
