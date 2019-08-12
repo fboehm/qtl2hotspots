@@ -6,34 +6,6 @@ MAINTAINER Frederick J. Boehm <frederick.boehm@gmail.com>
 
 COPY . /home/rstudio/qtl2hotspots
 
-# Install packages
-RUN DEBIAN_FRONTEND=noninteractive apt-get update -qq && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -yqq \
-    libssl-dev \
-    libssh2-1-dev \
-    libffi-dev \
-    zlib1g-dev \
-    python-cffi \
-    python-dev \
-    python-pip \
-    build-essential \
-    cmake \
-    gcc \
-    pkg-config \
-    git \
-    libhttp-parser-dev \
-    python-setuptools \
-    wget
-
-RUN wget https://github.com/libgit2/libgit2/archive/v0.28.0.tar.gz && \
-tar xzf v0.28.0.tar.gz && \
-cd libgit2-0.28.0/ && \
-cmake . && \
-make && \
-make install
-
-RUN ldconfig
-
 
 
 # Install R packages

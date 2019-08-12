@@ -1,0 +1,5 @@
+# ignore the big files
+
+analysis/data/raw_data/*
+analysis/data/derived_data/genoprobs.rds
+
