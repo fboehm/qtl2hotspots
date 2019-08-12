@@ -6,12 +6,16 @@ MAINTAINER Frederick J. Boehm <frederick.boehm@gmail.com>
 
 COPY . /home/rstudio/qtl2hotspots
 
+# Install packages
 RUN DEBIAN_FRONTEND=noninteractive apt-get update -qq && \
     DEBIAN_FRONTEND=noninteractive apt-get install -yqq \
     libssl-dev \
     libssh2-1-dev \
     libffi-dev \
     zlib1g-dev \
+    python-cffi \
+    python-dev \
+    python-pip \
     build-essential \
     cmake \
     gcc \
