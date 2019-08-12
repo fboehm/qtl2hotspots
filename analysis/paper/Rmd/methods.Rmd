@@ -1,16 +1,20 @@
 # Methods
 
-We used the publicly available data from @keller2018genetic to demonstrate our strategy. @keller2018genetic
-measured genome-wide gene expression levels with RNA sequencing of pancreatic islets in 378 Diversity Outbred mice. From the RNA sequencing counts, they obtained normalized gene expression levels for 21,771 transcripts, which they shared publicly via DataDryad [@dryad]. @keller2018genetic also included founder allele probabilities at 69,005 markers across the genome, covariates, and leave-one-chromosome-out estimated kinship matrices. @keller2018genetic calculated leave-one-chromosome-out kinship matrices for every chromosome [@broman2019rqtl2; @yang2014advantages].
+We used the publicly available data from @keller2018genetic to demonstrate our approach for 
+expression trait hotspot dissection. @keller2018genetic measured genome-wide gene expression 
+levels with RNA sequencing of pancreatic islets in 378 
+Diversity Outbred mice. From the RNA sequencing counts, they obtained normalized gene 
+expression levels for 21,771 transcripts, which they shared publicly via DataDryad [@dryad]. 
+@keller2018genetic also included founder allele probabilities at 69,005 markers across the 
+genome, covariates, and leave-one-chromosome-out estimated kinship matrices [@broman2019rqtl2; @yang2014advantages].
 
-@keller2018genetic performed univariate QTL mapping for all expression traits. 
+@keller2018genetic performed univariate QTL mapping for all expression traits. They
+defined an expression trait hotspot to be a 4-Mb region that affects at least 100 nonlocal 
+expression traits.
 They identified five expression trait hotspots in their
-study of pancreatic islet gene expression in 378 Diversity Outbred mice. They
-defined a hotspot to be a 4-Mb region that affects at least 100 nonlocal expression
-traits.
+study of pancreatic islet gene expression in 378 Diversity Outbred mice . 
 
-For each hotspot, we identified a set of local expression traits and a
-set of nonlocal expression traits. We focused on those local 
+In analyzing the data from @keller2018genetic, we first established criteria for identifying local and nonlocal transcripts at each of the five hotspots. We focused on those local 
 traits that strongly associated with QTL within the hotspot. We set the univariate LOD threshold for 
 local traits at 15. We limited consideration to those local traits for which the middle of the gene lay 
 within the hotspot interval. 
@@ -18,10 +22,14 @@ All nonlocal traits demonstrated univariate LOD peaks that met
 the genome-wide significance threshold, 7.18 [@keller2018genetic]. The nonlocal expression traits arose 
 from genes
 on other chromosomes, while the local traits reflected expression levels for
-genes on the same chromosome as the hotspot . We ignored transcripts for genes on the hotspot chromosome 
+genes on the same chromosome as the hotspot. We ignored transcripts for genes on the hotspot chromosome 
 but outside the hotspot interval. 
 
-
+For each hotspot, we performed both pairwise pleiotropy tests and linear regression-based 
+mediation analyses. For every pair of traits at a hotspot, we calculated a pleiotropy test 
+statistic[@boehm2019testing]. Due to the computational burden, we didn't determine bootstrap p-values for these 
+tests. For every local trait - nonlocal trait pair, we also performed a linear 
+regression-based mediation analysis [@chick2016defining,@keller2018genetic]. We describe in detail both procedures below.
 
 ## Pleiotropy testing
 
