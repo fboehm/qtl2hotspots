@@ -38,6 +38,11 @@ RUN ldconfig
 
 # Install R packages
 RUN install2.r --error \
+    BiocManager
+
+RUN Rscript -e 'BiocManager::install("S4Vectors")'
+
+RUN install2.r --error \
     broman \
     here \
     dendextend \
