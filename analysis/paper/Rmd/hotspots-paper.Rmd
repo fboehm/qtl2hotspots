@@ -137,7 +137,7 @@ out <- pmap_dfc(inputs, .f = function(hot_chr, hot_mid, keller_mediator) knitr::
 
 # Colophon
 
-This report was generated on ` r Sys.time()` using the following computational environment and dependencies:
+This report was generated on `r Sys.time()` using the following computational environment and dependencies:
 
 ```{r colophon, cache = FALSE, echo = TRUE, tidy.opts=list(width.cutoff=50), size = "tiny", results = "markup"}
 # which R packages and versions?
