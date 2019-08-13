@@ -8,10 +8,10 @@ right quadrant. This tells us that local-nonlocal trait pairs may have either hi
 statistics or high mediation LOD differences, but not both.
 
 
-Complex hotspots: Chr 5; Simple hotspots: Chr 2 (Hnf4a), Chr 13 (), Chr 7
+Complex hotspots: Chr 5; Simple hotspots: Chr 2 (Hnf4a), Chr 13 (), Chr 7, Chr 11
 
 
-Undetermined (right now): Chr 11
+
 
 
 
@@ -65,7 +65,10 @@ set of nonlocal traits clustered into two blocks. Within each block, any two tra
 QTL, ie, are pleiotropic. Yet, the off-diagonal cells, ie, those nonlocal trait pairs that 
 include one trait from each of the two blocks, tend to have greater pleiotropy test 
 statistics. Still, not all off-diagonal blocks have large pleiotropy test statistics. The 
-mostly dark blue matrix on the diagonal (from column 22 to 99) features no cells with pleiotropy test statistics above 3.2. While we didn't determine p-values for these analyses, prior analyses suggest that pleiotropy test statistics below 3.2 are consistent with p-values above 0.05, and, thus, are consistent with a single pleiotropic QTL.
+mostly dark blue matrix on the diagonal (from column 22 to 99) features no cells with pleiotropy test statistics 
+above 3.2. While we didn't determine p-values for these analyses, prior analyses suggest that pleiotropy test 
+statistics below 3.2 are consistent with p-values above 0.05, and, thus, are consistent with a single pleiotropic 
+QTL.
 
 Columns 100 to 119 (and rows 100 to 119) are a second (symmetric) block with only small 
 pleiotropy test statistics. Columns 120 to 202 contains cells for the third (symmetric) block. Column 203, the last column, contains a trait *Gm* that, based on pleiotropy test statistics, doesn't cluster near other traits.
