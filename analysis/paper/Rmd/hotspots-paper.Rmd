@@ -147,7 +147,7 @@ devtools::session_info()
 
 The current Git commit details are:
 
-```{r git2r, cache = FALSE, echo = TRUE, eval = FALSE}
+```{r git2r, cache = FALSE, echo = TRUE, eval = TRUE}
 # what commit is this file at?
 git2r::repository(here::here())
 ```

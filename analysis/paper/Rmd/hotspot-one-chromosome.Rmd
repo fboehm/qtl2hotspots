@@ -393,7 +393,6 @@ iheatmapr::main_heatmap(mymat, show_colorbar = FALSE, layout = list(font = list(
   iheatmapr::add_row_annotation(ann5, side = "left") %>%
     iheatmapr::add_col_labels() %>%
   iheatmapr::add_row_annotation(ann4, side = "left") %>%
-  iheatmapr::add_col_labels() %>%
   iheatmapr::add_row_annotation(ann6, side = "left") %>%
     iheatmapr::add_row_labels()
 
