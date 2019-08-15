@@ -1,4 +1,4 @@
-library(hotspots)
+library(qtl2hotspots)
 library(testthat)
 
 foo <- tibble::tibble(v1 = letters[c(1, 1, 2, 2)], v2 = letters[c(3, 4, 3, 4)], lrt = runif(4))

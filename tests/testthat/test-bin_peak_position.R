@@ -1,4 +1,4 @@
-library(hotspots)
+library(qtl2hotspots)
 library(testthat)
 
 
