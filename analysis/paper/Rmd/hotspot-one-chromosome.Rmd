@@ -222,53 +222,6 @@ local_nonlocal_annot <- dplyr::bind_rows(local_annot2, nonlocal_annot) %>%
          )
 ```
 
-```{r, define-contrasts-{{hot_chr}}}
-contrasts_BC_FG <- local_nonlocal_annot %>%
-  ungroup() %>%
-  select(symbol, cA:cH, local_tx, lod) %>%
-  (function(x) x[ord2, ]) %>%
-  mutate(row_num = 1:nrow(local_nonlocal_annot), 
-         AB = abs(cA - cB),
-         AC = abs(cA - cC),
-         AD = abs(cA - cD),
-         AE = abs(cA - cE),
-         AF = abs(cA - cF),
-         AG = abs(cA - cG),
-         AH = abs(cA - cH),
-         BC = abs(cB - cC),
-         BD = abs(cB - cD),
-         BE = abs(cB - cE),
-         BF = abs(cB - cF),
-         BG = abs(cB - cG),
-         BH = abs(cB - cH),
-         CD = abs(cC - cD),
-         CE = abs(cC - cE),
-         CF = abs(cC - cF),
-         CG = abs(cC - cG),
-         CH = abs(cC - cH),
-         DE = abs(cD - cE),
-         DF = abs(cD - cF),
-         DG = abs(cD - cG),
-         DH = abs(cD - cH),
-         EF = abs(cE - cF),
-         EG = abs(cE - cG),
-         EH = abs(cE - cH),
-         FG = abs(cF - cG),
-         FH = abs(cF - cH),
-         GH = abs(cG - cH)
-  ) %>%
-  mutate(BC_A = abs((cB + cC) / 2 - cA),
-         BC_D = abs((cB + cC) / 2 - cD),
-         BC_E = abs((cB + cC) / 2 - cE),
-         BC_F = abs((cB + cC) / 2 - cF),
-         BC_G = abs((cB + cC) / 2 - cG),
-         BC_H = abs((cB + cC) / 2 - cH),
-         BC_FG = abs((cB + cC) - (cF + cG))
-         ) %>%
-  select(symbol, BC_FG)
-
-
-```
 
 
 
@@ -359,6 +312,53 @@ lod_tibble <- local_nonlocal_annot %>%
   ungroup()
 ```
 
+```{r, define-contrasts-{{hot_chr}}}
+contrasts_BC_FG <- local_nonlocal_annot %>%
+  ungroup() %>%
+  select(symbol, cA:cH, local_tx, lod) %>%
+  mutate(row_num = 1:nrow(local_nonlocal_annot), 
+         AB = abs(cA - cB),
+         AC = abs(cA - cC),
+         AD = abs(cA - cD),
+         AE = abs(cA - cE),
+         AF = abs(cA - cF),
+         AG = abs(cA - cG),
+         AH = abs(cA - cH),
+         BC = abs(cB - cC),
+         BD = abs(cB - cD),
+         BE = abs(cB - cE),
+         BF = abs(cB - cF),
+         BG = abs(cB - cG),
+         BH = abs(cB - cH),
+         CD = abs(cC - cD),
+         CE = abs(cC - cE),
+         CF = abs(cC - cF),
+         CG = abs(cC - cG),
+         CH = abs(cC - cH),
+         DE = abs(cD - cE),
+         DF = abs(cD - cF),
+         DG = abs(cD - cG),
+         DH = abs(cD - cH),
+         EF = abs(cE - cF),
+         EG = abs(cE - cG),
+         EH = abs(cE - cH),
+         FG = abs(cF - cG),
+         FH = abs(cF - cH),
+         GH = abs(cG - cH)
+  ) %>%
+  mutate(BC_A = abs((cB + cC) / 2 - cA),
+         BC_D = abs((cB + cC) / 2 - cD),
+         BC_E = abs((cB + cC) / 2 - cE),
+         BC_F = abs((cB + cC) / 2 - cF),
+         BC_G = abs((cB + cC) / 2 - cG),
+         BC_H = abs((cB + cC) / 2 - cH),
+         BC_FG = abs((cB + cC) - (cF + cG))
+         ) %>%
+  select(symbol, BC_FG)
+```
+
+
+
 ```{r, order-annotations-{{hot_chr}}}
 # all annots 
 annots_ord <- list(lod_diffs_tibble, 
@@ -387,6 +387,7 @@ pm[ord, ord] %>% # order both cols and rows by 'ord'
                      fontsize = 2
                      )
 ```
+
 
 
 
