@@ -9,8 +9,11 @@
 #' listcol_to_cols(list_column = dplyr::quo(b), another_column = dplyr::quo(a))
 #' @export
 listcol_to_cols <- function(tibble, list_column, another_column){
+  if (!rlang::is_quosure(list_column) | !rlang::is_quosure(another_column)){
+    stop("Both `list_column` and `another_column` arguments must be quosures")
+    }
   tibble %>%
-    tidyr::unnest() %>%
+    tidyr::unnest(!! list_column, .drop = FALSE) %>%
     dplyr::group_by(!! another_column) %>%
     dplyr::mutate(col=seq_along(!! another_column)) %>%
     tidyr::spread(key = col, value = !! list_column)
