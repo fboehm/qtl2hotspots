@@ -219,7 +219,7 @@ local_nonlocal_annot <- dplyr::bind_rows(local_annot2, nonlocal_annot) %>%
   mutate(peak_effects = purrr::map2(.f = qtl2pleio::get_effects, .x = peak_index, .y = s1coef_out, map = map[["{{hot_chr}}"]])) %>%
   qtl2hotspots::listcol_to_cols(list_column = quo(peak_effects), another_column = quo(symbol)) %>%
   rename(cA = `1`, cB = `2`, cC = `3`, cD = `4`, cE = `5`, cF = `6`, cG = `7`, cH = `8`
-         ) %>%
+         )
 ```
 
 ```{r, define-contrasts-{{hot_chr}}}
