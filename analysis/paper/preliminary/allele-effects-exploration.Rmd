@@ -1,0 +1,411 @@
+---
+title: "Founder allele effects for hotspot traits"
+author: "Frederick Boehm"
+date: "8/14/2019"
+output: html_document
+---
+
+
+
+
+## Goal 
+
+The goals here are to follow up on Karl's suggestion to examine contrasts among allele effects. Specifically, can we see patterns of founder alleles near each trait's univariate peak. 
+
+The heatmap of allele effects itself doesn't really reveal patterns that are easily interpreted. Hence, the suggestion to examine contrasts. Specifically, for each diagonal block of traits, is there a single, informative contrast? (or, perhaps a set of contrasts for each diagonal block.)
+
+
+## Load the needed objects
+
+Here, we reuse code from ../Rmd/hotspots-paper.Rmd.
+
+```{r presetup}
+eval_code <- TRUE
+knitr::opts_chunk$set(comment=NA, fig.width=6, fig.height=6, eval = eval_code, echo = TRUE)
+```
+
+
+
+
+
+
+
+
+
+```{r define}
+library(qtl2hotspots)
+
+ult <- 15 
+# univariate lod threshold
+```
+
+```{r load_tidyverse}
+library(tidyverse)
+options(tibble.print_max = 50, tibble.print_min = 20)
+```
+
+
+
+```{r readRDS}
+lod_peaks <- readRDS(here::here("analysis", "data", "derived_data", "lod_peaks.rds"))
+annots <- readRDS(here::here("analysis", "data", "derived_data", "annots.rds"))
+expr <- readRDS(here::here("analysis", "data", "derived_data", "expr.rds"))
+probs <- readRDS(here::here("analysis", "data", "derived_data", "genoprobs.rds"))
+K <- readRDS(here::here("analysis", "data", "derived_data", "kinship.rds"))
+covar <- readRDS(here::here("analysis", "data", "derived_data", "covar.rds"))
+map <- readRDS(here::here("analysis", "data", "derived_data", "map.rds"))
+```
+
+
+```{r setup_continued}
+hot_chr <- c(2, 5, 7, 11, 13)
+hot_mid <- c(165.5, 146, 46, 71, 112.5)
+keller_mediator <- c("Hnf4a", "Pdx1", "Fam83e", "Sat2", "Il6st")
+inputs <- tibble(hot_chr, hot_mid, keller_mediator)
+out <- pmap_dfc(inputs, .f = function(hot_chr, hot_mid, keller_mediator) knitr::knit_expand(text = readLines(here::here("analysis", "paper", "Rmd", "hotspot-one-chromosome.Rmd"))))
+# note that ... argument must be a list, ie, it must be a single argument, not multiple args
+```
+
+
+`r if (eval_code) knitr::knit(text = out[[2]])`
+
+
+
+```{r, define-submap}
+figdir <- here::here("analysis", "figures", "Chr5-allele-effects-plots")
+names(s1coef_out) -> ids
+# find indices on Chr5 for boundaries of hotspot
+which(map$`5` > hot_lower)[1] -> start_index
+which(map$`5` > hot_upper)[1] -> stop_index
+submap <- list()
+submap$`5` <- map$`5`[start_index:stop_index]
+mylist <- list()
+for (i in 1:203){
+  mylist[[i]] <- s1out[ , i, drop = FALSE]
+}
+```
+
+
+
+```{r effects-plots}
+purrr::pmap(.l = list(s1coef_out, as.list(ids), mylist), 
+           .f = function(x, y, z){
+             main <- local_nonlocal_annot %>%
+               ungroup() %>%
+               filter(annot.id == y) %>%
+               select(annot.id, symbol) %>%
+               paste0()
+             qtl2::plot_coefCC(x, map = submap, main = main, scan1_output = z)
+           }
+)
+```
+
+
+```{r blup-plots}
+purrr::pmap(.l = list(s1coef_blup, as.list(ids), mylist), 
+           .f = function(x, y, z){
+             main <- local_nonlocal_annot %>%
+               ungroup() %>%
+               filter(annot.id == y) %>%
+               select(annot.id, symbol) %>%
+               paste0()
+             qtl2::plot_coefCC(x, map = submap, main = main, scan1_output = z)
+           }
+)
+```
+
+
+
+
+## Barplots for effects at peak positions
+
+Now, let's focus only on the 8 values at the LOD peak for each trait.
+
+```{r, barplots-scan1coef-effects, fig.height = 20, fig.width = 8}
+ord2 <- match(table = local_nonlocal_annot$symbol, x = rn)
+foobar <- local_nonlocal_annot %>%
+  select(symbol, cA:cH) %>%
+  (function(x) x[ord2, ]) %>%
+  tidyr::gather(key = "founder_allele", value = "effect", cA: cH)
+foobar2 <- arrange(transform(foobar,
+             symbol=factor(symbol,levels=rn)),symbol)
+foobar2 %>% 
+  ggplot() + geom_col(aes(y = effect, x = founder_allele, fill = founder_allele)) +
+  ylim(c(-1.5, 1.5)) + 
+  facet_wrap(symbol ~ ., ncol = 4) #+ theme(strip.text.x = element_blank())
+ggsave(here::here("analysis", "figures", "allele_blupss_at_peaks.png"), limitsize = FALSE)
+```
+
+## Bar plots for blup effects
+
+```{r, barplots-blup, fig.height = 20, fig.width = 8}
+foobar <- local_nonlocal_annot %>%
+  ungroup() %>%
+  (function(x) x[ord2, ]) %>%
+  select(symbol, 26:33) %>%
+  tidyr::gather(paste0("b", LETTERS[1:8]), key = "founder_allele", value = "blup_effect")
+foobar2 <- arrange(transform(foobar,
+             symbol=factor(symbol,levels=rn)),symbol)
+foobar2 %>% 
+  ggplot() + geom_col(aes(y = effect, x = founder_allele, fill = founder_allele)) +
+  ylim(c(-1.5, 1.5)) + 
+  facet_wrap(symbol ~ ., ncol = 4) #+ theme(strip.text.x = element_blank())
+ggsave(here::here("analysis", "figures", "allele_effects_at_peaks.png"), limitsize = FALSE)
+```
+
+
+
+
+
+
+
+
+
+```{r correlations}
+local_nonlocal_annot %>%
+  ungroup() %>%
+# 
+  select(18:25) %>% 
+  as.matrix() %>%
+  apply(FUN = as.numeric, MARGIN = 2) %>%
+  (function(x){rownames(x) <- local_nonlocal_annot$symbol; return(x)}) %>%
+  (function(x) x[ord2, ]) %>%
+  t() %>%
+  cor()
+which(rn == "Igfbp3")
+```
+
+```{r BC-v-FG}
+local_nonlocal_annot %>%
+  ungroup() %>%
+  (function(x) x[ord2, ]) %>%
+  select(symbol, 18:25) %>%
+    rename("A" = `1`, "B" = `2`, "C" = `3`, "D" = `4`, "E" = `5`, "F" = `6`, G = `7`, H = `8`
+         ) %>%
+  mutate(contrast_BC_FG = abs((B + C) - (F + G)), row_num = 1:203) %>%
+  ggplot() + geom_point(aes(y = contrast_BC_FG, x = row_num))
+```
+
+```{r BC-v-G}
+p <- local_nonlocal_annot %>%
+  ungroup() %>%
+  (function(x) x[ord2, ]) %>%
+  select(symbol, 18:25) %>%
+    rename("A" = `1`, "B" = `2`, "C" = `3`, "D" = `4`, "E" = `5`, "F" = `6`, G = `7`, H = `8`
+         ) %>%
+  mutate(contrast = abs((B + C) / 2 - G), row_num = 1:203) %>%
+  ggplot() + geom_point(aes(y = contrast, x = row_num)) + geom_smooth(aes(y = contrast, x = row_num))
+plotly::ggplotly(p)
+```
+
+```{r BCGH:ADEF}
+p <- local_nonlocal_annot %>%
+  ungroup() %>%
+  select(symbol, cA:cH) %>%
+  (function(x) x[ord2, ]) %>%
+  mutate(contrast = abs((cB + cC + cG + cH) - (cA + cD + cE + cF)), row_num = 1:203) %>%
+  ggplot() + geom_point(aes(y = contrast, x = row_num)) + geom_smooth(aes(y = contrast, x = row_num))
+plotly::ggplotly(p)
+
+  
+```
+
+```{r BCD:F}
+p <- local_nonlocal_annot %>%
+  ungroup() %>%
+  select(symbol, cA:cH, local_tx) %>%
+  (function(x) x[ord2, ]) %>%
+  mutate(contrast = abs((cB + cC + cD) / 3 - cF), row_num = 1:203) %>%
+  ggplot() + geom_point(aes(y = contrast, x = row_num, colour = local_tx, symbol = symbol)) + geom_smooth(aes(y = contrast, x = row_num))
+plotly::ggplotly(p)
+```
+
+```{r BCGH:ADEF}
+med_small <- med_tib %>% 
+  filter(local_symbol == "Rpl21")
+p <- local_nonlocal_annot %>%
+  ungroup() %>%
+  select(symbol, cA:cH, local_tx) %>%
+  (function(x) x[ord2, ]) %>%
+  inner_join(med_small, by = c("symbol" = "nonlocal_symbol")) %>%
+  mutate(contrast = abs((cB + cC + cG + cH) - (cA + cD + cE + cF))) %>%
+  ggplot() + geom_point(aes(y = contrast, x = lod_diff_proportion)) + geom_smooth(aes(y = contrast, x = lod_diff_proportion))
+plotly::ggplotly(p)
+
+  
+```
+Cxcl12 shows a strong contrast between B & G. 
+
+```{r B:G}
+med_small <- med_tib %>% 
+  filter(local_symbol == "Rpl21")
+p <- local_nonlocal_annot %>%
+  ungroup() %>%
+  select(symbol, cA:cH, local_tx) %>%
+  (function(x) x[ord2, ]) %>%
+  inner_join(med_small, by = c("symbol" = "nonlocal_symbol")) %>%
+  mutate(contrast = abs(cB - cG)) %>%
+  ggplot() + geom_point(aes(y = contrast, x = lod_diff_proportion)) + geom_smooth(aes(y = contrast, x = lod_diff_proportion))
+plotly::ggplotly(p)
+
+  
+```
+
+```{r B:G}
+p <- local_nonlocal_annot %>%
+  ungroup() %>%
+  select(symbol, cA:cH, local_tx) %>%
+  (function(x) x[ord2, ]) %>%
+  mutate(contrast = abs(cB - cG), row_num = 1:203) %>%
+  ggplot() + geom_point(aes(y = contrast, x = row_num, colour = local_tx, symbol = symbol)) + geom_smooth(aes(y = contrast, x = row_num))
+plotly::ggplotly(p)
+```
+
+## Calculate all pairwise contrasts for main effects
+
+```{r}
+contrasts <- local_nonlocal_annot %>%
+  ungroup() %>%
+  select(symbol, cA:cH, local_tx, lod) %>%
+  (function(x) x[ord2, ]) %>%
+  mutate(row_num = 1:203, 
+         AB = abs(cA - cB),
+         AC = abs(cA - cC),
+         AD = abs(cA - cD),
+         AE = abs(cA - cE),
+         AF = abs(cA - cF),
+         AG = abs(cA - cG),
+         AH = abs(cA - cH),
+         BC = abs(cB - cC),
+         BD = abs(cB - cD),
+         BE = abs(cB - cE),
+         BF = abs(cB - cF),
+         BG = abs(cB - cG),
+         BH = abs(cB - cH),
+         CD = abs(cC - cD),
+         CE = abs(cC - cE),
+         CF = abs(cC - cF),
+         CG = abs(cC - cG),
+         CH = abs(cC - cH),
+         DE = abs(cD - cE),
+         DF = abs(cD - cF),
+         DG = abs(cD - cG),
+         DH = abs(cD - cH),
+         EF = abs(cE - cF),
+         EG = abs(cE - cG),
+         EH = abs(cE - cH),
+         FG = abs(cF - cG),
+         FH = abs(cF - cH),
+         GH = abs(cG - cH)
+  ) 
+ctr <- contrasts %>% 
+  tidyr::gather(contrast, value, AB:GH) %>%
+  group_by(symbol) %>%
+  filter(value == max(value)) %>%
+  arrange(row_num) %>%
+  ungroup() %>%
+  select(contrast)
+ctr %>%
+  unlist() %>% 
+  table()
+ctr_runs <- ctr %>%
+  unlist() %>% 
+  rle()
+con2 <- contrasts %>%
+  mutate(BC_A = abs((cB + cC) / 2 - cA),
+         BC_D = abs((cB + cC) / 2 - cD),
+         BC_E = abs((cB + cC) / 2 - cE),
+         BC_F = abs((cB + cC) / 2 - cF),
+         BC_G = abs((cB + cC) / 2 - cG),
+         BC_H = abs((cB + cC) / 2 - cH),
+         BC_FG = abs((cB + cC) - (cF + cG))
+         )
+  con2 %>% 
+    ggplot() + geom_point(aes(x = row_num, y = BC_E, colour = local_tx)) + geom_smooth(aes(x = row_num, y = BC_E))
+```
+
+```{r}
+# which pairwise contrast has the greatest variability?
+contrasts %>%
+  select(local_tx, 13:40) %>% #select only the contrast column
+  filter(!local_tx) %>%
+  select(- local_tx) %>%
+  purrr::map(.f = function(x)var(x)) %>% unlist()
+```
+
+```{r}
+con2 %>% 
+  filter(!local_tx) %>%
+    ggplot() + geom_point(aes(x = row_num, y = BC_FG, colour = local_tx)) + geom_smooth(aes(x = row_num, y = BC_FG))
+```
+
+Now, add vertical lines that correspond to partitions between diagonal "blocks" in the pleiotropy statistics heatmap. 
+
+The lower left block ends just before transcript "Elmo1". That is, "Elmo1" is the first component of the second block. What is the row_num value of the entry that precedes "Elmo1"?
+
+```{r}
+con2 %>%
+  filter(symbol == "Elmo1")
+# 68 is the row_num value for "Elmo1". Let's draw a vertical line at 67.5
+con2 %>%
+  filter(symbol == "Cep68") # row_num 129, so draw a vertical line at 129.5
+
+
+```
+
+
+
+
+```{r}
+con2 %>% 
+  filter(!local_tx) %>%
+    ggplot() + geom_point(aes(x = row_num, y = BC_FG, colour = local_tx)) + geom_smooth(aes(x = row_num, y = BC_FG)) + geom_vline(aes(xintercept = 67.5)) + geom_vline(aes(xintercept = 129.5))
+```
+
+```{r}
+con2 %>%
+  filter(!local_tx) %>%
+  mutate(small = row_num < 67.5, big = row_num > 129.5) %>%
+  ggplot() + geom_histogram(aes(x = BC_FG)) + facet_wrap(~ big + small)
+```
+
+
+```{r}
+p <- contrasts %>%
+  select(1, row_num, local_tx, 13:40) %>%
+  tidyr::gather(key = "contrast", value = "value", AB:GH) %>%
+  filter(!local_tx) %>%
+  ggplot() + geom_point(aes(x = row_num, y = value, colour = symbol)) + facet_wrap(contrast ~ .) + theme(legend.position = "none")
+plotly::ggplotly(p)
+```
+
+
+
+
+
+```{r}
+  con2 %>% 
+    ggplot() + geom_point(aes(x = row_num, y = BC_G, colour = local_tx)) + geom_smooth(aes(x = row_num, y = BC_G))
+
+```
+
+```{r}
+  con2 %>% 
+    ggplot() + geom_point(aes(x = row_num, y = BC_F, colour = local_tx)) + geom_smooth(aes(x = row_num, y = BC_F))
+```
+
+```{r}
+  con2 %>% 
+    ggplot() + geom_point(aes(x = row_num, y = BC_H, colour = local_tx)) + geom_smooth(aes(x = row_num, y = BC_H))
+```
+
+```{r}
+  con2 %>% 
+    ggplot() + geom_point(aes(x = row_num, y = BC_D, colour = local_tx)) + geom_smooth(aes(x = row_num, y = BC_D))
+```
+
+
+```{r}
+  con2 %>% 
+    ggplot() + geom_point(aes(x = row_num, y = BC_A, colour = local_tx)) + geom_smooth(aes(x = row_num, y = BC_A))
+```
