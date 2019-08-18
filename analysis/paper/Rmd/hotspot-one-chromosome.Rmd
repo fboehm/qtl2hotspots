@@ -8,10 +8,10 @@ hot_upper <- {{hot_mid}} + 2
 
 
 ```{r, readRDS-{{hot_chr}}}
-pleio_mixed_list <- readRDS(here("analysis", "data", "derived_data", paste0("Chr", {{hot_chr}}, "_pleio.rds")))
-pleio_local_list <- readRDS(here("analysis", "data", "derived_data", paste0("Chr", {{hot_chr}}, "_pleio_local.rds")))
-pleio_nonlocal_list <- readRDS(here("analysis", "data", "derived_data", paste0("Chr", {{hot_chr}}, "_pleio_nonlocal.rds")))
-med_list <- readRDS(here("analysis", "data", "derived_data", paste0("Chr", {{hot_chr}}, "_mediations.rds")))
+pleio_mixed_list <- readRDS(here::here("analysis", "data", "derived_data", paste0("Chr", {{hot_chr}}, "_pleio.rds")))
+pleio_local_list <- readRDS(here::here("analysis", "data", "derived_data", paste0("Chr", {{hot_chr}}, "_pleio_local.rds")))
+pleio_nonlocal_list <- readRDS(here::here("analysis", "data", "derived_data", paste0("Chr", {{hot_chr}}, "_pleio_nonlocal.rds")))
+med_list <- readRDS(here::here("analysis", "data", "derived_data", paste0("Chr", {{hot_chr}}, "_mediations.rds")))
 ```
 
 
@@ -212,14 +212,64 @@ saveRDS(s1coef_out, fn)
 
 
 
-
 ```{r, get-allele-effects-{{hot_chr}}}
 # add index values for peak position
 local_nonlocal_annot <- dplyr::bind_rows(local_annot2, nonlocal_annot) %>%
   mutate(peak_index = match(table = names(map[["{{hot_chr}}"]]), x = marker.id)) %>%
   mutate(peak_effects = purrr::map2(.f = qtl2pleio::get_effects, .x = peak_index, .y = s1coef_out, map = map[["{{hot_chr}}"]])) %>%
-  qtl2hotspots::listcol_to_cols(list_column = quo(peak_effects), another_column = quo(symbol))
+  qtl2hotspots::listcol_to_cols(list_column = quo(peak_effects), another_column = quo(symbol)) %>%
+  rename(cA = `1`, cB = `2`, cC = `3`, cD = `4`, cE = `5`, cF = `6`, cG = `7`, cH = `8`
+         ) %>%
 ```
+
+```{r, define-contrasts-{{hot_chr}}}
+contrasts_BC_FG <- local_nonlocal_annot %>%
+  ungroup() %>%
+  select(symbol, cA:cH, local_tx, lod) %>%
+  (function(x) x[ord2, ]) %>%
+  mutate(row_num = 1:nrow(local_nonlocal_annot), 
+         AB = abs(cA - cB),
+         AC = abs(cA - cC),
+         AD = abs(cA - cD),
+         AE = abs(cA - cE),
+         AF = abs(cA - cF),
+         AG = abs(cA - cG),
+         AH = abs(cA - cH),
+         BC = abs(cB - cC),
+         BD = abs(cB - cD),
+         BE = abs(cB - cE),
+         BF = abs(cB - cF),
+         BG = abs(cB - cG),
+         BH = abs(cB - cH),
+         CD = abs(cC - cD),
+         CE = abs(cC - cE),
+         CF = abs(cC - cF),
+         CG = abs(cC - cG),
+         CH = abs(cC - cH),
+         DE = abs(cD - cE),
+         DF = abs(cD - cF),
+         DG = abs(cD - cG),
+         DH = abs(cD - cH),
+         EF = abs(cE - cF),
+         EG = abs(cE - cG),
+         EH = abs(cE - cH),
+         FG = abs(cF - cG),
+         FH = abs(cF - cH),
+         GH = abs(cG - cH)
+  ) %>%
+  mutate(BC_A = abs((cB + cC) / 2 - cA),
+         BC_D = abs((cB + cC) / 2 - cD),
+         BC_E = abs((cB + cC) / 2 - cE),
+         BC_F = abs((cB + cC) / 2 - cF),
+         BC_G = abs((cB + cC) / 2 - cG),
+         BC_H = abs((cB + cC) / 2 - cH),
+         BC_FG = abs((cB + cC) - (cF + cG))
+         ) %>%
+  select(symbol, BC_FG)
+
+
+```
+
 
 
 ```{r, scols-peak-position-{{hot_chr}}}
@@ -316,7 +366,8 @@ annots_ord <- list(lod_diffs_tibble,
                    allele_effects_tibble,
                    peak_positions, 
                    local_tibble,
-                   lod_tibble
+                   lod_tibble, 
+                   contrasts_BC_FG
                     ) %>% 
   purrr::map(.f = function(df, rn){
     out <- df[match(x = rn, table = df$symbol), ]
@@ -374,6 +425,10 @@ ann6 <- annots_ord[[6]] %>%
   select(-symbol) %>%
   as.matrix() %>%
   (function(x){rownames(x) <- annots_ord[[6]]$symbol; return(x)})
+ann7 <- annots_ord[[7]] %>% # BC_FG contrast
+  select(-symbol) %>%
+  as.matrix() %>%
+  (function(x){rownames(x) <- annots_ord[[7]]$symbol; return(x)})
 ann4 <- annots_ord[[4]] %>%
   ungroup() %>%
   select(-symbol) %>%
@@ -394,7 +449,8 @@ iheatmapr::main_heatmap(mymat, show_colorbar = FALSE, layout = list(font = list(
     iheatmapr::add_col_labels() %>%
   iheatmapr::add_row_annotation(ann4, side = "left") %>%
   iheatmapr::add_row_annotation(ann6, side = "left") %>%
-    iheatmapr::add_row_labels()
+  iheatmapr::add_row_annotation(ann7, side = "left") %>%
+  iheatmapr::add_row_labels()
 
 
 ```
