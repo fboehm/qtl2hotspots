@@ -427,10 +427,29 @@ effects_mat <- local_nonlocal_annot %>%
   ungroup() %>%
   select(cA:cH) %>%
   as.matrix()
+
 ```
 
 ```{r}
-ef <- apply(FUN = function(x) apply(X = pp, MARGIN = 1, FUN = calc_contrast, effects = x), X = effects_mat, MARGIN = 1)
+pp_tib <- pp %>%
+  as_tibble()
+effects_tib <- effects_mat %>%
+  as_tibble() 
+  
+ef <- pp_tib %>%
+  apply(MARGIN = 1, 
+        FUN = function(x){apply(X = effects_tib, 
+                                MARGIN = 1, 
+                                FUN = function(a, b = x){calc_contrast(grouping = b, effects = a)}
+                                )}) 
+
+ef %>%  apply(FUN = function(x) x[!is.na(x)], MARGIN = 1) %>% 
+  lapply(FUN = function(x) bind_rows(x)) %>%
+  purrr::map2(local_nonlocal_annot$symbol, .f = function(x,y){x %>% mutate(symbol = y)}) %>%
+  bind_rows() %>%
+  filter(contrast == "A_B") 
+  summarise(v = var(value)) %>%
+  arrange(desc(v))
 ```
 
 
