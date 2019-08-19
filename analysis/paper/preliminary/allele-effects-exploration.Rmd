@@ -430,7 +430,7 @@ effects_mat <- local_nonlocal_annot %>%
 ```
 
 ```{r}
-
+ef <- apply(FUN = function(x) apply(X = pp, MARGIN = 1, FUN = calc_contrast, effects = x), X = effects_mat, MARGIN = 1)
 ```
 
 
