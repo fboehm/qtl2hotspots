@@ -4,7 +4,7 @@
 #' @param effects founder allele effects vector of length 8
 #'
 #' @export
-calc_contrasts <- function(grouping, effects){
+calc_contrast <- function(grouping, effects){
   means <- numeric(length = 2) # one mean per founder allele
   for (i in 1:2){
     means[i] <- mean(effects_vector[which(grouping == i)])
