@@ -5,11 +5,18 @@
 #'
 #' @export
 calc_contrast <- function(grouping, effects){
-  means <- numeric(length = 2) # one mean per founder allele
-  for (i in 1:2){
-    means[i] <- mean(effects_vector[which(grouping == i)])
-    names(means)[i] <- LETTERS[which(grouping == i)]
-  }
-  diff <- abs(means[1] - means[2])
-  return(tibble::tibble(contrast = contr, value = diff))
+  # return NA if contrast can't be calculated, say, for a vector of all 1's.
+  if (length(unique(grouping[grouping < 3])) <= 1) {
+    out <- NA
+    } else {
+      means <- numeric(length = 2) # one mean per founder allele
+      for (i in 1:2){
+        means[i] <- mean(effects_vector[which(grouping == i)])
+        names(means)[i] <- paste(LETTERS[which(grouping == i)], collapse = "")
+        }
+      diff <- abs(means[1] - means[2])
+      contr <- paste(names(means), collapse = "_")
+      out <- tibble::tibble(contrast = contr, value = diff)
+    }
+  return(out)
 }
