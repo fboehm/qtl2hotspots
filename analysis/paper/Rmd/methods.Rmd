@@ -11,26 +11,22 @@ genome, covariates, and leave-one-chromosome-out estimated kinship matrices [@br
 @keller2018genetic performed univariate QTL mapping for all expression traits. They
 defined an expression trait hotspot to be a 4-Mb region that affects at least 100 nonlocal 
 expression traits.
-They identified five expression trait hotspots in their
-study of pancreatic islet gene expression in 378 Diversity Outbred mice. 
+They identified five expression trait hotspots - on Chromosomes 2, 5, 7, 11, and 13 - in their data. 
 
 In analyzing the data from @keller2018genetic, we first established criteria for identifying local and 
-nonlocal transcripts at each of the five hotspots. We focused on those local 
-traits that strongly associated with QTL within the hotspot. We set the univariate LOD threshold for 
-local traits at 15. We limited consideration to those local traits for which the middle of the gene lay 
-within the hotspot interval. 
-All nonlocal traits demonstrated univariate LOD peaks that met
-the genome-wide significance threshold, 7.18 [@keller2018genetic]. The nonlocal expression traits arose 
-from genes
-on other chromosomes, while the local traits reflected expression levels for
-genes on the same chromosome as the hotspot. We ignored transcripts for genes on the hotspot chromosome 
+nonlocal transcripts at each of the five hotspots. We defined a "local trait" to be one whose corresponding gene lay within the hotspot. We focused on those local 
+traits that strongly associated with QTL within the hotspot. To limit the scope of our analyses, 
+we only studied those expression traits with univariate LOD greater than 15.
+
+We defined a "nonlocal trait" to be one with univariate evidence of association (LOD at least 7.18, the genome-wide threshold)
+with a QTL in the hotspot. Additionally, we required that the nonlocal trait's gene not lie on the hotspot's chromosome. We ignored transcripts for genes on the hotspot chromosome 
 but outside the hotspot interval. 
 
 For each hotspot, we performed both pairwise pleiotropy tests and linear regression-based 
 mediation analyses. For every pair of traits at a hotspot, we calculated a pleiotropy test 
 statistic[@boehm2019testing]. Due to the computational burden, we didn't determine bootstrap p-values for these 
 tests. For every local trait - nonlocal trait pair, we also performed a linear 
-regression-based mediation analysis [@chick2016defining,@keller2018genetic]. We describe in detail both procedures below.
+regression-based mediation analysis [@chick2016defining,@keller2018genetic]. We describe both procedures below.
 
 ## Pleiotropy testing
 
@@ -41,8 +37,7 @@ vec(Y) = X vec(B) + vec(G) + vec(E)
 (\#eq:mvlmm)
 \end{equation}
 
-For each hotspot, we tested all pairs of traits, regardless of whether the traits were local or nonlocal. 
-We performed a
+For each hotspot, we tested all pairs of traits, regardless of whether the traits were local or nonlocal. For each test, we performed a
 two-dimensional, two-QTL scan over a genomic region that included the entirety of the
 hotspot. We fitted bivariate linear mixed effects models (Equations \@ref(eq:mvlmm), \@ref(eq:g), and \@ref(eq:e)) at each ordered pair of markers in a two-dimensional grid [@boehm2019testing].
 
@@ -80,7 +75,7 @@ l_{10}(\hat B, \hat \Sigma) = - \frac{1}{2}\log_{10}\left((Y - X\hat B)^T\hat \S
 For $n$ mice, $\Sigma$ is a $2n$ by $2n$ covariance matrix, while $V_g$ and $V_e$ are $2$ by $2$ covariance matrices. Estimates $\hat V_g$ and $\hat V_e$ are obtained via an expectation-maximization algorithm [@zhou2014efficient;@gemma2].
 
 
-From the two-dimensional scans, we calculated pleiotropy likelihood ratio test (LOD) statistics for each
+From the two-dimensional scan results, we calculated pleiotropy likelihood ratio test (LOD) statistics for each
 pair of traits [@jiang1995multiple;@boehm2019testing;@boehm2019thesis]. Because of the required
 computing time for bootstrap analyses, we didn't obtain p-values for the pleiotropy tests. Instead,
 we worked directly with the test statistic values.
@@ -123,8 +118,8 @@ Y = XB + WC + M\beta + E
 (\#eq:model4)
 \end{equation}
 
-In all of our mediation analyses, the nonlocal transcripts are the targets, while the local
-transcripts serve as candidate mediators of the QTL-target relationship. 
+In all of our mediation analyses, the nonlocal traits are the targets (Y), while the local
+transcripts serve as candidate mediators (M) of the QTL-target relationship. 
 We only considered as potential mediators those local traits with strong univariate LODs.
 In Equations~\ref{eq:model1} through \ref{eq:model4}, $X$ is a matrix of founder allele dosages,
 $B$ is a matrix

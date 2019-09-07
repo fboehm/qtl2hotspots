@@ -11,7 +11,7 @@ calc_contrast <- function(grouping, effects){
     } else {
       means <- numeric(length = 2) # one mean per founder allele
       for (i in 1:2){
-        means[i] <- mean(effects_vector[which(grouping == i)])
+        means[i] <- mean(effects[which(grouping == i)])
         names(means)[i] <- paste(LETTERS[which(grouping == i)], collapse = "")
         }
       diff <- abs(means[1] - means[2])

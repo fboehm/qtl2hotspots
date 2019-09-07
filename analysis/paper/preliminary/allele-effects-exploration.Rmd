@@ -32,7 +32,7 @@ knitr::opts_chunk$set(comment=NA, fig.width=6, fig.height=6, eval = eval_code, e
 
 
 
-```{r define}
+```{r define-ult}
 library(qtl2hotspots)
 
 ult <- 15 
@@ -73,7 +73,7 @@ out <- pmap_dfc(inputs, .f = function(hot_chr, hot_mid, keller_mediator) knitr::
 
 ```{r, define-submap}
 figdir <- here::here("analysis", "figures", "Chr5-allele-effects-plots")
-names(s1coef_out) -> ids
+names(s1coef_out) -> ids # need to run inline code above to define s1coef_out
 # find indices on Chr5 for boundaries of hotspot
 which(map$`5` > hot_lower)[1] -> start_index
 which(map$`5` > hot_upper)[1] -> stop_index
@@ -101,18 +101,6 @@ purrr::pmap(.l = list(s1coef_out, as.list(ids), mylist),
 ```
 
 
-```{r blup-plots}
-purrr::pmap(.l = list(s1coef_blup, as.list(ids), mylist), 
-           .f = function(x, y, z){
-             main <- local_nonlocal_annot %>%
-               ungroup() %>%
-               filter(annot.id == y) %>%
-               select(annot.id, symbol) %>%
-               paste0()
-             qtl2::plot_coefCC(x, map = submap, main = main, scan1_output = z)
-           }
-)
-```
 
 
 
@@ -136,22 +124,6 @@ foobar2 %>%
 ggsave(here::here("analysis", "figures", "allele_blupss_at_peaks.png"), limitsize = FALSE)
 ```
 
-## Bar plots for blup effects
-
-```{r, barplots-blup, fig.height = 20, fig.width = 8}
-foobar <- local_nonlocal_annot %>%
-  ungroup() %>%
-  (function(x) x[ord2, ]) %>%
-  select(symbol, 26:33) %>%
-  tidyr::gather(paste0("b", LETTERS[1:8]), key = "founder_allele", value = "blup_effect")
-foobar2 <- arrange(transform(foobar,
-             symbol=factor(symbol,levels=rn)),symbol)
-foobar2 %>% 
-  ggplot() + geom_col(aes(y = effect, x = founder_allele, fill = founder_allele)) +
-  ylim(c(-1.5, 1.5)) + 
-  facet_wrap(symbol ~ ., ncol = 4) #+ theme(strip.text.x = element_blank())
-ggsave(here::here("analysis", "figures", "allele_effects_at_peaks.png"), limitsize = FALSE)
-```
 
 
 
@@ -179,10 +151,8 @@ which(rn == "Igfbp3")
 local_nonlocal_annot %>%
   ungroup() %>%
   (function(x) x[ord2, ]) %>%
-  select(symbol, 18:25) %>%
-    rename("A" = `1`, "B" = `2`, "C" = `3`, "D" = `4`, "E" = `5`, "F" = `6`, G = `7`, H = `8`
-         ) %>%
-  mutate(contrast_BC_FG = abs((B + C) - (F + G)), row_num = 1:203) %>%
+  dplyr::select(symbol, 18:25) %>%
+  mutate(contrast_BC_FG = abs((cB + cC) - (cF + cG)), row_num = 1:203) %>%
   ggplot() + geom_point(aes(y = contrast_BC_FG, x = row_num))
 ```
 
@@ -190,10 +160,8 @@ local_nonlocal_annot %>%
 p <- local_nonlocal_annot %>%
   ungroup() %>%
   (function(x) x[ord2, ]) %>%
-  select(symbol, 18:25) %>%
-    rename("A" = `1`, "B" = `2`, "C" = `3`, "D" = `4`, "E" = `5`, "F" = `6`, G = `7`, H = `8`
-         ) %>%
-  mutate(contrast = abs((B + C) / 2 - G), row_num = 1:203) %>%
+  dplyr::select(symbol, 18:25) %>%
+  mutate(contrast = abs((cB + cC) / 2 - cG), row_num = 1:203) %>%
   ggplot() + geom_point(aes(y = contrast, x = row_num)) + geom_smooth(aes(y = contrast, x = row_num))
 plotly::ggplotly(p)
 ```
@@ -251,7 +219,7 @@ plotly::ggplotly(p)
   
 ```
 
-```{r B:G}
+```{r B:G2}
 p <- local_nonlocal_annot %>%
   ungroup() %>%
   select(symbol, cA:cH, local_tx) %>%
@@ -440,16 +408,165 @@ ef <- pp_tib %>%
   apply(MARGIN = 1, 
         FUN = function(x){apply(X = effects_tib, 
                                 MARGIN = 1, 
-                                FUN = function(a, b = x){calc_contrast(grouping = b, effects = a)}
-                                )}) 
+                                FUN = function(a, 
+                                               b = x){
+                                  qtl2hotspots::calc_contrast(grouping = b, 
+                                                              effects = a)
+                                  }
+                                )}
+        ) 
 
-ef %>%  apply(FUN = function(x) x[!is.na(x)], MARGIN = 1) %>% 
+ef2 <- ef %>%  apply(FUN = function(x) x[!is.na(x)], MARGIN = 1) %>% 
   lapply(FUN = function(x) bind_rows(x)) %>%
   purrr::map2(local_nonlocal_annot$symbol, .f = function(x,y){x %>% mutate(symbol = y)}) %>%
-  bind_rows() %>%
-  filter(contrast == "A_B") 
+  bind_rows() 
+ef2 %>%
+  group_by(contrast) %>%
   summarise(v = var(value)) %>%
   arrange(desc(v))
 ```
+
+```{r}
+rn_tib <- tibble::tibble(symbol = rn, row_number = 1:203)
+ef2 %>%
+  filter(contrast == "B_F") %>%
+  inner_join(rn_tib) %>%
+  inner_join(local_nonlocal_annot, by = "symbol") %>%
+  filter(!local_tx) %>%
+  ggplot() + geom_point(aes(x = row_number, y = value)) + geom_vline(aes(xintercept = 68.5))
+```
+
+## Defining the boundaries from the heatmap
+
+I need to examine the heatmap to see how many diagonal "blocks" there are, and where the endpoints are, from 1:203, for every block.
+
+First, note that 1:182 are all nonlocal traits. Now, Adamts15 through Cntnap2, inclusive, seems to define the first block.
+
+The second block starts right above Cntnap2, ie, with Elmo1 and ends roughtly at Cep68.
+
+Let's look at the first "block". 
+
+```{r}
+which(rn_tib$symbol == "Elmo1")
+which(rn_tib$symbol == "Adamts15")
+abs_diff <- function(x){abs(x[1] - x[2])}
+notgroup1 <- rn_tib %>%
+  mutate(group1_member = row_number <= 68) %>%
+  inner_join(ef2) %>%
+  group_by(contrast, group1_member) %>%
+  summarise(variance = var(value), mean = mean(value)) %>%
+  arrange(contrast) %>%
+  ungroup() %>%
+  group_by(contrast) %>%
+  filter(!group1_member) %>%
+  arrange(variance) %>% 
+  rename(variance_notgroup1 = variance, mean_notgroup1 = mean)
+
+rn_tib %>%
+  mutate(group1_member = row_number <= 68) %>%
+  inner_join(ef2) %>%
+  group_by(contrast, group1_member) %>%
+  summarise(variance = var(value), mean = mean(value)) %>%
+  arrange(contrast) %>%
+  ungroup() %>%
+  group_by(contrast) %>%
+  filter(group1_member) %>%
+  arrange(variance) %>% 
+  rename(variance_group1 = variance, mean_group1 = mean) %>%
+  inner_join(notgroup1, by = "contrast") %>%
+  dplyr::select(- group1_member.x, - group1_member.y)
+
+```
+
+
+```{r}
+ef2 %>%
+  filter(contrast == "B_G") %>%
+  inner_join(rn_tib) %>%
+  inner_join(local_nonlocal_annot, by = "symbol") %>%
+  filter(!local_tx) %>%
+  ggplot() + geom_point(aes(x = row_number, y = value)) + geom_vline(aes(xintercept = 68.5)) + geom_smooth(aes(x = row_number, y = value))
+
+```
+
+
+```{r}
+rn_tib %>%
+  mutate(group1_member = row_number <= 68) %>%
+  inner_join(ef2) %>%
+  group_by(contrast) %>%
+  summarise(t_stat = t.test(value ~ group1_member)$statistic) %>%
+  arrange(desc(t_stat))
+```
+
+```{r}
+ef2 %>%
+  filter(contrast == "AGH_CEF") %>%
+  inner_join(rn_tib) %>%
+  inner_join(local_nonlocal_annot, by = "symbol") %>%
+  filter(!local_tx) %>%
+  ggplot() + geom_point(aes(x = row_number, y = value)) + geom_vline(aes(xintercept = 68.5))
+
+```
+
+
+
+
+```{r, define-contrasts-5-1}
+contr <- ef2 %>%
+  filter(contrast == "AGH_CEF") %>%
+  inner_join(rn_tib) %>%
+  arrange(row_number)
+```
+
+
+
+```{r, order-annotations-5-1}
+# all annots 
+annots_ord <- list(lod_diffs_tibble, 
+                   lod_diff_proportions_tibble, 
+                   allele_effects_tibble,
+                   peak_positions, 
+                   local_tibble,
+                   lod_tibble, 
+                   contr
+                    ) %>% 
+  purrr::map(.f = function(df, rn){
+    out <- df[match(x = rn, table = df$symbol), ]
+    return(out)
+  }, 
+  rn = rn)
+ann7 <- annots_ord[[7]] %>% # contrast
+  dplyr::select(value) %>%
+  as.matrix() %>%
+  (function(x){rownames(x) <- annots_ord[[7]]$symbol; return(x)})
+```
+
+```{r}
+iheatmapr::main_heatmap(mymat, show_colorbar = FALSE, layout = list(font = list(size = 4))) %>%
+  iheatmapr::add_col_labels() %>%
+  iheatmapr::add_col_annotation(ann5, show_colorbar = FALSE) %>%
+  iheatmapr::add_main_heatmap(ann3, name = "signal3", size = 0.2, show_colorbar = FALSE) %>%
+    iheatmapr::add_col_labels() %>%
+
+  iheatmapr::add_main_heatmap(ann2, name = "signal2", size = 0.5, show_colorbar = FALSE) %>%
+  iheatmapr::add_col_labels() %>%
+  iheatmapr::add_main_heatmap(ann1, name = "signal1", size = 0.5, show_colorbar = FALSE) %>%
+  iheatmapr::add_row_annotation(ann5, side = "left", show_colorbar = TRUE) %>%
+  iheatmapr::add_col_labels() %>%
+  iheatmapr::add_row_annotation(ann4, side = "left", show_colorbar = TRUE) %>%
+  iheatmapr::add_row_annotation(ann6, side = "left", show_colorbar = TRUE) %>%
+  iheatmapr::add_row_annotation(ann7, side = "left", show_colorbar = TRUE) %>%
+  iheatmapr::add_row_labels()
+
+```
+
+
+
+# Other ideas
+
+What results do we get when we try to "find the contrast" for other hotspots: 2, 7, 11, 13?
+
+
 
 
