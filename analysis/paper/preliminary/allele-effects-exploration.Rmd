@@ -63,66 +63,13 @@ hot_mid <- c(165.5, 146, 46, 71, 112.5)
 keller_mediator <- c("Hnf4a", "Pdx1", "Fam83e", "Sat2", "Il6st")
 inputs <- tibble(hot_chr, hot_mid, keller_mediator)
 out <- pmap_dfc(inputs, .f = function(hot_chr, hot_mid, keller_mediator) knitr::knit_expand(text = readLines(here::here("analysis", "paper", "Rmd", "hotspot-one-chromosome.Rmd"))))
-# note that ... argument must be a list, ie, it must be a single argument, not multiple args
+# note that ... argument for knit_expand must be a list, ie, it must be a single argument, not multiple args
 ```
 
 
 `r if (eval_code) knitr::knit(text = out[[2]])`
 
 
-
-```{r, define-submap}
-figdir <- here::here("analysis", "figures", "Chr5-allele-effects-plots")
-names(s1coef_out) -> ids # need to run inline code above to define s1coef_out
-# find indices on Chr5 for boundaries of hotspot
-which(map$`5` > hot_lower)[1] -> start_index
-which(map$`5` > hot_upper)[1] -> stop_index
-submap <- list()
-submap$`5` <- map$`5`[start_index:stop_index]
-mylist <- list()
-for (i in 1:203){
-  mylist[[i]] <- s1out[ , i, drop = FALSE]
-}
-```
-
-
-
-```{r effects-plots}
-purrr::pmap(.l = list(s1coef_out, as.list(ids), mylist), 
-           .f = function(x, y, z){
-             main <- local_nonlocal_annot %>%
-               ungroup() %>%
-               filter(annot.id == y) %>%
-               select(annot.id, symbol) %>%
-               paste0()
-             qtl2::plot_coefCC(x, map = submap, main = main, scan1_output = z)
-           }
-)
-```
-
-
-
-
-
-
-## Barplots for effects at peak positions
-
-Now, let's focus only on the 8 values at the LOD peak for each trait.
-
-```{r, barplots-scan1coef-effects, fig.height = 20, fig.width = 8}
-ord2 <- match(table = local_nonlocal_annot$symbol, x = rn)
-foobar <- local_nonlocal_annot %>%
-  select(symbol, cA:cH) %>%
-  (function(x) x[ord2, ]) %>%
-  tidyr::gather(key = "founder_allele", value = "effect", cA: cH)
-foobar2 <- arrange(transform(foobar,
-             symbol=factor(symbol,levels=rn)),symbol)
-foobar2 %>% 
-  ggplot() + geom_col(aes(y = effect, x = founder_allele, fill = founder_allele)) +
-  ylim(c(-1.5, 1.5)) + 
-  facet_wrap(symbol ~ ., ncol = 4) #+ theme(strip.text.x = element_blank())
-ggsave(here::here("analysis", "figures", "allele_blupss_at_peaks.png"), limitsize = FALSE)
-```
 
 
 
@@ -566,6 +513,10 @@ iheatmapr::main_heatmap(mymat, show_colorbar = FALSE, layout = list(font = list(
 # Other ideas
 
 What results do we get when we try to "find the contrast" for other hotspots: 2, 7, 11, 13?
+
+What if more than one contrast is "responsible" for a given block in a hotspot? Maybe max of two contrasts, for example? Or min of two contrasts?
+
+
 
 
 
