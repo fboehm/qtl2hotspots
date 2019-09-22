@@ -288,7 +288,7 @@ lod_diff_proportions_tibble <- med_tib %>%
 allele_effects_tibble <- local_nonlocal_annot %>%
   dplyr::select(symbol, 18:25)
 # peak positions tibble
-peak_positions <- binning %>%
+peak_positions <- local_nonlocal_annot %>%
   select(symbol, pos)
 # local indicator
 local_tibble <- local_nonlocal_annot %>%
@@ -313,8 +313,7 @@ annots_ord <- list(lod_diffs_tibble,
                    allele_effects_tibble,
                    peak_positions, 
                    local_tibble,
-                   lod_tibble, 
-                   contrasts_BC_FG
+                   lod_tibble 
                     ) %>% 
   purrr::map(.f = function(df, rn){
     out <- df[match(x = rn, table = df$symbol), ]
@@ -350,38 +349,55 @@ p <- tibble(nonlocal_symbol = rownames(pm[indic_nonlocal, ])[ord_nonlocal], inde
 plotly::ggplotly(p)
 ```
 
-```{r iheatmapr-{{hot_chr}}, out.width="25in", out.height = "10in"}
+```{r {{hot_chr}}-ann3}
 ann3 <- annots_ord[[3]] %>%
   ungroup() %>%
   select(- symbol) %>%
   as.matrix() %>%
   (function(x){rownames(x) <- annots_ord[[3]]$symbol; return(x)})
 colnames(ann3) <- LETTERS[1:8]
+```
+
+```{r {{hot_chr}}-ann2}
 ann2 <- annots_ord[[2]] %>%
   select(-symbol) %>%
   as.matrix() %>%
   (function(x){rownames(x) <- annots_ord[[2]]$symbol; return(x)})
+```
+
+```{r {{hot_chr}}-ann1}
 ann1 <- annots_ord[[1]] %>%
   select(-symbol) %>%
   as.matrix() %>%
   (function(x){rownames(x) <- annots_ord[[1]]$symbol; return(x)})
+```
+
+```{r {{hot_chr}}-ann5}
 ann5 <- annots_ord[[5]] %>%
   select(-symbol) %>%
   as.matrix() %>%
   (function(x){rownames(x) <- annots_ord[[5]]$symbol; return(x)})
+```
+
+```{r {{hot_chr}}-ann6}
 ann6 <- annots_ord[[6]] %>%
   select(-symbol) %>%
   as.matrix() %>%
   (function(x){rownames(x) <- annots_ord[[6]]$symbol; return(x)})
-ann7 <- annots_ord[[7]] %>% # BC_FG contrast
-  select(-symbol) %>%
-  as.matrix() %>%
-  (function(x){rownames(x) <- annots_ord[[7]]$symbol; return(x)})
+```
+
+
+
+
+```{r {{hot_chr}}-ann4}
 ann4 <- annots_ord[[4]] %>%
   ungroup() %>%
   select(-symbol) %>%
   as.matrix() %>%
   (function(x){rownames(x) <- annots_ord[[4]]$symbol; return(x)})
+```
+
+```{r iheatmapr-{{hot_chr}}, out.width="25in", out.height = "10in"}
 mymat <- pm[ord, ord] %>% # order both cols and rows by 'ord'
   apply(FUN = trunc2, MARGIN = 2, threshold = 5)
 iheatmapr::main_heatmap(mymat, show_colorbar = FALSE, layout = list(font = list(size = 4))) %>%
@@ -397,71 +413,7 @@ iheatmapr::main_heatmap(mymat, show_colorbar = FALSE, layout = list(font = list(
     iheatmapr::add_col_labels() %>%
   iheatmapr::add_row_annotation(ann4, side = "left") %>%
   iheatmapr::add_row_annotation(ann6, side = "left") %>%
-  iheatmapr::add_row_annotation(ann7, side = "left") %>%
   iheatmapr::add_row_labels()
 ```
-
-
-### Allele effects contrasts
-
-```{r, define-submap-{{hot_chr}}}
-figdir <- here::here("analysis", "figures", "Chr{{hot_chr}}-allele-effects-plots")
-names(s1coef_out) -> ids # need to run inline code above to define s1coef_out
-# find indices on Chr5 for boundaries of hotspot
-which(map[[hot_chr]] > hot_lower)[1] -> start_index
-which(map[[hot_chr]] > hot_upper)[1] -> stop_index
-submap <- list()
-submap$`5` <- map[[hot_chr]][start_index:stop_index]
-mylist <- list()
-for (i in 1:(nlocal + nnonlocal)) {
-  mylist[[i]] <- s1out[ , i, drop = FALSE]
-}
-```
-
-
-
-```{r effects-plots-{{hot_chr}}}
-purrr::pmap(.l = list(s1coef_out, as.list(ids), mylist), 
-           .f = function(x, y, z){
-             main <- local_nonlocal_annot %>%
-               ungroup() %>%
-               filter(annot.id == y) %>%
-               select(annot.id, symbol) %>%
-               paste0()
-             fn <- here::here("analysis", "figures", "Chr{{hot_chr}}-allele-effects", paste0(main, ".pdf"))
-             pdf(file = fn)
-             qtl2::plot_coefCC(x, map = submap, main = main, scan1_output = z)
-             dev.off()
-           }
-)
-
-```
-
-
-
-
-
-
-## Barplots for effects at peak positions
-
-Now, let's focus only on the 8 values at the LOD peak for each trait.
-
-```{r, barplots-scan1coef-effects-{{hot_chr}}, fig.height = 20, fig.width = 8}
-ord2 <- match(table = local_nonlocal_annot$symbol, x = rn)
-foobar <- local_nonlocal_annot %>%
-  select(symbol, cA:cH) %>%
-  (function(x) x[ord2, ]) %>%
-  tidyr::gather(key = "founder_allele", value = "effect", cA:cH)
-foobar2 <- arrange(transform(foobar,
-             symbol = factor(symbol, levels = rn)), symbol)
-foobar2 %>% 
-  ggplot() + geom_col(aes(y = effect, x = founder_allele, fill = founder_allele)) +
-  ylim(c(-1.5, 1.5)) + 
-  facet_wrap(symbol ~ ., ncol = 4) #+ theme(strip.text.x = element_blank())
-ggsave(here::here("analysis", "figures", "allele_effects_at_peaks-{{hot_chr}}.png"), limitsize = FALSE)
-```
-
-
-
 
 
