@@ -57,7 +57,7 @@ options(tibble.print_max = 50, tibble.print_min = 20)
 
 ```{r saveRDS}
 if (!file.exists(here::here("analysis", "data", "derived_data", "genoprobs.rds"))){
-  download.file("https://datadryad.org/bitstream/handle/10255/dryad.166774/Attie_DO378_eQTL_viewer_v1.Rdata?sequence=2",
+  download.file("https://datadryad.org/stash/downloads/file_stream/63306",
               destfile = here::here("analysis", "data", "raw_data", "Attie_DO378_eQTL_viewer_v1.Rdata")
               )
   load(here::here("analysis", "data", "raw_data", "Attie_DO378_eQTL_viewer_v1.Rdata"))
