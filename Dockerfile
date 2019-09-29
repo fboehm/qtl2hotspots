@@ -24,7 +24,7 @@ RUN install2.r --error \
     seriation \
     devtools
 
-RUN Rscript -e 'devtools::install_github("rqtl/qtl2")'
+RUN Rscript -e 'install.packages("qtl2", repos="https://rqtl.org/qtl2cran")'
 
 
 # build this compendium package
