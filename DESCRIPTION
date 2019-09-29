@@ -20,5 +20,6 @@ Suggests:
     plotly,
     iheatmapr,
     pheatmap,
-    seriation
+    seriation,
+    qtl2
 RoxygenNote: 6.1.1

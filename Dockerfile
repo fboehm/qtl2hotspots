@@ -21,7 +21,10 @@ RUN install2.r --error \
     plotly \
     iheatmapr \
     pheatmap \
-    seriation
+    seriation \
+    devtools
+
+RUN Rscript -e 'devtools::install_github("rqtl/qtl2")'
 
 
 # build this compendium package
