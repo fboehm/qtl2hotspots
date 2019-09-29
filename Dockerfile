@@ -1,5 +1,5 @@
 # get the base image, the rocker/verse has R, RStudio and pandoc
-FROM rocker/verse:3.6.1
+FROM fjboehm/tidyverse-qtl2
 
 # required - see https://github.com/thomasWeise/docker-pandoc/blob/98ad0ab53308701b93fa8ba82c80546495fc7828/image/Dockerfile
 MAINTAINER Frederick J. Boehm <frederick.boehm@gmail.com>
@@ -21,8 +21,6 @@ RUN install2.r --error \
     pheatmap \
     seriation \
     devtools
-
-RUN Rscript -e 'install.packages("qtl2", repos="https://rqtl.org/qtl2cran")'
 
 
 # build this compendium package
