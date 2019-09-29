@@ -20,7 +20,8 @@ RUN install2.r --error \
     dendextend \
     plotly \
     iheatmapr \
-    pheatmap
+    pheatmap \
+    seriation
 
 
 # build this compendium package

@@ -19,5 +19,6 @@ Suggests:
     dendextend,
     plotly,
     iheatmapr,
-    pheatmap
+    pheatmap,
+    seriation
 RoxygenNote: 6.1.1
