@@ -9,8 +9,6 @@ COPY . /home/rstudio/qtl2hotspots
 
 
 # Install R packages
-RUN install2.r --error \
-    BiocManager
 
 RUN Rscript -e 'BiocManager::install("S4Vectors")'
 
