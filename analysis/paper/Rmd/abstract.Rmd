@@ -1,5 +1,7 @@
 # Abstract
 
 We present our analysis of five expression trait hotspots in pancreatic islets from 378
-Diversity Outbred mice.
+Diversity Outbred mice. @keller2018genetic defined the hotspots in their initial report. We now apply our newly developed pleiotropy test and mediation analysis to understand biological relationships among traits that map to the hotspots.
+
+Four of five hotspots show patterns consistent with a single local trait causing the hotspot associations. For these hotspots, mediation analyses revealed that the local trait mediates most of the associated nonlocal traits, while pleiotropy test results were consistent with presence of a single QTL at each hotspot. However, the fifth hotspot demonstrated distinct patterns in both mediation analyses and pleiotropy testing.
 
