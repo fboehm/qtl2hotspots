@@ -1,0 +1,20 @@
+#BSUB -q long 
+#BSUB -o %J.out 
+#BSUB -e %J.err 
+#BSUB -N
+#BSUB -W 100:00
+#BSUB -n 15
+#BSUB -R rusage[mem=32000]
+#BSUB -M 48000
+#BSUB -R span[hosts=1]
+
+module load gcc/8.1.0
+module load libpng/1.6.8
+module load pandoc/2.7.2
+module load R/3.6.1_packages/tidyverse/1.3.0
+module load cairo/1.12.16
+Rscript -e '.libPaths("~/work/libs"); rmarkdown::render("../paper/Rmd/hotspot-one-chromosome-TIMBR.Rmd")'
+
+
+
+
