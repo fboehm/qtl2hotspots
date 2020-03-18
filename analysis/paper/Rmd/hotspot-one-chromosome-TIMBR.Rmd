@@ -1,3 +1,14 @@
+---
+title: "QTL mapping and TIMBR for Chr 2"
+author: "Frederick J. Boehm"
+date: "03/18/2020"
+output: html_document
+params:
+  lastmod: !r lubridate::now()
+---
+
+Last modified: `r params$lastmod`.
+
 
 ```{r setupx, include=FALSE, dev="CairoPNG"}
 .libPaths("~/work/libs")
