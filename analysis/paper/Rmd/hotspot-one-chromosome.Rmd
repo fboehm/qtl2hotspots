@@ -416,4 +416,3 @@ iheatmapr::main_heatmap(mymat, show_colorbar = FALSE, layout = list(font = list(
   iheatmapr::add_row_labels()
 ```
 
-

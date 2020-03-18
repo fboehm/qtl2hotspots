@@ -1,0 +1,207 @@
+
+```{r setup}
+library(qtl2hotspots)
+ult <- 15 # univariate lod threshold
+```
+
+```{r load_tidyverse}
+library(tidyverse)
+options(tibble.print_max = 50, tibble.print_min = 20)
+```
+
+
+
+```{r saveRDS}
+if (!file.exists(here::here("analysis", "data", "derived_data", "genoprobs.rds"))){
+  download.file("https://datadryad.org/stash/downloads/file_stream/63306",
+              destfile = here::here("analysis", "data", "raw_data", "Attie_DO378_eQTL_viewer_v1.Rdata")
+              )
+  load(here::here("analysis", "data", "raw_data", "Attie_DO378_eQTL_viewer_v1.Rdata"))
+  saveRDS(dataset.islet.rnaseq$lod.peaks, here::here("analysis", "data", "derived_data", "lod_peaks.rds"))
+  saveRDS(dataset.islet.rnaseq$annots, here::here("analysis", "data", "derived_data", "annots.rds"))
+  saveRDS(dataset.islet.rnaseq$expr, here::here("analysis", "data", "derived_data", "expr.rds"))
+  saveRDS(K, here::here("analysis", "data", "derived_data", "kinship.rds"))
+  saveRDS(map, here::here("analysis", "data", "derived_data", "map.rds"))
+  saveRDS(genoprobs, here::here("analysis", "data", "derived_data", "genoprobs.rds"))
+  saveRDS(dataset.islet.rnaseq$covar, here::here("analysis", "data", "derived_data", "covar.rds"))
+}
+```
+
+```{r readRDS}
+lod_peaks <- readRDS(here::here("analysis", "data", "derived_data", "lod_peaks.rds"))
+annots <- readRDS(here::here("analysis", "data", "derived_data", "annots.rds"))
+expr <- readRDS(here::here("analysis", "data", "derived_data", "expr.rds"))
+probs <- readRDS(here::here("analysis", "data", "derived_data", "genoprobs.rds"))
+K <- readRDS(here::here("analysis", "data", "derived_data", "kinship.rds"))
+covar <- readRDS(here::here("analysis", "data", "derived_data", "covar.rds"))
+map <- readRDS(here::here("analysis", "data", "derived_data", "map.rds"))
+```
+
+```{r}
+hot_chr <- 2
+hot_mid <- 165.5
+keller_mediator <- "Hnf4a"
+```
+
+```{r}
+hot_lower <- hot_mid - 2
+hot_upper <- hot_mid + 2
+```
+
+
+
+
+```{r, define_local_annot}
+local_annot <- lod_peaks %>%
+  filter(chrom == hot_chr, pos <= hot_upper, pos >= hot_lower) %>%
+  left_join(y = annots, by = c("annot.id" = "gene_id")) %>%
+  filter(!duplicated(annot.id)) %>%
+  filter(lod >= ult) %>%
+  mutate(local_tx = chr == hot_chr) %>%
+  filter(local_tx)
+```
+
+
+```{r, define_nonlocal_annot}
+nonlocal_annot <- lod_peaks %>%
+  filter(chrom == hot_chr, pos <= hot_upper, pos >= hot_lower) %>%
+  inner_join(y = annots, by = c("annot.id" = "gene_id")) %>%
+  filter(!duplicated(annot.id)) %>%
+  filter(lod >= 7.18) %>%
+  mutate(local_tx = chr == hot_chr) %>%
+  filter(!local_tx) %>%
+  filter(!is.na(hotspot))
+```
+
+
+
+```{r, local_annot2}
+local_annot2 <- local_annot %>%
+  filter(middle <= hot_upper, middle >= hot_lower) %>% 
+  arrange(desc(lod))
+```
+
+
+```{r hot_expr}
+hot_local <- expr[, colnames(expr) %in% local_annot2$annot.id]
+hot_nonlocal <- expr[, colnames(expr) %in% nonlocal_annot$annot.id]
+nnonlocal <- nrow(nonlocal_annot)
+nlocal <- nrow(local_annot2)
+```
+
+
+```{r, hot_annot-hot_chr}
+hot_annot <- local_annot2 %>%
+  bind_rows(nonlocal_annot) %>%
+  dplyr::select(annot.id, symbol)
+```
+
+
+
+
+```{r, scan1}
+fn <- here::here("analysis", "data", "derived_data", "Chr2_scan1_out.rds")
+if (file.exists(fn)) {
+  s1out <- readRDS(fn)
+} else {
+  s1out <- qtl2::scan1(genoprobs = probs, 
+                       pheno = cbind(hot_local, hot_nonlocal), 
+                       kinship = K[["{{hot_chr}}"]], 
+                       addcovar = covar, 
+                       reml = TRUE, 
+                       cores = 1
+                       )
+  saveRDS(s1out, fn)
+}
+```
+
+
+
+```{r allele-effects}
+fn <- here::here("analysis", "data", "derived_data", "Chr2_scan1coef_out.rds")
+if (file.exists(fn)) {
+  s1coef_out <- readRDS(fn)
+} else {
+s1coef_out <- purrr::map(.x = as_tibble(cbind(hot_local, hot_nonlocal)), 
+           .f = function(pheno) {
+             ph <- as.matrix(pheno)
+             rownames(ph) <- rownames(expr)
+             qtl2::scan1coef(genoprobs = list(probs[[hot_chr]]), 
+                             pheno = ph, 
+                             kinship = K[[hot_chr]], 
+                             addcovar = covar, 
+                             reml = TRUE, 
+                             cores = 1
+                             )
+           }
+                )
+saveRDS(s1coef_out, fn)
+}
+```
+
+
+
+```{r, get-allele-effects}
+# add index values for peak position
+local_nonlocal_annot <- dplyr::bind_rows(local_annot2, nonlocal_annot) %>%
+  mutate(peak_index = match(table = names(map[[hot_chr]]), x = marker.id)) 
+```
+
+
+
+### TIMBR analyses
+
+
+
+
+
+```{r, timbr-setup}
+tr <- cbind(hot_local, hot_nonlocal)
+prior_M <- list(model.type = "crp",
+                prior.alpha.type = "gamma",
+                prior.alpha.shape = 2.3009322,
+                prior.alpha.rate = 0.7488104
+                )
+library(TIMBR)
+data(mcv.data) # get A matrix
+peaks <- qtl2::find_peaks(s1out, map)
+```
+
+```{r}
+fn <- "attie_DO500_genoprobs_v5_36state_chr2.rds"
+gp <- readRDS(here::here("analysis", "data", "derived_data", fn))
+```
+
+
+
+```{r, timbr}
+pheno <- cbind(hot_local, hot_nonlocal)
+set.seed(3411192) # to ensure getting the same samples with TIMBR
+t_out <- peaks %>%
+  dplyr::filter(chr == hot_chr, pos <= hot_upper, pos >= hot_lower) %>%
+  dplyr::mutate(marker_index = purrr::map2_int(.x = pos, .y = chr, .f = function(x, y) which(map[[y]] == x))) %>%
+  dplyr::mutate(t_out = purrr::pmap(.l = list(lodcolumn, chr, marker_index), .f = function(lodcolumn, chr, marker_index){
+    phe_pre <- pheno[ , colnames(pheno) == lodcolumn, drop = FALSE]
+    phe <- phe_pre[!is.na(phe_pre), , drop = FALSE]
+    pr_pre <- gp[[1]][, , marker_index] # use first (and only!) entry in gp
+    pr <- pr_pre[rownames(pr_pre) %in% rownames(phe), ]
+    cov_pre <- cbind(1, covar)
+    cov_pre2 <- cov_pre[rownames(cov_pre) %in% rownames(phe), ]
+    cov <- qtl2:::drop_depcols(cov_pre2)
+    TIMBR::TIMBR(y = phe, 
+                 prior.D = list(P = pr, 
+                                A = mcv.data$prior.D$A, # works for autosomes
+                                fixed.diplo = FALSE), 
+                 prior.M = prior_M, 
+                 samples = 10000, 
+                 samples.ml = 10000,
+                 Z = cov, 
+                 verbose = TRUE
+                 )  
+}))
+saveRDS(t_out, here::here("analysis", "data", "derived_data", "timbr-chr2-10ksamples.rds"))
+```
+
+
+
+

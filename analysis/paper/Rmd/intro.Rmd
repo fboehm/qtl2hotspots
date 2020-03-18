@@ -2,8 +2,7 @@
 
 Genetics studies in model organisms like mice can identify
 genomic regions that affect complex quantitative traits, such as systolic blood pressure, body 
-weight, and, more recently, biomolecular traits such as gene expression levels and protein 
-concentrations [@sax1923association;@soller1976power;@lander1989mapping;@broman2009guide;@jansen2007quantitative;@chick2016defining]. 
+weight, and, more recently, biomolecular traits such as gene expression levels and protein levels [@sax1923association;@soller1976power;@lander1989mapping;@broman2009guide;@jansen2007quantitative;@chick2016defining;@keller2018genetic]. 
 These genomic regions that affect variability in one or more complex traits are called "quantitative trait loci" or "QTL".
 A genome-wide QTL "scan" reveals
 associations between genotypes and phenotypes by considering each position along the genome,
@@ -15,18 +14,19 @@ and may contain more than a hundred genes.
 Identification of a causal gene (for a given complex trait) from 
 among those genes near the QTL is
 challenging and may require costly and time-consuming experiments.
+
 The growing need for greater QTL mapping resolution fueled development over the
 last two decades of model organism multiparental populations for high-resolution QTL mapping [@de2017back;@churchill2004collaborative;@svenson2012high;@huang2012multiparent;@shivakumar2018soybean;@huang2011analysis;@kover2009multiparent;@tisne2017identification;@stanley2017genetic].
 
 Recent systems genetics studies have sought to identify QTL for thousands of biomolecular traits [@keller2018genetic;@chick2016defining]. 
 
-Other researchers have identified and examined QTL hotspots in model organism genetics studies. @tian2016dissection 
+Other researchers have identified and examined QTL hotspots in model organism genetics studies [@neto2012quantile]. @tian2016dissection 
 presented quantitative methods for hotspot dissection in F$_2$ intercross mice. 
 
 @boehm2019thesis and @boehm2019testing argued for complementary roles for mediation analysis and pleiotropy testing in hotspot 
 dissection. Here, we clarify this argument by presenting a study of five expression trait 
 hotspots in a publicly available data set. At each hotspot, we identify 
-a set of local traits that have QTL within the hotspot. We also identify a set of nonlocal traits with QTL 
+a set of local traits that have QTL within the hotspot region. We also identify a set of nonlocal traits with QTL 
 arising from the hotspot. We perform pleiotropy tests and mediation analyses for all local-nonlocal trait pairs. 
 Graphical summaries of our results enable us to conclude that at least one of the five hotspots is due to multiple QTL, 
 while the evidence at the four other hotspots is consistent with a single local trait affecting most or all of the 
@@ -41,4 +41,6 @@ I
 - why is it useful to study expression hotspots? 
 - why are these two methods - pleiotropy tests and mediation analyses useful for studying hotspots? 
 - who else has studied hotspots? And what did they do?
+- reread intros of Neto 2012 and Tian 2016
+
 
