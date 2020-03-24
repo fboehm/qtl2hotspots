@@ -1,4 +1,5 @@
 genoprobs.rds
+timbr-chr2-10ksamples.rds
 Chr11_scan1_out.rds
 Chr11_scan1coef_out.rds
 Chr13_scan1_out.rds
