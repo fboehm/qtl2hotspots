@@ -105,7 +105,12 @@ gp <- readRDS(here::here("analysis", "data", "derived_data", fn))
 
 
 
-```{r, timbr}
+```{r}
+library(future)
+options(future.globals.maxSize= 891289600)
+```
+
+```{r}
 pheno <- cbind(hot_local, hot_nonlocal)
 set.seed(3411192) # to ensure getting the same samples with TIMBR
 future::plan("multiprocess")
