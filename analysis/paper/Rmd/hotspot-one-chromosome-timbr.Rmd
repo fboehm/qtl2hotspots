@@ -108,7 +108,7 @@ gp <- readRDS(here::here("analysis", "data", "derived_data", fn))
 ```{r, timbr}
 pheno <- cbind(hot_local, hot_nonlocal)
 set.seed(3411192) # to ensure getting the same samples with TIMBR
-future::plan("cluster")
+future::plan("multiprocess")
 t_out <- peaks %>%
   dplyr::filter(chr == hot_chr, pos <= hot_upper, pos >= hot_lower) %>%
   dplyr::mutate(marker_index = purrr::map2_int(.x = pos, .y = chr, .f = function(x, y) which(map[[y]] == x))) %>%
