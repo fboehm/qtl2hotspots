@@ -71,32 +71,32 @@ hot_upper <- hot_mid + 2
 
 ```{r, define_local_annot}
 local_annot <- lod_peaks %>%
-  filter(chrom == hot_chr, pos <= hot_upper, pos >= hot_lower) %>%
-  left_join(y = annots, by = c("annot.id" = "gene_id")) %>%
-  filter(!duplicated(annot.id)) %>%
-  filter(lod >= ult) %>%
-  mutate(local_tx = chr == hot_chr) %>%
-  filter(local_tx)
+  dplyr::filter(chrom == hot_chr, pos <= hot_upper, pos >= hot_lower) %>%
+  dplyr::left_join(y = annots, by = c("annot.id" = "gene_id")) %>%
+  dplyr::filter(!duplicated(annot.id)) %>%
+  dplyr::filter(lod >= ult) %>%
+  dplyr::mutate(local_tx = chr == hot_chr) %>%
+  dplyr::filter(local_tx)
 ```
 
 
 ```{r, define_nonlocal_annot}
 nonlocal_annot <- lod_peaks %>%
-  filter(chrom == hot_chr, pos <= hot_upper, pos >= hot_lower) %>%
-  inner_join(y = annots, by = c("annot.id" = "gene_id")) %>%
-  filter(!duplicated(annot.id)) %>%
-  filter(lod >= 7.18) %>%
-  mutate(local_tx = chr == hot_chr) %>%
-  filter(!local_tx) %>%
-  filter(!is.na(hotspot))
+  dplyr::filter(chrom == hot_chr, pos <= hot_upper, pos >= hot_lower) %>%
+  dplyr::inner_join(y = annots, by = c("annot.id" = "gene_id")) %>%
+  dplyr::filter(!duplicated(annot.id)) %>%
+  dplyr::filter(lod >= 7.18) %>%
+  dplyr::mutate(local_tx = chr == hot_chr) %>%
+  dplyr::filter(!local_tx) %>%
+  dplyr::filter(!is.na(hotspot))
 ```
 
 
 
 ```{r, local_annot2}
 local_annot2 <- local_annot %>%
-  filter(middle <= hot_upper, middle >= hot_lower) %>% 
-  arrange(desc(lod))
+  dplyr::filter(middle <= hot_upper, middle >= hot_lower) %>% 
+  dplyr::arrange(desc(lod))
 ```
 
 
@@ -110,7 +110,7 @@ nlocal <- nrow(local_annot2)
 
 ```{r, hot_annot-hot_chr}
 hot_annot <- local_annot2 %>%
-  bind_rows(nonlocal_annot) %>%
+  dplyr::bind_rows(nonlocal_annot) %>%
   dplyr::select(annot.id, symbol)
 ```
 
@@ -220,6 +220,7 @@ t_out <- peaks %>%
 saveRDS(t_out, here::here("analysis", "data", "derived_data", "timbr-chr2-10ksamples.rds"))
 ```
 
-
-
-
+```{r}
+t_out <- readRDS(here::here("analysis", "data", "derived_data", "timbr-chr2-10ksamples.rds")) %>%
+  dplyr::rename(timbr = t_out)
+```

@@ -1,0 +1,152 @@
+## Chr {{hot_chr}}
+
+
+```{r, def-{{hot_chr}}}
+hot_lower <- {{hot_mid}} - 2
+hot_upper <- {{hot_mid}} + 2
+```
+
+
+
+
+```{r, define_local_annot-{{hot_chr}}}
+local_annot <- lod_peaks %>%
+  filter(chrom == {{hot_chr}}, pos <= hot_upper, pos >= hot_lower) %>%
+  left_join(y = annots, by = c("annot.id" = "gene_id")) %>%
+  filter(!duplicated(annot.id)) %>%
+  filter(lod >= ult) %>%
+  mutate(local_tx = chr == {{hot_chr}}) %>%
+  filter(local_tx)
+```
+
+
+```{r, define_nonlocal_annot-{{hot_chr}}}
+nonlocal_annot <- lod_peaks %>%
+  filter(chrom == {{hot_chr}}, pos <= hot_upper, pos >= hot_lower) %>%
+  inner_join(y = annots, by = c("annot.id" = "gene_id")) %>%
+  filter(!duplicated(annot.id)) %>%
+  filter(lod >= 7.18) %>%
+  mutate(local_tx = chr == {{hot_chr}}) %>%
+  filter(!local_tx) %>%
+  filter(!is.na(hotspot))
+```
+
+
+
+```{r, local_annot2-{{hot_chr}}}
+local_annot2 <- local_annot %>%
+  filter(middle <= hot_upper, middle >= hot_lower) %>% 
+  arrange(desc(lod))
+```
+
+
+```{r hot_expr-{{hot_chr}}}
+hot_local <- expr[, colnames(expr) %in% local_annot2$annot.id]
+hot_nonlocal <- expr[, colnames(expr) %in% nonlocal_annot$annot.id]
+nnonlocal <- nrow(nonlocal_annot)
+nlocal <- nrow(local_annot2)
+```
+
+
+
+```{r, hot_annot-{{hot_chr}}}
+hot_annot <- local_annot2 %>%
+  bind_rows(nonlocal_annot) %>%
+  dplyr::select(annot.id, symbol)
+```
+
+
+
+
+
+```{r, scan1-{{hot_chr}}}
+fn <- here::here("analysis", "data", "derived_data", "Chr{{hot_chr}}_scan1_out.rds")
+if (file.exists(fn)) {
+  s1out <- readRDS(fn)
+} else {
+  s1out <- qtl2::scan1(genoprobs = probs, 
+                       pheno = cbind(hot_local, hot_nonlocal), 
+                       kinship = K[["{{hot_chr}}"]], 
+                       addcovar = covar, 
+                       reml = TRUE, 
+                       cores = 1
+                       )
+  saveRDS(s1out, fn)
+}
+```
+
+
+### TIMBR analyses
+
+
+
+
+
+```{r, timbr-setup}
+tr <- cbind(hot_local, hot_nonlocal)
+prior_M1 <- list(model.type = "crp", # crp - Chinese Restaurant Process
+  prior.alpha.type = "gamma",
+  prior.alpha.shape = 1,
+  prior.alpha.rate = 2.333415)
+prior_M2 <- list(model.type = "crp",
+                prior.alpha.type = "gamma",
+                prior.alpha.shape = 2.3009322,
+                prior.alpha.rate = 0.7488104
+                )
+library(TIMBR)
+data(mcv.data) # get A matrix
+peaks <- qtl2::find_peaks(s1out, map)
+```
+
+```{r}
+fn <- "attie_DO500_genoprobs_v5_36state_chr{{hot_chr}}.rds"
+gp <- readRDS(here::here("analysis", "data", "derived_data", fn))
+```
+
+
+
+```{r, timbr}
+pheno <- cbind(hot_local, hot_nonlocal)
+set.seed(3411192) # to ensure getting the same samples with TIMBR
+future::plan(cluster)
+t_out <- peaks %>%
+  dplyr::filter(chr == hot_chr, pos <= hot_upper, pos >= hot_lower) %>%
+  dplyr::mutate(marker_index = purrr::map2_int(.x = pos, .y = chr, .f = function(x, y) which(map[[y]] == x))) %>%
+  dplyr::mutate(t_out = furrr::future_pmap(.l = list(lodcolumn, chr, marker_index), .f = function(lodcolumn, chr, marker_index){
+    phe_pre <- pheno[ , colnames(pheno) == lodcolumn, drop = FALSE]
+    phe <- phe_pre[!is.na(phe_pre), , drop = FALSE]
+    pr_pre <- gp[[1]][, , marker_index] # use first (and only!) entry in gp
+    pr <- pr_pre[rownames(pr_pre) %in% rownames(phe), ]
+    cov_pre <- cbind(1, covar)
+    cov_pre2 <- cov_pre[rownames(cov_pre) %in% rownames(phe), ]
+    cov <- qtl2:::drop_depcols(cov_pre2)
+    TIMBR::TIMBR(y = phe, 
+                 prior.D = list(P = pr, 
+                                A = mcv.data$prior.D$A, # works for autosomes
+                                fixed.diplo = FALSE), 
+                 prior.M = prior_M1, 
+                 samples = 10000, 
+                 samples.ml = 10000,
+                 Z = cov, 
+                 verbose = TRUE
+                 )  
+}))
+saveRDS(t_out, here::here("analysis", "data", "derived_data", "timbr-chr{{hot_chr}}-10ksamples-M1.rds"))
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
