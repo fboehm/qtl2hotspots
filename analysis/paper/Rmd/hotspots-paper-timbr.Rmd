@@ -29,15 +29,6 @@ knitr::opts_chunk$set(comment=NA, fig.width=6, fig.height=6, eval = eval_code)
 
 
 
-
-
-
-
-
-
-
-
-
 ```{r setup}
 library(qtl2hotspots)
 ult <- 15 # univariate lod threshold
@@ -88,11 +79,6 @@ out <- pmap_dfc(inputs, .f = function(hot_chr, hot_mid, keller_mediator) knitr::
 
 
 
-
-
-
-
-
 `r if (eval_code) knitr::knit(text = out[[1]])`
 
 
@@ -106,11 +92,6 @@ out <- pmap_dfc(inputs, .f = function(hot_chr, hot_mid, keller_mediator) knitr::
 
 
 `r if (eval_code) knitr::knit(text = out[[5]])`
-
-
-
-
-
 
 
 
