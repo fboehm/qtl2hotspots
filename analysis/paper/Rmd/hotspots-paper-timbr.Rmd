@@ -65,6 +65,13 @@ out <- pmap_dfc(inputs, .f = function(hot_chr, hot_mid, keller_mediator) knitr::
 
 `r if (eval_code) knitr::knit(text = out[[1]])`
 
+`r if (eval_code) knitr::knit(text = out[[2]])`
+
+`r if (eval_code) knitr::knit(text = out[[3]])`
+
+`r if (eval_code) knitr::knit(text = out[[4]])`
+
+`r if (eval_code) knitr::knit(text = out[[5]])`
 
 
 
