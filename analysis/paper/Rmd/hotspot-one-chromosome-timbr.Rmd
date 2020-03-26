@@ -96,7 +96,7 @@ future::plan("multiprocess")
 t_out <- hot_annot %>%
   dplyr::filter(pos <= hot_upper, pos >= hot_lower) %>%
   dplyr::mutate(marker_index = purrr::map_int(.x = pos, .f = function(x) which(map[[{{hot_chr}}]] == x))) %>%
-  dplyr::mutate(t_out = furrr::future_pmap(.l = list(lodcolumn, marker_index), .f = function(lodcolumn, marker_index){
+  dplyr::mutate(t_out = furrr::future_pmap(.l = list(annot.id, marker_index), .f = function(lodcolumn, marker_index){
     phe_pre <- pheno[ , colnames(pheno) == lodcolumn, drop = FALSE]
     phe <- phe_pre[!is.na(phe_pre), , drop = FALSE]
     pr_pre <- gp[[1]][, , marker_index] # use first (and only!) entry in gp
