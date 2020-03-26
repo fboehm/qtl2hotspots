@@ -41,22 +41,6 @@ options(tibble.print_max = 50, tibble.print_min = 20)
 
 
 
-```{r saveRDS}
-if (!file.exists(here::here("analysis", "data", "derived_data", "genoprobs.rds"))){
-  download.file("https://datadryad.org/stash/downloads/file_stream/63306",
-              destfile = here::here("analysis", "data", "raw_data", "Attie_DO378_eQTL_viewer_v1.Rdata")
-              )
-  load(here::here("analysis", "data", "raw_data", "Attie_DO378_eQTL_viewer_v1.Rdata"))
-  saveRDS(dataset.islet.rnaseq$lod.peaks, here::here("analysis", "data", "derived_data", "lod_peaks.rds"))
-  saveRDS(dataset.islet.rnaseq$annots, here::here("analysis", "data", "derived_data", "annots.rds"))
-  saveRDS(dataset.islet.rnaseq$expr, here::here("analysis", "data", "derived_data", "expr.rds"))
-  saveRDS(K, here::here("analysis", "data", "derived_data", "kinship.rds"))
-  saveRDS(map, here::here("analysis", "data", "derived_data", "map.rds"))
-  saveRDS(genoprobs, here::here("analysis", "data", "derived_data", "genoprobs.rds"))
-  saveRDS(dataset.islet.rnaseq$covar, here::here("analysis", "data", "derived_data", "covar.rds"))
-}
-```
-
 ```{r readRDS}
 lod_peaks <- readRDS(here::here("analysis", "data", "derived_data", "lod_peaks.rds"))
 annots <- readRDS(here::here("analysis", "data", "derived_data", "annots.rds"))
@@ -82,16 +66,6 @@ out <- pmap_dfc(inputs, .f = function(hot_chr, hot_mid, keller_mediator) knitr::
 `r if (eval_code) knitr::knit(text = out[[1]])`
 
 
-`r if (eval_code) knitr::knit(text = out[[2]])`
-
-
-`r if (eval_code) knitr::knit(text = out[[3]])`
-
-
-`r if (eval_code) knitr::knit(text = out[[4]])`
-
-
-`r if (eval_code) knitr::knit(text = out[[5]])`
 
 
 

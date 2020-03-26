@@ -11,32 +11,32 @@ hot_upper <- {{hot_mid}} + 2
 
 ```{r, define_local_annot-{{hot_chr}}}
 local_annot <- lod_peaks %>%
-  filter(chrom == {{hot_chr}}, pos <= hot_upper, pos >= hot_lower) %>%
-  left_join(y = annots, by = c("annot.id" = "gene_id")) %>%
-  filter(!duplicated(annot.id)) %>%
-  filter(lod >= ult) %>%
-  mutate(local_tx = chr == {{hot_chr}}) %>%
-  filter(local_tx)
+  dplyr::filter(chrom == {{hot_chr}}, pos <= hot_upper, pos >= hot_lower) %>%
+  dplyr::left_join(y = annots, by = c("annot.id" = "gene_id")) %>%
+  dplyr::filter(!duplicated(annot.id)) %>%
+  dplyr::filter(lod >= ult) %>%
+  dplyr::mutate(local_tx = chr == {{hot_chr}}) %>%
+  dplyr::filter(local_tx)
 ```
 
 
 ```{r, define_nonlocal_annot-{{hot_chr}}}
 nonlocal_annot <- lod_peaks %>%
-  filter(chrom == {{hot_chr}}, pos <= hot_upper, pos >= hot_lower) %>%
-  inner_join(y = annots, by = c("annot.id" = "gene_id")) %>%
-  filter(!duplicated(annot.id)) %>%
-  filter(lod >= 7.18) %>%
-  mutate(local_tx = chr == {{hot_chr}}) %>%
-  filter(!local_tx) %>%
-  filter(!is.na(hotspot))
+  dplyr::filter(chrom == {{hot_chr}}, pos <= hot_upper, pos >= hot_lower) %>%
+  dplyr::inner_join(y = annots, by = c("annot.id" = "gene_id")) %>%
+  dplyr::filter(!duplicated(annot.id)) %>%
+  dplyr::filter(lod >= 7.18) %>%
+  dplyr::mutate(local_tx = chr == {{hot_chr}}) %>%
+  dplyr::filter(!local_tx) %>%
+  dplyr::filter(!is.na(hotspot))
 ```
 
 
 
 ```{r, local_annot2-{{hot_chr}}}
 local_annot2 <- local_annot %>%
-  filter(middle <= hot_upper, middle >= hot_lower) %>% 
-  arrange(desc(lod))
+  dplyr::filter(middle <= hot_upper, middle >= hot_lower) %>% 
+  dplyr::arrange(desc(lod))
 ```
 
 
@@ -51,29 +51,10 @@ nlocal <- nrow(local_annot2)
 
 ```{r, hot_annot-{{hot_chr}}}
 hot_annot <- local_annot2 %>%
-  bind_rows(nonlocal_annot) %>%
-  dplyr::select(annot.id, symbol)
+  bind_rows(nonlocal_annot) 
 ```
 
 
-
-
-
-```{r, scan1-{{hot_chr}}}
-fn <- here::here("analysis", "data", "derived_data", "Chr{{hot_chr}}_scan1_out.rds")
-if (file.exists(fn)) {
-  s1out <- readRDS(fn)
-} else {
-  s1out <- qtl2::scan1(genoprobs = probs, 
-                       pheno = cbind(hot_local, hot_nonlocal), 
-                       kinship = K[["{{hot_chr}}"]], 
-                       addcovar = covar, 
-                       reml = TRUE, 
-                       cores = 1
-                       )
-  saveRDS(s1out, fn)
-}
-```
 
 
 ### TIMBR analyses
@@ -83,7 +64,6 @@ if (file.exists(fn)) {
 
 
 ```{r, timbr-setup}
-tr <- cbind(hot_local, hot_nonlocal)
 prior_M1 <- list(model.type = "crp", # crp - Chinese Restaurant Process
   prior.alpha.type = "gamma",
   prior.alpha.shape = 1,
@@ -95,7 +75,6 @@ prior_M2 <- list(model.type = "crp",
                 )
 library(TIMBR)
 data(mcv.data) # get A matrix
-peaks <- qtl2::find_peaks(s1out, map)
 ```
 
 ```{r}
@@ -107,17 +86,17 @@ gp <- readRDS(here::here("analysis", "data", "derived_data", fn))
 
 ```{r}
 library(future)
-options(future.globals.maxSize= 891289600)
+options(future.globals.maxSize= 10 * 1024 ^ 3)
 ```
 
 ```{r}
 pheno <- cbind(hot_local, hot_nonlocal)
 set.seed(3411192) # to ensure getting the same samples with TIMBR
 future::plan("multiprocess")
-t_out <- peaks %>%
-  dplyr::filter(chr == hot_chr, pos <= hot_upper, pos >= hot_lower) %>%
-  dplyr::mutate(marker_index = purrr::map2_int(.x = pos, .y = chr, .f = function(x, y) which(map[[y]] == x))) %>%
-  dplyr::mutate(t_out = furrr::future_pmap(.l = list(lodcolumn, chr, marker_index), .f = function(lodcolumn, chr, marker_index){
+t_out <- hot_annot %>%
+  dplyr::filter(pos <= hot_upper, pos >= hot_lower) %>%
+  dplyr::mutate(marker_index = purrr::map_int(.x = pos, .f = function(x) which(map[[{{hot_chr}}]] == x))) %>%
+  dplyr::mutate(t_out = furrr::future_pmap(.l = list(lodcolumn, marker_index), .f = function(lodcolumn, marker_index){
     phe_pre <- pheno[ , colnames(pheno) == lodcolumn, drop = FALSE]
     phe <- phe_pre[!is.na(phe_pre), , drop = FALSE]
     pr_pre <- gp[[1]][, , marker_index] # use first (and only!) entry in gp
@@ -136,22 +115,9 @@ t_out <- peaks %>%
                  verbose = TRUE
                  )  
 }))
+dim(t_out)
 saveRDS(t_out, here::here("analysis", "data", "derived_data", "timbr-chr{{hot_chr}}-10ksamples-M1.rds"))
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
