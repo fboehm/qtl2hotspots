@@ -3,8 +3,8 @@
 #BSUB -e %J.err 
 #BSUB -N
 #BSUB -W 100:00
-#BSUB -n 15
-#BSUB -R rusage[mem=32000]
+#BSUB -n 16
+#BSUB -R rusage[mem=8000]
 #BSUB -M 48000
 #BSUB -R span[hosts=1]
 
