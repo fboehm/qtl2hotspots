@@ -62,6 +62,20 @@ out <- pmap_dfc(inputs, .f = function(hot_chr, hot_mid, keller_mediator) knitr::
 ```
 
 
+```{r, timbr-setup}
+prior_M1 <- list(model.type = "crp", # crp - Chinese Restaurant Process
+  prior.alpha.type = "gamma",
+  prior.alpha.shape = 1,
+  prior.alpha.rate = 2.333415)
+prior_M2 <- list(model.type = "crp",
+                prior.alpha.type = "gamma",
+                prior.alpha.shape = 2.3009322,
+                prior.alpha.rate = 0.7488104
+                )
+library(TIMBR)
+data(mcv.data) # get A matrix
+```
+
 
 `r if (eval_code) knitr::knit(text = out[[1]])`
 

@@ -6,76 +6,24 @@ hot_lower <- {{hot_mid}} - 2
 hot_upper <- {{hot_mid}} + 2
 ```
 
-
-
-
-```{r, define_local_annot-{{hot_chr}}}
-local_annot <- lod_peaks %>%
+```{r, define_hot_annot-{{hot_chr}}}
+hot_annot <- lod_peaks %>%
   dplyr::filter(chrom == {{hot_chr}}, pos <= hot_upper, pos >= hot_lower) %>%
   dplyr::left_join(y = annots, by = c("annot.id" = "gene_id")) %>%
   dplyr::filter(!duplicated(annot.id)) %>%
-  dplyr::filter(lod >= ult) %>%
-  dplyr::mutate(local_tx = chr == {{hot_chr}}) %>%
-  dplyr::filter(local_tx)
-```
-
-
-```{r, define_nonlocal_annot-{{hot_chr}}}
-nonlocal_annot <- lod_peaks %>%
-  dplyr::filter(chrom == {{hot_chr}}, pos <= hot_upper, pos >= hot_lower) %>%
-  dplyr::inner_join(y = annots, by = c("annot.id" = "gene_id")) %>%
-  dplyr::filter(!duplicated(annot.id)) %>%
   dplyr::filter(lod >= 7.18) %>%
   dplyr::mutate(local_tx = chr == {{hot_chr}}) %>%
-  dplyr::filter(!local_tx) %>%
-  dplyr::filter(!is.na(hotspot))
-```
-
-
-
-```{r, local_annot2-{{hot_chr}}}
-local_annot2 <- local_annot %>%
-  dplyr::filter(middle <= hot_upper, middle >= hot_lower) %>% 
-  dplyr::arrange(desc(lod))
+  dplyr::filter((!local_tx) | (lod >= ult & middle <= hot_upper & middle >= hot_lower))
 ```
 
 
 ```{r hot_expr-{{hot_chr}}}
-hot_local <- expr[, colnames(expr) %in% local_annot2$annot.id]
-hot_nonlocal <- expr[, colnames(expr) %in% nonlocal_annot$annot.id]
-nnonlocal <- nrow(nonlocal_annot)
-nlocal <- nrow(local_annot2)
+hot_expr <- expr[, colnames(expr) %in% hot_annot$annot.id]
 ```
-
-
-
-```{r, hot_annot-{{hot_chr}}}
-hot_annot <- local_annot2 %>%
-  bind_rows(nonlocal_annot) 
-```
-
-
 
 
 ### TIMBR analyses
 
-
-
-
-
-```{r, timbr-setup}
-prior_M1 <- list(model.type = "crp", # crp - Chinese Restaurant Process
-  prior.alpha.type = "gamma",
-  prior.alpha.shape = 1,
-  prior.alpha.rate = 2.333415)
-prior_M2 <- list(model.type = "crp",
-                prior.alpha.type = "gamma",
-                prior.alpha.shape = 2.3009322,
-                prior.alpha.rate = 0.7488104
-                )
-library(TIMBR)
-data(mcv.data) # get A matrix
-```
 
 ```{r}
 fn <- "attie_DO500_genoprobs_v5_36state_chr{{hot_chr}}.rds"
@@ -83,23 +31,19 @@ gp <- readRDS(here::here("analysis", "data", "derived_data", fn))
 ```
 
 
-
 ```{r}
 library(future)
 options(future.globals.maxSize= 10 * 1024 ^ 3)
 ```
 
-```{r}
-pheno <- cbind(hot_local, hot_nonlocal)
+```{r, timbr-{{hot_chr}}}
 set.seed(3411192) # to ensure getting the same samples with TIMBR
 future::plan("multiprocess")
 t_out <- hot_annot %>%
-  dplyr::filter(pos <= hot_upper, pos >= hot_lower) %>%
-  dplyr::mutate(marker_index = purrr::map_int(.x = pos, .f = function(x) which(map[[{{hot_chr}}]] == x))) %>%
-  dplyr::mutate(t_out = furrr::future_pmap(.l = list(annot.id, marker_index), .f = function(lodcolumn, marker_index){
-    phe_pre <- pheno[ , colnames(pheno) == lodcolumn, drop = FALSE]
+  dplyr::mutate(timbr = furrr::future_pmap(.l = list(annot.id, marker.id), .f = function(annot.id, marker.id){
+    phe_pre <- hot_expr[ , colnames(hot_expr) == annot.id, drop = FALSE]
     phe <- phe_pre[!is.na(phe_pre), , drop = FALSE]
-    pr_pre <- gp[[1]][, , marker_index] # use first (and only!) entry in gp
+    pr_pre <- gp[[1]][, , marker.id] # use first (and only!) entry in gp
     pr <- pr_pre[rownames(pr_pre) %in% rownames(phe), ]
     cov_pre <- cbind(1, covar)
     cov_pre2 <- cov_pre[rownames(cov_pre) %in% rownames(phe), ]
