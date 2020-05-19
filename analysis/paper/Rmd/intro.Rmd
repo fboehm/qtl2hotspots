@@ -8,6 +8,7 @@ A genome-wide QTL "scan" reveals
 associations between genotypes and phenotypes by considering each position along the genome,
 one at a time, as a candidate QTL for the trait of interest.
 A genomic region with strong evidence of association with a complex quantitative trait, then, defines a QTL.
+
 Because nearby markers have correlated
 genotypes, a QTL in a two-parent cross often spans multiple megabases in length
 and may contain more than a hundred genes.
@@ -16,23 +17,29 @@ among those genes near the QTL is
 challenging and may require costly and time-consuming experiments.
 
 The growing need for greater QTL mapping resolution fueled development over the
-last two decades of model organism multiparental populations for high-resolution QTL mapping [@de2017back;@churchill2004collaborative;@svenson2012high;@huang2012multiparent;@shivakumar2018soybean;@huang2011analysis;@kover2009multiparent;@tisne2017identification;@stanley2017genetic].
+last two decades of model organism multiparental populations for high-resolution QTL mapping [@de2017back;@churchill2004collaborative;@svenson2012high;@huang2012multiparent;@shivakumar2018soybean;@huang2011analysis;@kover2009multiparent;@tisne2017identification;@stanley2017genetic]. In contrast to traditional, two-parent crosses, a multiparental population arises from more than two founders. The widely studied Collaborative Cross and Diversity Outbred mice share the same eight inbred founders. 
 
 Recent systems genetics studies have sought to identify QTL for thousands of biomolecular traits [@keller2018genetic;@chick2016defining]. 
 
-Other researchers have identified and examined QTL hotspots in model organism genetics studies [@neto2012quantile]. @tian2016dissection 
-presented quantitative methods for hotspot dissection in F$_2$ intercross mice. 
+Other researchers have identified and examined QTL hotspots in model organism genetics studies [@neto2012quantile]. 
+@tian2016dissection presented quantitative methods for hotspot dissection in F$_2$ intercross mice. 
 
-@boehm2019thesis and @boehm2019testing argued for complementary roles for mediation analysis and pleiotropy testing in hotspot 
+@boehm2019thesis and @boehm2019testing argued for complementary roles for mediation analysis 
+and pleiotropy testing in hotspot 
 dissection. Here, we clarify this argument by presenting a study of five expression trait 
 hotspots in a publicly available data set. At each hotspot, we identify 
-a set of local traits that have QTL within the hotspot region. We also identify a set of nonlocal traits with QTL 
-arising from the hotspot. We perform pleiotropy tests and mediation analyses for all local-nonlocal trait pairs. 
-Graphical summaries of our results enable us to conclude that one of the five hotspots is due to multiple QTL, 
-while the evidence at the four other hotspots is consistent with a single local trait affecting most or all of the 
-nonlocal associated traits. The Chr 5 hotspot 
+a set of local traits that have QTL within the hotspot region. We also identify a set of 
+nonlocal traits affected by the hotspot. We perform pleiotropy tests and mediation analyses 
+for all local-nonlocal trait pairs. 
+Graphical summaries of our results enable us to conclude that one of the five hotspots is 
+due to multiple QTL, 
+while the evidence at the four other hotspots is consistent with a single local trait 
+affecting most or all of the 
+nonlocal associated traits. The Chr 5 hotspot, initially attributed to *Pdx1*, likely 
+arises from multiple causal loci. Evidence for this includes the pleiotropy test statistics 
+(Figure ), which support presence of more than one QTL and the allelic series inferences, 
+which demonstrate multiple allelic series at the Chr 5 hotspot.
 
-I
 
 
 
